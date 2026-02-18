@@ -14,16 +14,265 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orders: {
+        Row: {
+          address: string
+          budget: number | null
+          category_id: string | null
+          client_id: string
+          client_rating: number | null
+          client_review: string | null
+          created_at: string
+          description: string | null
+          id: string
+          master_id: string | null
+          phone: string
+          preferred_time: string | null
+          service_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          budget?: number | null
+          category_id?: string | null
+          client_id: string
+          client_rating?: number | null
+          client_review?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          master_id?: string | null
+          phone?: string
+          preferred_time?: string | null
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          budget?: number | null
+          category_id?: string | null
+          client_id?: string
+          client_rating?: number | null
+          client_review?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          master_id?: string | null
+          phone?: string
+          preferred_time?: string | null
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          client_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          master_id: string
+          order_id: string
+          rating: number
+        }
+        Insert: {
+          client_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          master_id: string
+          order_id: string
+          rating: number
+        }
+        Update: {
+          client_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          master_id?: string
+          order_id?: string
+          rating?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_categories: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string
+          id: string
+          name_en: string
+          name_ru: string
+          name_tj: string
+          sort_order: number
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name_en?: string
+          name_ru: string
+          name_tj?: string
+          sort_order?: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name_en?: string
+          name_ru?: string
+          name_tj?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          name_en: string
+          name_ru: string
+          name_tj: string
+          note: string | null
+          price_avg: number
+          price_max: number
+          price_min: number
+          sort_order: number
+          unit: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          name_en?: string
+          name_ru: string
+          name_tj?: string
+          note?: string | null
+          price_avg?: number
+          price_max?: number
+          price_min?: number
+          sort_order?: number
+          unit?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          name_en?: string
+          name_ru?: string
+          name_tj?: string
+          note?: string | null
+          price_avg?: number
+          price_max?: number
+          price_min?: number
+          sort_order?: number
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "client" | "master" | "admin" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +399,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["client", "master", "admin", "super_admin"],
+    },
   },
 } as const
