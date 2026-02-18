@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ import {
 import {
   Languages,
   LogIn,
+  LogOut,
   Menu,
   X,
   ChevronRight,
@@ -25,11 +27,15 @@ import {
   Phone,
   UserPlus,
   Wrench,
+  LayoutDashboard,
+  User,
 } from "lucide-react";
 
 export default function Header() {
   const { language, setLanguage, t } = useLanguage();
+  const { user, profile, signOut, loading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -89,23 +95,30 @@ export default function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[120px]">
-                <DropdownMenuItem onClick={() => setLanguage("ru")} className="cursor-pointer">
-                  🇷🇺 Русский
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage("tj")} className="cursor-pointer">
-                  🇹🇯 Тоҷикӣ
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage("en")} className="cursor-pointer">
-                  🇬🇧 English
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("ru")} className="cursor-pointer">🇷🇺 Русский</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("tj")} className="cursor-pointer">🇹🇯 Тоҷикӣ</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("en")} className="cursor-pointer">🇬🇧 English</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="hidden sm:block">
-              <Button onClick={() => {}} size="sm" className="rounded-full gap-2 px-4">
-                <LogIn className="w-4 h-4" />
-                <span>{t("login")}</span>
-              </Button>
+            <div className="hidden sm:flex items-center gap-2">
+              {!loading && user ? (
+                <>
+                  <Button onClick={() => navigate("/dashboard")} size="sm" variant="ghost" className="rounded-full gap-2">
+                    <LayoutDashboard className="w-4 h-4" />
+                    {t("cabinet")}
+                  </Button>
+                  <Button onClick={signOut} size="sm" variant="outline" className="rounded-full gap-2">
+                    <LogOut className="w-4 h-4" />
+                    {t("logout")}
+                  </Button>
+                </>
+              ) : !loading ? (
+                <Button onClick={() => navigate("/auth")} size="sm" className="rounded-full gap-2 px-4">
+                  <LogIn className="w-4 h-4" />
+                  {t("login")}
+                </Button>
+              ) : null}
             </div>
 
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -119,20 +132,29 @@ export default function Header() {
                   <div className="p-4 border-b border-border">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-primary-foreground font-bold">
-                          М
-                        </div>
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-primary-foreground font-bold">М</div>
                         <span className="text-lg font-bold text-foreground">Мастер Час</span>
                       </div>
                       <SheetClose asChild>
-                        <Button variant="ghost" size="icon" className="rounded-full">
-                          <X className="w-5 h-5" />
-                        </Button>
+                        <Button variant="ghost" size="icon" className="rounded-full"><X className="w-5 h-5" /></Button>
                       </SheetClose>
                     </div>
+                    {user && profile?.full_name && (
+                      <p className="text-sm text-muted-foreground mt-2">{profile.full_name}</p>
+                    )}
                   </div>
-
                   <nav className="flex-1 p-4 space-y-1 overflow-auto">
+                    {user && (
+                      <SheetClose asChild>
+                        <Link to="/dashboard" className="flex items-center justify-between px-4 py-3 rounded-xl bg-primary/10 text-primary mb-2">
+                          <div className="flex items-center gap-3">
+                            <LayoutDashboard className="w-5 h-5" />
+                            <span className="font-medium">{t("cabinet")}</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 opacity-50" />
+                        </Link>
+                      </SheetClose>
+                    )}
                     {navItems.map((item) => {
                       const Icon = item.icon;
                       return (
@@ -140,9 +162,7 @@ export default function Header() {
                           <Link
                             to={item.path}
                             className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
-                              isActive(item.path)
-                                ? "bg-primary/10 text-primary"
-                                : "text-muted-foreground hover:bg-accent"
+                              isActive(item.path) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent"
                             }`}
                           >
                             <div className="flex items-center gap-3">
@@ -155,15 +175,27 @@ export default function Header() {
                       );
                     })}
                     <div className="pt-4 border-t border-border mt-4">
-                      <SheetClose asChild>
-                        <Link
-                          to="/"
-                          className="flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
-                        >
-                          <LogIn className="w-5 h-5" />
-                          {t("login")}
-                        </Link>
-                      </SheetClose>
+                      {user ? (
+                        <SheetClose asChild>
+                          <button
+                            onClick={signOut}
+                            className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-full border border-destructive/30 text-destructive font-medium hover:bg-destructive/10 transition-colors"
+                          >
+                            <LogOut className="w-5 h-5" />
+                            {t("logout")}
+                          </button>
+                        </SheetClose>
+                      ) : (
+                        <SheetClose asChild>
+                          <Link
+                            to="/auth"
+                            className="flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+                          >
+                            <LogIn className="w-5 h-5" />
+                            {t("login")}
+                          </Link>
+                        </SheetClose>
+                      )}
                     </div>
                   </nav>
                 </div>
