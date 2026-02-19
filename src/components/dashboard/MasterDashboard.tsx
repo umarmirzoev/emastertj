@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ClipboardList, DollarSign, Star, Clock, User, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 
 const statusColors: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",
@@ -44,6 +45,7 @@ export default function MasterDashboard() {
   };
 
   useEffect(() => { fetchOrders(); }, [user]);
+  useRealtimeOrders({ userId: user?.id, role: "master", onUpdate: fetchOrders });
 
   const updateStatus = async (orderId: string, status: string) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);

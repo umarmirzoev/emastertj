@@ -15,6 +15,7 @@ import BecomeMaster from "./pages/BecomeMaster";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import PriceList from "./pages/PriceList";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const AnimatedRoutes = () => {
         <Route path="/how-it-works" element={<PageTransition><HowItWorks /></PageTransition>} />
         <Route path="/categories" element={<PageTransition><Categories /></PageTransition>} />
         <Route path="/contacts" element={<PageTransition><Contacts /></PageTransition>} />
+        <Route path="/services" element={<PageTransition><PriceList /></PageTransition>} />
         <Route path="/become-master" element={<PageTransition><BecomeMaster /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
         <Route path="/dashboard" element={<Dashboard />} />
