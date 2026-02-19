@@ -13,6 +13,7 @@ import {
   ShieldCheck, Wrench, DollarSign,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 
 const statusColors: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",
@@ -42,21 +43,23 @@ export default function AdminDashboard() {
 
   const isSuperAdmin = hasRole("super_admin");
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      const [ordersRes, usersRes, catsRes] = await Promise.all([
-        supabase.from("orders").select("*, service_categories(name_ru), services(name_ru)").order("created_at", { ascending: false }).limit(100),
-        supabase.from("profiles").select("*, user_roles(role)").limit(200),
-        supabase.from("service_categories").select("*, services(count)").order("sort_order"),
-      ]);
-      setOrders(ordersRes.data || []);
-      setUsers(usersRes.data || []);
-      setCategories(catsRes.data || []);
-      setLoading(false);
-    };
-    load();
-  }, []);
+  const loadData = async () => {
+    setLoading(true);
+    const [ordersRes, usersRes, catsRes] = await Promise.all([
+      supabase.from("orders").select("*, service_categories(name_ru), services(name_ru)").order("created_at", { ascending: false }).limit(100),
+      supabase.from("profiles").select("*, user_roles(role)").limit(200),
+      supabase.from("service_categories").select("*, services(count)").order("sort_order"),
+    ]);
+    setOrders(ordersRes.data || []);
+    setUsers(usersRes.data || []);
+    setCategories(catsRes.data || []);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadData(); }, []);
+
+  const { user } = useAuth();
+  useRealtimeOrders({ userId: user?.id, role: "admin", onUpdate: loadData });
 
   const updateOrderStatus = async (orderId: string, status: string) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);

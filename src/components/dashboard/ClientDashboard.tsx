@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ClipboardList, Plus, Star, Clock, User, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 
 const statusColors: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",
@@ -32,18 +33,19 @@ export default function ClientDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchOrders = async () => {
     if (!user) return;
-    supabase
+    const { data } = await supabase
       .from("orders")
       .select("*, service_categories(name_ru), services(name_ru)")
       .eq("client_id", user.id)
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setOrders(data || []);
-        setLoading(false);
-      });
-  }, [user]);
+      .order("created_at", { ascending: false });
+    setOrders(data || []);
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchOrders(); }, [user]);
+  useRealtimeOrders({ userId: user?.id, role: "client", onUpdate: fetchOrders });
 
   const navItems = [
     { path: "/dashboard", label: "Мои заказы", icon: ClipboardList },

@@ -41,6 +41,7 @@ export default function Header() {
   const navItems = [
     { path: "/about", labelKey: "navAbout", icon: Building2 },
     { path: "/categories", labelKey: "navCategories", icon: Wrench },
+    { path: "/services", labelKey: "servicesTitle", icon: Wrench },
     { path: "/how-it-works", labelKey: "navHowItWorks", icon: HelpCircle },
     { path: "/contacts", labelKey: "navContacts", icon: Phone },
     { path: "/become-master", labelKey: "navBecomeMaster", icon: UserPlus },

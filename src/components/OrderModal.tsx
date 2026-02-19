@@ -1,36 +1,86 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface OrderModalProps {
   isOpen: boolean;
   onClose: () => void;
   category: string | null;
   initialServiceName?: string;
+  categoryId?: string;
+  serviceId?: string;
 }
 
-export default function OrderModal({ isOpen, onClose, category, initialServiceName }: OrderModalProps) {
+export default function OrderModal({ isOpen, onClose, category, initialServiceName, categoryId, serviceId }: OrderModalProps) {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
   const [district, setDistrict] = useState("");
+  const [address, setAddress] = useState("");
+  const [preferredTime, setPreferredTime] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isOpen) {
+      setSubmitted(false);
+      setSubmitting(false);
+    }
+  }, [isOpen]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!user) {
+      toast({ title: t("login"), description: "Пожалуйста, войдите в аккаунт", variant: "destructive" });
+      navigate("/auth");
+      onClose();
+      return;
+    }
+
+    setSubmitting(true);
+    const { error } = await supabase.from("orders").insert({
+      client_id: user.id,
+      category_id: categoryId || null,
+      service_id: serviceId || null,
+      description: `${initialServiceName ? initialServiceName + ". " : ""}${comment}`.trim(),
+      address: `${district ? t(district) + ", " : ""}${address}`,
+      phone,
+      preferred_time: preferredTime || null,
+      status: "new",
+    });
+
+    setSubmitting(false);
+
+    if (error) {
+      toast({ title: "Ошибка", description: error.message, variant: "destructive" });
+      return;
+    }
+
     setSubmitted(true);
+    toast({ title: t("orderModalSuccess") });
+
     setTimeout(() => {
       setSubmitted(false);
       setName("");
       setPhone("");
       setComment("");
       setDistrict("");
+      setAddress("");
+      setPreferredTime("");
       onClose();
     }, 2000);
   };
@@ -40,7 +90,9 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("orderModalTitle")}</DialogTitle>
-          <DialogDescription>{t("orderModalDesc")}</DialogDescription>
+          <DialogDescription>
+            {initialServiceName ? initialServiceName : t("orderModalDesc")}
+          </DialogDescription>
         </DialogHeader>
 
         {submitted ? (
@@ -62,8 +114,13 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
                 ))}
               </SelectContent>
             </Select>
+            <Input placeholder="Адрес / Address" value={address} onChange={(e) => setAddress(e.target.value)} required />
+            <Input placeholder="Удобное время / Preferred time" value={preferredTime} onChange={(e) => setPreferredTime(e.target.value)} />
             <Textarea placeholder={t("formComment")} value={comment} onChange={(e) => setComment(e.target.value)} />
-            <Button type="submit" className="w-full rounded-full">{t("orderModalSubmit")}</Button>
+            <Button type="submit" className="w-full rounded-full" disabled={submitting}>
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              {t("orderModalSubmit")}
+            </Button>
           </form>
         )}
       </DialogContent>
