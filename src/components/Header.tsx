@@ -30,6 +30,7 @@ import {
   LayoutDashboard,
   User,
 } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 
 export default function Header() {
   const { language, setLanguage, t } = useLanguage();
@@ -105,6 +106,7 @@ export default function Header() {
             <div className="hidden sm:flex items-center gap-2">
               {!loading && user ? (
                 <>
+                  <NotificationBell />
                   <Button onClick={() => navigate("/dashboard")} size="sm" variant="ghost" className="rounded-full gap-2">
                     <LayoutDashboard className="w-4 h-4" />
                     {t("cabinet")}

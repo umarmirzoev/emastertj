@@ -14,14 +14,49 @@ export type Database = {
   }
   public: {
     Tables: {
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean | null
+          related_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean | null
+          related_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean | null
+          related_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
+          accepted_at: string | null
           address: string
           budget: number | null
           category_id: string | null
           client_id: string
           client_rating: number | null
           client_review: string | null
+          completed_at: string | null
           created_at: string
           description: string | null
           id: string
@@ -29,16 +64,19 @@ export type Database = {
           phone: string
           preferred_time: string | null
           service_id: string | null
+          started_at: string | null
           status: string
           updated_at: string
         }
         Insert: {
+          accepted_at?: string | null
           address?: string
           budget?: number | null
           category_id?: string | null
           client_id: string
           client_rating?: number | null
           client_review?: string | null
+          completed_at?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -46,16 +84,19 @@ export type Database = {
           phone?: string
           preferred_time?: string | null
           service_id?: string | null
+          started_at?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
+          accepted_at?: string | null
           address?: string
           budget?: number | null
           category_id?: string | null
           client_id?: string
           client_rating?: number | null
           client_review?: string | null
+          completed_at?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -63,6 +104,7 @@ export type Database = {
           phone?: string
           preferred_time?: string | null
           service_id?: string | null
+          started_at?: string | null
           status?: string
           updated_at?: string
         }
@@ -85,31 +127,52 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approval_status: string | null
           avatar_url: string | null
+          average_rating: number | null
           created_at: string
+          documents: Json | null
+          experience_years: number | null
           full_name: string
           id: string
           phone: string | null
+          service_categories: string[] | null
+          total_reviews: number | null
           updated_at: string
           user_id: string
+          working_districts: string[] | null
         }
         Insert: {
+          approval_status?: string | null
           avatar_url?: string | null
+          average_rating?: number | null
           created_at?: string
+          documents?: Json | null
+          experience_years?: number | null
           full_name?: string
           id?: string
           phone?: string | null
+          service_categories?: string[] | null
+          total_reviews?: number | null
           updated_at?: string
           user_id: string
+          working_districts?: string[] | null
         }
         Update: {
+          approval_status?: string | null
           avatar_url?: string | null
+          average_rating?: number | null
           created_at?: string
+          documents?: Json | null
+          experience_years?: number | null
           full_name?: string
           id?: string
           phone?: string | null
+          service_categories?: string[] | null
+          total_reviews?: number | null
           updated_at?: string
           user_id?: string
+          working_districts?: string[] | null
         }
         Relationships: []
       }
@@ -121,6 +184,7 @@ export type Database = {
           id: string
           master_id: string
           order_id: string
+          photos: string[] | null
           rating: number
         }
         Insert: {
@@ -130,6 +194,7 @@ export type Database = {
           id?: string
           master_id: string
           order_id: string
+          photos?: string[] | null
           rating: number
         }
         Update: {
@@ -139,6 +204,7 @@ export type Database = {
           id?: string
           master_id?: string
           order_id?: string
+          photos?: string[] | null
           rating?: number
         }
         Relationships: [

@@ -6,7 +6,7 @@ import DashboardLayout from "./DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ClipboardList, DollarSign, Star, Clock, User, CheckCircle, XCircle } from "lucide-react";
+import { ClipboardList, DollarSign, Star, Clock, User, CheckCircle, XCircle, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 
@@ -15,6 +15,7 @@ const statusColors: Record<string, string> = {
   accepted: "bg-yellow-100 text-yellow-800",
   in_progress: "bg-purple-100 text-purple-800",
   completed: "bg-green-100 text-green-800",
+  reviewed: "bg-violet-100 text-violet-800",
   cancelled: "bg-red-100 text-red-800",
 };
 
@@ -23,6 +24,7 @@ const statusLabels: Record<string, string> = {
   accepted: "Принят",
   in_progress: "В работе",
   completed: "Завершён",
+  reviewed: "Оценён",
   cancelled: "Отменён",
 };
 
@@ -47,12 +49,28 @@ export default function MasterDashboard() {
   useEffect(() => { fetchOrders(); }, [user]);
   useRealtimeOrders({ userId: user?.id, role: "master", onUpdate: fetchOrders });
 
-  const updateStatus = async (orderId: string, status: string) => {
-    const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);
+  const updateStatus = async (orderId: string, status: string, order: any) => {
+    const updateData: any = { status };
+    if (status === "accepted") updateData.accepted_at = new Date().toISOString();
+    if (status === "in_progress") updateData.started_at = new Date().toISOString();
+    if (status === "completed") updateData.completed_at = new Date().toISOString();
+
+    const { error } = await supabase.from("orders").update(updateData).eq("id", orderId);
     if (error) {
       toast({ title: "Ошибка", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Статус обновлён" });
+
+      // Notify client
+      const statusText = statusLabels[status] || status;
+      await supabase.from("notifications").insert({
+        user_id: order.client_id,
+        title: "Статус обновлён",
+        message: `Ваш заказ — ${statusText}`,
+        type: "status_change",
+        related_id: orderId,
+      });
+
       fetchOrders();
     }
   };
@@ -62,7 +80,7 @@ export default function MasterDashboard() {
     { path: "/dashboard/profile", label: "Профиль", icon: User },
   ];
 
-  const completedOrders = orders.filter((o) => o.status === "completed");
+  const completedOrders = orders.filter((o) => ["completed", "reviewed"].includes(o.status));
   const stats = [
     { label: "Всего заказов", value: orders.length, icon: ClipboardList },
     { label: "В работе", value: orders.filter((o) => ["accepted", "in_progress"].includes(o.status)).length, icon: Clock },
@@ -120,21 +138,21 @@ export default function MasterDashboard() {
                 <div className="flex gap-2">
                   {order.status === "new" && (
                     <>
-                      <Button size="sm" onClick={() => updateStatus(order.id, "accepted")} className="rounded-full gap-1">
+                      <Button size="sm" onClick={() => updateStatus(order.id, "accepted", order)} className="rounded-full gap-1">
                         <CheckCircle className="w-3 h-3" /> Принять
                       </Button>
-                      <Button size="sm" variant="destructive" onClick={() => updateStatus(order.id, "cancelled")} className="rounded-full gap-1">
+                      <Button size="sm" variant="destructive" onClick={() => updateStatus(order.id, "cancelled", order)} className="rounded-full gap-1">
                         <XCircle className="w-3 h-3" /> Отклонить
                       </Button>
                     </>
                   )}
                   {order.status === "accepted" && (
-                    <Button size="sm" onClick={() => updateStatus(order.id, "in_progress")} className="rounded-full gap-1">
-                      Начать работу
+                    <Button size="sm" onClick={() => updateStatus(order.id, "in_progress", order)} className="rounded-full gap-1">
+                      <Play className="w-3 h-3" /> Начать работу
                     </Button>
                   )}
                   {order.status === "in_progress" && (
-                    <Button size="sm" onClick={() => updateStatus(order.id, "completed")} className="rounded-full gap-1">
+                    <Button size="sm" onClick={() => updateStatus(order.id, "completed", order)} className="rounded-full gap-1">
                       <CheckCircle className="w-3 h-3" /> Завершить
                     </Button>
                   )}
