@@ -11,8 +11,10 @@ import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { LogIn, UserPlus, Mail, Lock, User, Phone, ArrowLeft, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import MasterRegistrationFields from "@/components/dashboard/MasterRegistrationFields";
 
-type AuthMode = "login" | "register" | "verify";
+type AuthMode = "login" | "register" | "verify" | "master_details";
+type RoleChoice = "client" | "master";
 
 const Auth = () => {
   const { t } = useLanguage();
@@ -25,9 +27,10 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [roleChoice, setRoleChoice] = useState<RoleChoice>("client");
+  const [newUserId, setNewUserId] = useState<string | null>(null);
 
-  // Redirect if already logged in - use useEffect pattern to avoid hooks issues
-  if (user && !loading) {
+  if (user && !loading && mode !== "master_details") {
     setTimeout(() => navigate("/dashboard"), 0);
   }
 
@@ -50,7 +53,7 @@ const Auth = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -61,9 +64,16 @@ const Auth = () => {
     setLoading(false);
     if (error) {
       toast({ title: "Ошибка", description: error.message, variant: "destructive" });
+    } else if (roleChoice === "master" && data.user) {
+      setNewUserId(data.user.id);
+      setMode("master_details");
     } else {
       setMode("verify");
     }
+  };
+
+  const handleMasterComplete = () => {
+    setMode("verify");
   };
 
   return (
@@ -83,6 +93,16 @@ const Auth = () => {
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Вернуться к входу
                 </Button>
+              </CardContent>
+            </Card>
+          ) : mode === "master_details" && newUserId ? (
+            <Card>
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl">Данные мастера</CardTitle>
+                <CardDescription>Заполните информацию о вашей специализации</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <MasterRegistrationFields userId={newUserId} onComplete={handleMasterComplete} />
               </CardContent>
             </Card>
           ) : (
@@ -109,6 +129,25 @@ const Auth = () => {
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input placeholder="Телефон" value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-10" type="tel" />
+                      </div>
+                      {/* Role choice */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          type="button"
+                          variant={roleChoice === "client" ? "default" : "outline"}
+                          onClick={() => setRoleChoice("client")}
+                          className="rounded-full"
+                        >
+                          Клиент
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={roleChoice === "master" ? "default" : "outline"}
+                          onClick={() => setRoleChoice("master")}
+                          className="rounded-full"
+                        >
+                          Мастер
+                        </Button>
                       </div>
                     </>
                   )}

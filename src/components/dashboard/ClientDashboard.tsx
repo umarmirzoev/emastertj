@@ -3,18 +3,21 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "./DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ClipboardList, Plus, Star, Clock, User, Settings } from "lucide-react";
+import { ClipboardList, Plus, Star, Clock, User, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
+import { useToast } from "@/hooks/use-toast";
+import ReviewModal from "./ReviewModal";
 
 const statusColors: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",
   accepted: "bg-yellow-100 text-yellow-800",
   in_progress: "bg-purple-100 text-purple-800",
   completed: "bg-green-100 text-green-800",
+  reviewed: "bg-violet-100 text-violet-800",
   cancelled: "bg-red-100 text-red-800",
 };
 
@@ -23,15 +26,18 @@ const statusLabels: Record<string, string> = {
   accepted: "Принят",
   in_progress: "В работе",
   completed: "Завершён",
+  reviewed: "Оценён",
   cancelled: "Отменён",
 };
 
 export default function ClientDashboard() {
   const { user, profile } = useAuth();
   const { t } = useLanguage();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviewOrder, setReviewOrder] = useState<any>(null);
 
   const fetchOrders = async () => {
     if (!user) return;
@@ -47,6 +53,12 @@ export default function ClientDashboard() {
   useEffect(() => { fetchOrders(); }, [user]);
   useRealtimeOrders({ userId: user?.id, role: "client", onUpdate: fetchOrders });
 
+  const cancelOrder = async (orderId: string) => {
+    const { error } = await supabase.from("orders").update({ status: "cancelled" }).eq("id", orderId);
+    if (error) toast({ title: "Ошибка", description: error.message, variant: "destructive" });
+    else { toast({ title: "Заказ отменён" }); fetchOrders(); }
+  };
+
   const navItems = [
     { path: "/dashboard", label: "Мои заказы", icon: ClipboardList },
     { path: "/dashboard/profile", label: "Профиль", icon: User },
@@ -54,13 +66,12 @@ export default function ClientDashboard() {
 
   const stats = [
     { label: "Всего заказов", value: orders.length, icon: ClipboardList },
-    { label: "Активных", value: orders.filter((o) => !["completed", "cancelled"].includes(o.status)).length, icon: Clock },
-    { label: "Завершённых", value: orders.filter((o) => o.status === "completed").length, icon: Star },
+    { label: "Активных", value: orders.filter((o) => !["completed", "cancelled", "reviewed"].includes(o.status)).length, icon: Clock },
+    { label: "Завершённых", value: orders.filter((o) => ["completed", "reviewed"].includes(o.status)).length, icon: Star },
   ];
 
   return (
     <DashboardLayout title={t("clientCabinet")} navItems={navItems}>
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {stats.map((s, i) => (
           <Card key={i}>
@@ -77,21 +88,16 @@ export default function ClientDashboard() {
         ))}
       </div>
 
-      {/* Actions */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-foreground">Мои заказы</h2>
         <Button onClick={() => navigate("/categories")} size="sm" className="rounded-full gap-2">
-          <Plus className="w-4 h-4" />
-          Новый заказ
+          <Plus className="w-4 h-4" /> Новый заказ
         </Button>
       </div>
 
-      {/* Orders list */}
       {loading ? (
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-muted animate-pulse rounded-xl" />
-          ))}
+          {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-muted animate-pulse rounded-xl" />)}
         </div>
       ) : orders.length === 0 ? (
         <Card>
@@ -99,8 +105,7 @@ export default function ClientDashboard() {
             <ClipboardList className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground mb-4">У вас пока нет заказов</p>
             <Button onClick={() => navigate("/categories")} className="rounded-full">
-              <Plus className="w-4 h-4 mr-2" />
-              Создать первый заказ
+              <Plus className="w-4 h-4 mr-2" /> Создать первый заказ
             </Button>
           </CardContent>
         </Card>
@@ -109,7 +114,7 @@ export default function ClientDashboard() {
           {orders.map((order) => (
             <Card key={order.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground truncate">
                       {order.services?.name_ru || order.service_categories?.name_ru || "Заказ"}
@@ -123,10 +128,33 @@ export default function ClientDashboard() {
                     {statusLabels[order.status] || order.status}
                   </Badge>
                 </div>
+                <div className="flex gap-2">
+                  {order.status === "new" && (
+                    <Button size="sm" variant="destructive" onClick={() => cancelOrder(order.id)} className="rounded-full gap-1">
+                      <XCircle className="w-3 h-3" /> Отменить
+                    </Button>
+                  )}
+                  {order.status === "completed" && order.master_id && (
+                    <Button size="sm" onClick={() => setReviewOrder(order)} className="rounded-full gap-1">
+                      <Star className="w-3 h-3" /> Оставить отзыв
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
+      )}
+
+      {reviewOrder && (
+        <ReviewModal
+          isOpen={!!reviewOrder}
+          onClose={() => setReviewOrder(null)}
+          orderId={reviewOrder.id}
+          masterId={reviewOrder.master_id}
+          clientId={user!.id}
+          onSubmitted={fetchOrders}
+        />
       )}
     </DashboardLayout>
   );
