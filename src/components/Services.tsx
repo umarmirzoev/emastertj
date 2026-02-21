@@ -29,7 +29,7 @@ export const Services = ({ onOrderService }: ServicesProps) => {
 
   return (
     <div className="container px-4 mx-auto">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {serviceItems.map((service) => {
           const Icon = service.icon;
           return (
@@ -37,15 +37,15 @@ export const Services = ({ onOrderService }: ServicesProps) => {
               key={service.key}
               className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border"
             >
-              <CardContent className="p-5 text-center">
-                <div className={`w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-7 h-7 text-white" />
+              <CardContent className="p-4 sm:p-5 text-center">
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
                 <h3 className="font-semibold text-foreground text-sm mb-3">{t(service.key)}</h3>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="w-full rounded-full text-xs"
+                  className="w-full rounded-full text-xs h-9"
                   onClick={() => onOrderService(t(service.key), service.key)}
                 >
                   {t("categoryOrderButton")}

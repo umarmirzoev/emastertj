@@ -124,7 +124,7 @@ export default function PriceList() {
                 const catServices = groupedByCategory.get(cat.id) || [];
                 return (
                   <AccordionItem key={cat.id} value={cat.id} className="border rounded-xl px-4 overflow-hidden">
-                    <AccordionTrigger className="hover:no-underline py-4">
+                    <AccordionTrigger className="hover:no-underline py-4 min-h-[48px]">
                       <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center`}>
                           <Wrench className="w-5 h-5 text-white" />
@@ -175,17 +175,17 @@ function ServiceRow({ service, getName, priceLabel, onOrder }: {
   onOrder: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-2 py-2 px-3 rounded-lg hover:bg-accent/50 transition-colors group">
+    <div className="flex items-center justify-between gap-2 py-3 px-3 rounded-lg hover:bg-accent/50 transition-colors group min-h-[48px]">
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground truncate">{getName(service)}</p>
+        <p className="text-sm font-medium text-foreground">{getName(service)}</p>
         {service.note && <p className="text-xs text-muted-foreground">{service.note}</p>}
       </div>
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <Badge variant="secondary" className="text-xs whitespace-nowrap">
           {service.price_min}–{service.price_max} {priceLabel}
         </Badge>
         <span className="text-xs text-muted-foreground hidden sm:block">/{service.unit}</span>
-        <Button size="sm" variant="ghost" className="rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={onOrder}>
+        <Button size="sm" variant="ghost" className="rounded-full sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-9 w-9 p-0" onClick={onOrder}>
           <ArrowRight className="w-4 h-4" />
         </Button>
       </div>

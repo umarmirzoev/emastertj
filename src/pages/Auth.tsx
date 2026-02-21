@@ -68,12 +68,12 @@ const Auth = () => {
       setNewUserId(data.user.id);
       setMode("master_details");
     } else {
-      setMode("verify");
+      navigate("/dashboard");
     }
   };
 
   const handleMasterComplete = () => {
-    setMode("verify");
+    navigate("/pending-approval");
   };
 
   return (
@@ -159,7 +159,7 @@ const Auth = () => {
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10" type="password" required minLength={6} />
                   </div>
-                  <Button type="submit" className="w-full rounded-full" disabled={loading}>
+                  <Button type="submit" className="w-full rounded-full h-12 text-base" disabled={loading}>
                     {loading ? "..." : mode === "login" ? t("login") : "Зарегистрироваться"}
                   </Button>
                 </form>
