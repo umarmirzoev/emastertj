@@ -87,7 +87,7 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[100dvh] sm:max-h-[85vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>{t("orderModalTitle")}</DialogTitle>
           <DialogDescription>
@@ -101,11 +101,11 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
             <p className="text-center font-medium text-foreground">{t("orderModalSuccess")}</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input placeholder={t("formName")} value={name} onChange={(e) => setName(e.target.value)} required />
-            <Input placeholder={t("formPhone")} value={phone} onChange={(e) => setPhone(e.target.value)} required type="tel" />
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+            <Input placeholder={t("formName")} value={name} onChange={(e) => setName(e.target.value)} required className="h-12 text-base" />
+            <Input placeholder={t("formPhone")} value={phone} onChange={(e) => setPhone(e.target.value)} required type="tel" className="h-12 text-base" />
             <Select value={district} onValueChange={setDistrict}>
-              <SelectTrigger>
+              <SelectTrigger className="h-12 text-base">
                 <SelectValue placeholder={t("formDistrict")} />
               </SelectTrigger>
               <SelectContent>
@@ -114,10 +114,10 @@ export default function OrderModal({ isOpen, onClose, category, initialServiceNa
                 ))}
               </SelectContent>
             </Select>
-            <Input placeholder="Адрес / Address" value={address} onChange={(e) => setAddress(e.target.value)} required />
-            <Input placeholder="Удобное время / Preferred time" value={preferredTime} onChange={(e) => setPreferredTime(e.target.value)} />
-            <Textarea placeholder={t("formComment")} value={comment} onChange={(e) => setComment(e.target.value)} />
-            <Button type="submit" className="w-full rounded-full" disabled={submitting}>
+            <Input placeholder="Адрес / Address" value={address} onChange={(e) => setAddress(e.target.value)} required className="h-12 text-base" />
+            <Input placeholder="Удобное время / Preferred time" value={preferredTime} onChange={(e) => setPreferredTime(e.target.value)} className="h-12 text-base" />
+            <Textarea placeholder={t("formComment")} value={comment} onChange={(e) => setComment(e.target.value)} className="text-base min-h-[80px]" />
+            <Button type="submit" className="w-full rounded-full h-12 text-base" disabled={submitting}>
               {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               {t("orderModalSubmit")}
             </Button>

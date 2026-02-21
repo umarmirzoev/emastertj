@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, LogOut, ChevronRight, Home } from "lucide-react";
+import BottomNav from "@/components/BottomNav";
 
 interface NavItem {
   path: string;
@@ -81,7 +82,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-60 border-r border-border flex-col bg-card">
+      <aside className="hidden md:flex w-60 border-r border-border flex-col bg-card">
         <SidebarContent />
       </aside>
 
@@ -90,7 +91,7 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
         <header className="sticky top-0 z-40 h-14 border-b border-border bg-background/80 backdrop-blur-xl flex items-center px-4 gap-3">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
+              <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
@@ -100,10 +101,13 @@ export default function DashboardLayout({ children, title, navItems }: Dashboard
           </Sheet>
           <h1 className="text-lg font-bold text-foreground">{title}</h1>
         </header>
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
+        <main className="flex-1 p-3 md:p-6 overflow-auto pb-20 md:pb-6">
           {children}
         </main>
       </div>
+
+      {/* Mobile bottom nav */}
+      <BottomNav />
     </div>
   );
 }

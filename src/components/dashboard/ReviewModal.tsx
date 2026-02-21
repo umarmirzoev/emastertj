@@ -75,7 +75,7 @@ export default function ReviewModal({ isOpen, onClose, orderId, masterId, client
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[100dvh] sm:max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Оставить отзыв</DialogTitle>
         </DialogHeader>
@@ -88,10 +88,10 @@ export default function ReviewModal({ isOpen, onClose, orderId, masterId, client
                 onClick={() => setRating(i)}
                 onMouseEnter={() => setHover(i)}
                 onMouseLeave={() => setHover(0)}
-                className="p-1 transition-transform hover:scale-110"
+                className="p-2 transition-transform hover:scale-110"
               >
                 <Star
-                  className={`w-8 h-8 ${
+                  className={`w-10 h-10 sm:w-8 sm:h-8 ${
                     i <= (hover || rating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
                   }`}
                 />
@@ -103,8 +103,9 @@ export default function ReviewModal({ isOpen, onClose, orderId, masterId, client
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             maxLength={500}
+            className="text-base min-h-[100px]"
           />
-          <Button onClick={handleSubmit} disabled={submitting || rating === 0} className="w-full rounded-full">
+          <Button onClick={handleSubmit} disabled={submitting || rating === 0} className="w-full rounded-full h-12 text-base">
             {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
             Отправить отзыв
           </Button>

@@ -57,11 +57,11 @@ export default function MasterProfile() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-3xl">
         {/* Profile Card */}
         <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start gap-4">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-primary-foreground text-2xl font-bold">
                 {master.full_name?.charAt(0) || "М"}
               </div>
@@ -96,11 +96,11 @@ export default function MasterProfile() {
             )}
 
             {master.phone && (
-              <div className="flex gap-2 mt-4">
-                <Button size="sm" className="rounded-full gap-2" asChild>
+              <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                <Button size="sm" className="rounded-full gap-2 h-11 flex-1 sm:flex-none" asChild>
                   <a href={`tel:${master.phone}`}><Phone className="w-3.5 h-3.5" /> Позвонить</a>
                 </Button>
-                <Button size="sm" variant="outline" className="rounded-full gap-2" asChild>
+                <Button size="sm" variant="outline" className="rounded-full gap-2 h-11 flex-1 sm:flex-none" asChild>
                   <a href={`https://wa.me/${master.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                   </a>

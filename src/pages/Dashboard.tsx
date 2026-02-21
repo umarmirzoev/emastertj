@@ -16,16 +16,10 @@ const Dashboard = () => {
     if (!loading && !user) navigate("/auth");
   }, [user, loading, navigate]);
 
-  // Check email verification and approval status
+  // Check approval status
   useEffect(() => {
     const check = async () => {
       if (!user) return;
-      // Check email verification
-      if (!user.email_confirmed_at) {
-        navigate("/verify-email");
-        return;
-      }
-      // Check master approval status
       const { data } = await supabase.from("profiles").select("approval_status").eq("user_id", user.id).single();
       setApprovalStatus(data?.approval_status || "active");
       setCheckingApproval(false);
