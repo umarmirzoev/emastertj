@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import ClientDashboard from "@/components/dashboard/ClientDashboard";
 import MasterDashboard from "@/components/dashboard/MasterDashboard";
 import AdminDashboard from "@/components/dashboard/AdminDashboard";
+import SuperAdminDashboard from "@/components/dashboard/SuperAdminDashboard";
 
 const Dashboard = () => {
   const { user, loading, hasRole } = useAuth();
@@ -43,7 +44,8 @@ const Dashboard = () => {
     return null;
   }
 
-  if (hasRole("super_admin") || hasRole("admin")) return <AdminDashboard />;
+  if (hasRole("super_admin")) return <SuperAdminDashboard />;
+  if (hasRole("admin")) return <AdminDashboard />;
   if (hasRole("master")) return <MasterDashboard />;
   return <ClientDashboard />;
 };

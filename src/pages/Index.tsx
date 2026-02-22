@@ -115,18 +115,22 @@ const Index = () => {
           </motion.div>
 
           {/* Trust stats */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="grid grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6 max-w-2xl mx-auto">
             {[
-              { icon: Clock, value: t("trustTime"), desc: t("trustTimeDesc"), iconColor: "text-primary" },
-              { icon: Star, value: t("trustRating"), desc: t("trustRatingDesc"), iconColor: "text-yellow-500" },
-              { icon: CheckCircle, value: t("trustOrders"), desc: t("trustOrdersDesc"), iconColor: "text-primary" },
+              { icon: Clock, value: t("trustTime"), desc: t("trustTimeDesc"), gradient: "from-primary/20 to-emerald-400/20", iconBg: "bg-primary/15", iconColor: "text-primary" },
+              { icon: Star, value: t("trustRating"), desc: t("trustRatingDesc"), gradient: "from-yellow-400/20 to-amber-400/20", iconBg: "bg-yellow-500/15", iconColor: "text-yellow-600" },
+              { icon: CheckCircle, value: t("trustOrders"), desc: t("trustOrdersDesc"), gradient: "from-blue-400/20 to-sky-400/20", iconBg: "bg-blue-500/15", iconColor: "text-blue-600" },
             ].map((stat, i) => (
-              <div key={i} className="text-center p-4 rounded-2xl bg-muted">
-                <div className="flex items-center justify-center mb-2">
-                  <stat.icon className={`w-5 h-5 ${stat.iconColor} mr-2`} />
-                  <span className="text-xl md:text-2xl font-bold text-foreground">{stat.value}</span>
+              <div key={i} className={`relative p-5 rounded-2xl bg-gradient-to-br ${stat.gradient} border border-white/40 dark:border-white/10 backdrop-blur-md shadow-sm`}>
+                <div className="flex items-center gap-4 sm:flex-col sm:text-center">
+                  <div className={`w-12 h-12 rounded-xl ${stat.iconBg} flex items-center justify-center shrink-0`}>
+                    <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                    <p className="text-sm text-muted-foreground">{stat.desc}</p>
+                  </div>
                 </div>
-                <p className="text-xs md:text-sm text-muted-foreground">{stat.desc}</p>
               </div>
             ))}
           </motion.div>
