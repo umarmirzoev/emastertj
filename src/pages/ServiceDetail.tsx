@@ -447,9 +447,9 @@ export default function ServiceDetail() {
                               </div>
                               <div className="flex items-center justify-between pt-3 border-t border-border/50">
                                 <div>
-                                  <p className="text-xs text-muted-foreground">от</p>
+                                  <p className="text-xs text-muted-foreground">аз</p>
                                   <p className="text-base font-bold text-foreground">
-                                    {master.price_min} <span className="text-xs font-normal text-muted-foreground">сом.</span>
+                                    {master.price_min} <span className="text-xs font-normal text-muted-foreground">сомонӣ</span>
                                   </p>
                                 </div>
                                 <div className="flex gap-1.5">
