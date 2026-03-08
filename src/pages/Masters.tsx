@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import {
   Search, Star, MapPin, Clock, Phone, MessageCircle,
-  SlidersHorizontal, X, ChevronDown, Users,
+  SlidersHorizontal, X, ChevronDown, Users, Award, Shield,
 } from "lucide-react";
 
 interface MasterListing {
