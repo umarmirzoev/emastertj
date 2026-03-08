@@ -275,6 +275,7 @@ export default function AdminDashboard() {
     { key: "users", label: "Клиенты", icon: Users },
     { key: "masters", label: "Мастера", icon: Wrench },
     { key: "reviews", label: "Отзывы", icon: StarIcon },
+    { key: "shop", label: "Магазин", icon: ShoppingCart },
   ];
 
   const getClientName = (clientId: string) => {
