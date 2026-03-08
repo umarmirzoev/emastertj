@@ -232,6 +232,7 @@ export default function SuperAdminDashboard() {
     { key: "admins", label: "Админы", icon: Shield },
     { key: "applications", label: "Заявки", icon: FileText, count: pendingApps.length },
     { key: "reviews", label: "Отзывы", icon: StarIcon },
+    { key: "shop", label: "Магазин", icon: ShoppingCart },
   ];
 
   return (
