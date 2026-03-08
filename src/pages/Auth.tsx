@@ -18,7 +18,7 @@ type RoleChoice = "client" | "master";
 
 const Auth = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, getDashboardPath } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [mode, setMode] = useState<AuthMode>("login");
