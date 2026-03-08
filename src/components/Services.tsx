@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Zap, Droplets, Paintbrush, Sofa, Hammer, Camera, Flame, Wrench, Home, Cpu, MoreHorizontal, ArrowRight,
+  Zap, Droplets, Paintbrush, Sofa, Hammer, Camera, Flame, Wrench, Home, Cpu, MoreHorizontal, ArrowRight, Wind,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
