@@ -64,7 +64,7 @@ export function PriceBreakdown({ servicePrice, materialsCost, urgencySurcharge, 
         {items.map((item, i) => (
           <div key={i} className="flex justify-between text-muted-foreground">
             <span>{item.label}</span>
-            <span>{item.value.toLocaleString()} сом.</span>
+            <span>{item.value.toLocaleString()} сомонӣ</span>
           </div>
         ))}
         <Separator className="my-1" />
