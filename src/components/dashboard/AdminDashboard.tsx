@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import {
   LayoutDashboard, ClipboardList, Users, UserCheck, Wrench, Star as StarIcon,
   Search, DollarSign, CheckCircle, XCircle, TrendingUp, Eye, MapPin, Phone,
-  Calendar, ArrowRight, Filter, FileText, Mail,
+  Calendar, ArrowRight, Filter, FileText, Mail, ShoppingCart,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
