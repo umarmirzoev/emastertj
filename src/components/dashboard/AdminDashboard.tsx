@@ -622,6 +622,8 @@ export default function AdminDashboard() {
             </Card>
           ))}
         </div>
+      ) : tab === "shop" ? (
+        <AdminShopManager />
       ) : null}
 
       {/* Order detail dialog */}
