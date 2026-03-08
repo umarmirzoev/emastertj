@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import QuickBooking from "@/components/QuickBooking";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -41,6 +42,7 @@ const Index = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedServiceName, setSelectedServiceName] = useState("");
+  const [quickBookOpen, setQuickBookOpen] = useState(false);
 
   // Popular masters
   const [popularMasters, setPopularMasters] = useState<PopularMaster[]>([]);
@@ -244,7 +246,7 @@ const Index = () => {
               <Phone className="w-5 h-5 mr-2" />
               {t("heroOrderButton")}
             </Button>
-            <Button onClick={() => { setSelectedCategory("urgent"); setIsOrderModalOpen(true); }} variant="outline" size="lg" className="flex-1 border-2 border-destructive/30 text-destructive rounded-full px-6 py-6 text-base font-semibold group">
+            <Button onClick={() => setQuickBookOpen(true)} variant="outline" size="lg" className="flex-1 border-2 border-destructive/30 text-destructive rounded-full px-6 py-6 text-base font-semibold group">
               <Siren className="w-5 h-5 mr-2 group-hover:animate-pulse" />
               <span className="flex flex-col items-start sm:items-center">
                 <span>{t("heroEmergencyButton")}</span>
@@ -431,6 +433,7 @@ const Index = () => {
         category={selectedCategory}
         initialServiceName={selectedServiceName}
       />
+      <QuickBooking open={quickBookOpen} onOpenChange={setQuickBookOpen} />
     </div>
   );
 };
