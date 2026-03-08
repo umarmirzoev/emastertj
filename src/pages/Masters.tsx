@@ -31,6 +31,10 @@ interface MasterListing {
   price_max: number;
   latitude: number | null;
   longitude: number | null;
+  ranking_score: number;
+  is_top_master: boolean;
+  quality_flag: string;
+  completed_orders: number;
 }
 
 const ALL_CATEGORIES = [
