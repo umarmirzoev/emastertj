@@ -198,6 +198,7 @@ const translations = {
     categoryEmergencyBadge: "Зудӣ",
     categoryPriceFrom: "аз",
     categoryOrderButton: "Усто фармудан",
+    categoryChooseServices: "Хидматро интихоб кунед",
     contactsTitle: "Бо мо тамос гиред",
     contactsDescription: "Агар саволҳо, пешниҳодҳо ё ҳолати зудӣ дошта бошед — мо ҳамеша дар тамос ҳастем.",
     contactsPhone: "Телефон",
