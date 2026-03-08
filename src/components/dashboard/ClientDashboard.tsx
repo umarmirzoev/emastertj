@@ -156,6 +156,7 @@ export default function ClientDashboard() {
     { key: "orders", label: "Все заказы", icon: ClipboardList, count: orders.length },
     { key: "active", label: "Активные", icon: Clock, count: activeOrders.length },
     { key: "completed", label: "Завершённые", icon: CheckCircle, count: completedOrders.length },
+    ...(myApplication ? [{ key: "application" as Tab, label: "Заявка мастера", icon: FileText }] : []),
     { key: "profile", label: "Профиль", icon: User },
     { key: "notifications", label: "Уведомления", icon: Bell, count: unreadCount },
   ];
