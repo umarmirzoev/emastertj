@@ -228,6 +228,8 @@ const translations: Record<Language, Record<string, string>> = {
     shopBoughtTogetherDesc: "Товары, которые часто покупают с этим продуктом",
     shopRecentlyViewed: "Недавно просмотренные",
     shopRecentlyViewedDesc: "Товары, которые вы недавно смотрели",
+    shopRecommended: "Рекомендуем для вас",
+    shopRecommendedDesc: "Подобрано на основе ваших интересов",
     sellerOrders: "заказов",
     shopByPopularity: "По популярности",
     shopPriceAsc: "Цена ↑",
