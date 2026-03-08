@@ -256,6 +256,7 @@ export default function AdminDashboard() {
     { path: "/admin/dashboard/masters", label: "Мастера", icon: Wrench },
     { path: "/admin/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
     { path: "/admin/dashboard/reviews", label: "Отзывы", icon: StarIcon },
+    { path: "/admin/dashboard/shop", label: "Магазин", icon: ShoppingCart },
   ];
 
   const stats = [
