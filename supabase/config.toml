@@ -1,1 +1,10 @@
 project_id = "vkyankveiufptylktiiz"
+
+[functions.seed-demo-accounts]
+verify_jwt = false
+
+[functions.seed-demo-data]
+verify_jwt = false
+
+[functions.ai-match-master]
+verify_jwt = false

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import QuickBooking from "@/components/QuickBooking";
+import AiMasterMatch from "@/components/AiMasterMatch";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -14,7 +15,7 @@ import { Services } from "@/components/Services";
 import OrderModal from "@/components/OrderModal";
 import {
   Clock, Shield, Star, CheckCircle,
-  Phone, Siren, Search, FileText, Truck, ArrowRight, Users, MapPin, Quote,
+  Phone, Siren, Search, FileText, Truck, ArrowRight, Users, MapPin, Quote, Brain,
 } from "lucide-react";
 
 interface PopularMaster {
@@ -43,6 +44,7 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedServiceName, setSelectedServiceName] = useState("");
   const [quickBookOpen, setQuickBookOpen] = useState(false);
+  const [aiMatchOpen, setAiMatchOpen] = useState(false);
 
   // Popular masters
   const [popularMasters, setPopularMasters] = useState<PopularMaster[]>([]);
@@ -241,7 +243,7 @@ const Index = () => {
           </motion.div>
 
           {/* CTA buttons */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="flex flex-col sm:flex-row gap-3 justify-center max-w-xl mx-auto mb-12">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="flex flex-col sm:flex-row gap-3 justify-center max-w-xl mx-auto mb-6">
             <Button onClick={handleQuickOrder} size="lg" className="flex-1 rounded-full px-8 py-6 text-base font-semibold shadow-xl hover:shadow-2xl transition-all bg-gradient-to-r from-primary to-emerald-500 hover:from-primary/90 hover:to-emerald-500/90">
               <Phone className="w-5 h-5 mr-2" />
               {t("heroOrderButton")}
@@ -252,6 +254,20 @@ const Index = () => {
                 <span>{t("heroEmergencyButton")}</span>
                 <span className="text-xs opacity-70">{t("heroEmergencySubtext")}</span>
               </span>
+            </Button>
+          </motion.div>
+
+          {/* AI Master Match CTA */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.35 }} className="flex justify-center mb-12">
+            <Button
+              onClick={() => setAiMatchOpen(true)}
+              variant="outline"
+              size="lg"
+              className="rounded-full px-8 py-5 text-base font-semibold border-2 border-primary/30 hover:border-primary hover:bg-primary/5 gap-2 shadow-md"
+            >
+              <Brain className="w-5 h-5 text-primary" />
+              <span>🤖 AI подбор мастера</span>
+              <Badge className="bg-primary/10 text-primary border-0 text-[10px]">Новинка</Badge>
             </Button>
           </motion.div>
 
@@ -434,6 +450,7 @@ const Index = () => {
         initialServiceName={selectedServiceName}
       />
       <QuickBooking open={quickBookOpen} onOpenChange={setQuickBookOpen} />
+      <AiMasterMatch open={aiMatchOpen} onOpenChange={setAiMatchOpen} />
     </div>
   );
 };
