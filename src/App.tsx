@@ -46,6 +46,8 @@ const AnimatedRoutes = () => {
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />
         <Route path="/how-it-works" element={<PageTransition><HowItWorks /></PageTransition>} />
         <Route path="/categories" element={<PageTransition><Categories /></PageTransition>} />
+        <Route path="/category/:id" element={<PageTransition><CategoryDetail /></PageTransition>} />
+        <Route path="/service/:id" element={<PageTransition><ServiceDetail /></PageTransition>} />
         <Route path="/contacts" element={<PageTransition><Contacts /></PageTransition>} />
         <Route path="/services" element={<PageTransition><PriceList /></PageTransition>} />
         <Route path="/become-master" element={<PageTransition><BecomeMaster /></PageTransition>} />
