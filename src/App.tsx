@@ -62,6 +62,12 @@ const AnimatedRoutes = () => {
         <Route path="/pending-approval" element={<PageTransition><PendingApproval /></PageTransition>} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route path="/master-dashboard" element={<MasterDashboardPage />} />
+        <Route path="/master-dashboard/*" element={<MasterDashboardPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/admin/dashboard/*" element={<AdminDashboardPage />} />
+        <Route path="/super-admin/dashboard" element={<SuperAdminDashboardPage />} />
+        <Route path="/super-admin/dashboard/*" element={<SuperAdminDashboardPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
