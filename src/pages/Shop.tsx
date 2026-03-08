@@ -48,6 +48,7 @@ export default function Shop() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [popular, setPopular] = useState<any[]>([]);
   const [discounted, setDiscounted] = useState<any[]>([]);
+  const [hotDeals, setHotDeals] = useState<any[]>([]);
   const [recommended, setRecommended] = useState<any[]>([]);
   const [byCategory, setByCategory] = useState<Record<string, any[]>>({});
   const [installProduct, setInstallProduct] = useState<any>(null);
