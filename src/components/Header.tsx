@@ -34,7 +34,7 @@ import NotificationBell from "@/components/NotificationBell";
 
 export default function Header() {
   const { language, setLanguage, t } = useLanguage();
-  const { user, profile, signOut, loading } = useAuth();
+  const { user, profile, signOut, loading, getDashboardPath } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
