@@ -17,16 +17,21 @@ const Dashboard = () => {
     if (!loading && !user) navigate("/auth");
   }, [user, loading, navigate]);
 
-  // Check approval status
+  // Check approval status for masters
   useEffect(() => {
     const check = async () => {
       if (!user) return;
-      const { data } = await supabase.from("profiles").select("approval_status").eq("user_id", user.id).single();
-      setApprovalStatus(data?.approval_status || "active");
+      // Only check if user has master role
+      if (hasRole("master")) {
+        const { data } = await supabase.from("profiles").select("approval_status").eq("user_id", user.id).single();
+        setApprovalStatus(data?.approval_status || "active");
+      } else {
+        setApprovalStatus("active");
+      }
       setCheckingApproval(false);
     };
     if (user && !loading) check();
-  }, [user, loading, navigate]);
+  }, [user, loading, hasRole]);
 
   if (loading || checkingApproval) {
     return (

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   ClipboardList, Plus, Star, Clock, User, XCircle, MapPin, Phone,
-  CheckCircle, ChevronRight, Bell, MessageSquare, Loader2, Calendar,
+  CheckCircle, ChevronRight, Bell, MessageSquare, Loader2, Calendar, FileText,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
@@ -54,7 +54,7 @@ const statusLabels: Record<string, string> = {
   cancelled: "Отменён",
 };
 
-type Tab = "orders" | "active" | "completed" | "profile" | "reviews" | "notifications";
+type Tab = "orders" | "active" | "completed" | "profile" | "reviews" | "notifications" | "application";
 
 export default function ClientDashboard() {
   const { user, profile } = useAuth();
@@ -67,6 +67,7 @@ export default function ClientDashboard() {
   const [reviewOrder, setReviewOrder] = useState<any>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [masterInfo, setMasterInfo] = useState<any>(null);
+  const [myApplication, setMyApplication] = useState<any>(null);
   const { notifications, unreadCount } = useNotifications(user?.id);
 
   // Profile editing
@@ -85,7 +86,18 @@ export default function ClientDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchOrders(); }, [user]);
+  const fetchApplication = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("master_applications")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (data && data.length > 0) setMyApplication(data[0]);
+  };
+
+  useEffect(() => { fetchOrders(); fetchApplication(); }, [user]);
   useEffect(() => {
     if (profile) {
       setEditName(profile.full_name || "");
@@ -144,6 +156,7 @@ export default function ClientDashboard() {
     { key: "orders", label: "Все заказы", icon: ClipboardList, count: orders.length },
     { key: "active", label: "Активные", icon: Clock, count: activeOrders.length },
     { key: "completed", label: "Завершённые", icon: CheckCircle, count: completedOrders.length },
+    ...(myApplication ? [{ key: "application" as Tab, label: "Заявка мастера", icon: FileText }] : []),
     { key: "profile", label: "Профиль", icon: User },
     { key: "notifications", label: "Уведомления", icon: Bell, count: unreadCount },
   ];
@@ -248,6 +261,43 @@ export default function ClientDashboard() {
               {savingProfile ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               Сохранить
             </Button>
+          </CardContent>
+        </Card>
+      ) : tab === "application" && myApplication ? (
+        <Card>
+          <CardContent className="py-8">
+            <div className="text-center">
+              {myApplication.status === "pending" && (
+                <>
+                  <Clock className="w-14 h-14 text-amber-500 mx-auto mb-4" />
+                  <Badge className="bg-amber-100 text-amber-800 mb-3">На рассмотрении</Badge>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Заявка на рассмотрении</h3>
+                  <p className="text-muted-foreground">Администратор рассматривает вашу заявку. Мы уведомим вас о результате.</p>
+                </>
+              )}
+              {myApplication.status === "approved" && (
+                <>
+                  <CheckCircle className="w-14 h-14 text-green-500 mx-auto mb-4" />
+                  <Badge className="bg-green-100 text-green-800 mb-3">Одобрена</Badge>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Заявка одобрена!</h3>
+                  <p className="text-muted-foreground mb-4">Вы можете работать как мастер. Перезайдите, чтобы увидеть панель мастера.</p>
+                </>
+              )}
+              {myApplication.status === "rejected" && (
+                <>
+                  <XCircle className="w-14 h-14 text-red-500 mx-auto mb-4" />
+                  <Badge className="bg-red-100 text-red-800 mb-3">Отклонена</Badge>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Заявка отклонена</h3>
+                  <p className="text-muted-foreground mb-4">К сожалению, ваша заявка была отклонена. Вы можете подать новую.</p>
+                  <Button onClick={() => navigate("/become-master")} className="rounded-full">Подать новую заявку</Button>
+                </>
+              )}
+              <div className="mt-6 text-xs text-muted-foreground space-y-1">
+                <p>Специализация: {myApplication.specialization}</p>
+                <p>Район: {myApplication.district}</p>
+                <p>Подана: {new Date(myApplication.created_at).toLocaleDateString("ru-RU")}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       ) : tab === "notifications" ? (

@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      master_applications: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          description: string | null
+          district: string
+          email: string
+          experience_years: number
+          full_name: string
+          id: string
+          phone: string
+          photo_url: string | null
+          specialization: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string
+          email?: string
+          experience_years?: number
+          full_name?: string
+          id?: string
+          phone?: string
+          photo_url?: string | null
+          specialization?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          description?: string | null
+          district?: string
+          email?: string
+          experience_years?: number
+          full_name?: string
+          id?: string
+          phone?: string
+          photo_url?: string | null
+          specialization?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       master_listings: {
         Row: {
           avatar_url: string | null
