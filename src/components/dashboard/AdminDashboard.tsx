@@ -429,7 +429,11 @@ export default function AdminDashboard() {
                   <div className="md:grid md:grid-cols-12 md:gap-3 md:items-center space-y-2 md:space-y-0">
                     <div className="col-span-3 min-w-0">
                       <p className="font-medium text-sm truncate">{order.services?.name_ru || order.service_categories?.name_ru || "Заказ"}</p>
-                      <p className="text-[11px] text-muted-foreground">ID: {order.id.slice(0, 8)}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[11px] text-muted-foreground">ID: {order.id.slice(0, 8)}</p>
+                        {(order.total_amount || order.budget) > 0 && <span className="text-[10px] font-semibold text-primary">{(order.total_amount || order.budget || 0).toLocaleString()} с.</span>}
+                        <PaymentStatusBadge status={(order as any).payment_status || "unpaid"} />
+                      </div>
                     </div>
                     <div className="col-span-2 min-w-0">
                       <p className="text-sm truncate">{getClientName(order.client_id)}</p>
