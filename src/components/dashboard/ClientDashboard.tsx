@@ -513,7 +513,7 @@ export default function ClientDashboard() {
                 <div><span className="text-muted-foreground">Адрес:</span><p className="font-medium">{selectedOrder.address}</p></div>
                 <div><span className="text-muted-foreground">Телефон:</span><p className="font-medium">{selectedOrder.phone}</p></div>
                 <div><span className="text-muted-foreground">Дата:</span><p className="font-medium">{new Date(selectedOrder.created_at).toLocaleDateString("ru-RU")}</p></div>
-                {selectedOrder.budget > 0 && <div><span className="text-muted-foreground">Бюджет:</span><p className="font-medium">{selectedOrder.budget} сом.</p></div>}
+                {selectedOrder.budget > 0 && <div><span className="text-muted-foreground">Бюджет:</span><p className="font-medium">{selectedOrder.budget} сомонӣ</p></div>}
               </div>
 
               {/* Master info */}
