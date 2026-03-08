@@ -57,7 +57,7 @@ const statusLabels: Record<string, string> = {
   cancelled: "Отменён",
 };
 
-type Tab = "orders" | "active" | "completed" | "profile" | "reviews" | "notifications" | "application";
+type Tab = "orders" | "active" | "completed" | "payments" | "profile" | "reviews" | "notifications" | "application";
 
 export default function ClientDashboard() {
   const { user, profile, refetchUserData, hasRole } = useAuth();
