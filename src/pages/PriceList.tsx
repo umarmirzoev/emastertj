@@ -601,16 +601,3 @@ function ServiceCard({ service, getName, priceLabel, fromLabel, chooseMasterLabe
   );
 }
 
-interface Service {
-  id: string;
-  category_id: string;
-  name_ru: string;
-  name_tj: string;
-  name_en: string;
-  price_min: number;
-  price_avg: number;
-  price_max: number;
-  unit: string;
-  note: string | null;
-  sort_order: number;
-}
