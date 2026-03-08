@@ -264,6 +264,7 @@ export default function MasterDashboard() {
     { path: "/master-dashboard/portfolio", label: "Портфолио", icon: Image },
     { path: "/master-dashboard/profile", label: "Профиль мастера", icon: User },
     { path: "/master-dashboard/notifications", label: "Уведомления", icon: Bell, badge: unreadCount },
+    { path: "/master-dashboard/products", label: "Мои товары", icon: Package },
   ];
 
   const stats = [
