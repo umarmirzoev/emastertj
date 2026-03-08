@@ -57,7 +57,7 @@ const statusLabels: Record<string, string> = {
 type Tab = "orders" | "active" | "completed" | "profile" | "reviews" | "notifications" | "application";
 
 export default function ClientDashboard() {
-  const { user, profile } = useAuth();
+  const { user, profile, refetchUserData, hasRole } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
