@@ -402,6 +402,16 @@ export default function AdminDashboard() {
                 {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name_ru}</SelectItem>)}
               </SelectContent>
             </Select>
+            <Select value={paymentFilter} onValueChange={setPaymentFilter}>
+              <SelectTrigger className="w-36 h-10"><SelectValue placeholder="Оплата" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все</SelectItem>
+                <SelectItem value="paid">Оплачен</SelectItem>
+                <SelectItem value="unpaid">Не оплачен</SelectItem>
+                <SelectItem value="pending">Ожидает</SelectItem>
+                <SelectItem value="failed">Ошибка</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
