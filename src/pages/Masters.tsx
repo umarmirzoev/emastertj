@@ -93,6 +93,7 @@ export default function Masters() {
 
     result = [...result].sort((a, b) => {
       switch (sortBy) {
+        case "ranking": return (b.ranking_score || 0) - (a.ranking_score || 0);
         case "rating": return b.average_rating - a.average_rating;
         case "price_low": return a.price_min - b.price_min;
         case "price_high": return b.price_max - a.price_max;
