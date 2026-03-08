@@ -321,7 +321,7 @@ export default function SuperAdminDashboard() {
             <Card className="bg-gradient-to-br from-violet-500 to-purple-600 text-white">
               <CardContent className="p-5">
                 <BarChart3 className="w-8 h-8 mb-2 opacity-80" />
-                <p className="text-3xl font-bold">{monthRevenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сом.</span></p>
+                <p className="text-3xl font-bold">{monthRevenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сомонӣ</span></p>
                 <p className="text-sm opacity-80">Доход за месяц</p>
                 <p className="text-xs opacity-60 mt-1">{monthOrders.length} заказов</p>
               </CardContent>
