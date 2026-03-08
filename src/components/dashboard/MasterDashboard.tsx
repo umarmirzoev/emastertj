@@ -212,7 +212,8 @@ export default function MasterDashboard() {
   const weekEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo).reduce((s, o) => s + getPayout(o), 0);
   const monthEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo).reduce((s, o) => s + getPayout(o), 0);
   const avgRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : "—";
-  const avgOrderValue = completedOrders.length > 0 ? Math.round(totalEarnings / completedOrders.length) : 0;
+  const avgOrderValue = completedOrders.length > 0 ? Math.round(totalGross / completedOrders.length) : 0;
+  const totalCommission = Math.round(totalGross * COMMISSION_RATE);
 
   // Rating distribution
   const ratingDist = useMemo(() => {
