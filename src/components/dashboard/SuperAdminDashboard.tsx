@@ -224,6 +224,32 @@ export default function SuperAdminDashboard() {
 
   return (
     <DashboardLayout title="Суперадмин" navItems={navItems}>
+      {/* Hero counters — Total Users & Masters */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <Card className="bg-gradient-to-br from-blue-600 to-indigo-700 border-0 shadow-lg">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+              <Users className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <p className="text-4xl font-extrabold text-white">{allUsers.length}</p>
+              <p className="text-sm text-white/80 font-medium">Всего пользователей</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-emerald-600 to-green-700 border-0 shadow-lg">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+              <Wrench className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <p className="text-4xl font-extrabold text-white">{masterUsers.length}</p>
+              <p className="text-sm text-white/80 font-medium">Всего мастеров</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* User/Master Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-4">
         {mainStats.map((s, i) => (
