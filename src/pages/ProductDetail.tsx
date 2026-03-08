@@ -10,8 +10,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/hooks/useCart";
 import { motion } from "framer-motion";
 import {
-  ShoppingCart, Star, ArrowLeft, Package, Phone, Minus, Plus,
-  CheckCircle, Wrench, Truck, User, Briefcase, Award,
+  ShoppingCart, Star, Package, Phone, Minus, Plus,
+  CheckCircle, Wrench, Truck, User, Award,
 } from "lucide-react";
 
 export default function ProductDetail() {
@@ -22,6 +22,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [withInstall, setWithInstall] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function ProductDetail() {
         .eq("id", id!)
         .single();
       setProduct(data);
-      // Fetch seller info if master product
+      setActiveImage(0);
       if (data?.master_id) {
         const { data: masterData } = await supabase
           .from("master_listings")
@@ -63,7 +64,14 @@ export default function ProductDetail() {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container px-4 mx-auto py-16">
-          <div className="h-96 bg-muted animate-pulse rounded-2xl" />
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="aspect-square bg-muted animate-pulse rounded-2xl" />
+            <div className="space-y-4">
+              <div className="h-8 bg-muted animate-pulse rounded-lg w-3/4" />
+              <div className="h-6 bg-muted animate-pulse rounded-lg w-1/2" />
+              <div className="h-10 bg-muted animate-pulse rounded-lg w-1/3" />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -82,6 +90,15 @@ export default function ProductDetail() {
     );
   }
 
+  // Build gallery: main image + extra images
+  const galleryImages: string[] = [];
+  if (product.image_url) galleryImages.push(product.image_url);
+  if (product.images && Array.isArray(product.images)) {
+    for (const img of product.images) {
+      if (img && !galleryImages.includes(img)) galleryImages.push(img);
+    }
+  }
+
   const discount = product.old_price ? Math.round((1 - product.price / product.old_price) * 100) : 0;
   const totalPrice = product.price * qty + (withInstall && product.installation_price ? product.installation_price : 0);
   const specs = typeof product.specs === "object" && product.specs !== null ? product.specs : {};
@@ -95,25 +112,53 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container px-4 mx-auto py-8">
+        {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
           <Link to="/shop" className="hover:text-primary">Магазин</Link>
           <span>/</span>
           <Link to={`/shop/category/${product.category_id}`} className="hover:text-primary">{product.shop_categories?.name}</Link>
           <span>/</span>
-          <span className="text-foreground">{product.name}</span>
+          <span className="text-foreground truncate max-w-[200px]">{product.name}</span>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Image */}
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <div className="aspect-square bg-muted/20 rounded-2xl border border-border flex items-center justify-center p-8 relative">
-              {product.image_url ? (
-                <img src={product.image_url} alt={product.name} className="w-full h-full object-contain" />
+          {/* Image Gallery */}
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3">
+            {/* Main Image */}
+            <div className="aspect-square bg-muted/20 rounded-2xl border border-border flex items-center justify-center overflow-hidden relative">
+              {galleryImages.length > 0 ? (
+                <img
+                  src={galleryImages[activeImage] || galleryImages[0]}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-all duration-300"
+                />
               ) : (
                 <Package className="w-32 h-32 text-muted-foreground/20" />
               )}
-              {discount > 0 && <Badge className="absolute top-4 left-4 bg-red-500 text-white text-sm px-3">-{discount}%</Badge>}
+              {discount > 0 && <Badge className="absolute top-4 left-4 bg-destructive text-destructive-foreground text-sm px-3">-{discount}%</Badge>}
+              {product.seller_type === "master" && (
+                <Badge className="absolute top-4 right-4 bg-primary text-primary-foreground text-xs gap-1">
+                  <Award className="w-3 h-3" /> От мастера
+                </Badge>
+              )}
             </div>
+
+            {/* Thumbnails */}
+            {galleryImages.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {galleryImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImage(i)}
+                    className={`w-16 h-16 md:w-20 md:h-20 rounded-xl border-2 overflow-hidden shrink-0 transition-all ${
+                      activeImage === i ? "border-primary shadow-md" : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Info */}
@@ -124,7 +169,7 @@ export default function ProductDetail() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.rating || 0) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`} />
                 ))}
@@ -137,15 +182,15 @@ export default function ProductDetail() {
               {product.old_price && <span className="text-lg text-muted-foreground line-through">{product.old_price} с.</span>}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {product.in_stock ? (
-                <Badge className="bg-emerald-100 text-emerald-700"><CheckCircle className="w-3 h-3 mr-1" />В наличии</Badge>
+                <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"><CheckCircle className="w-3 h-3 mr-1" />В наличии</Badge>
               ) : (
                 <Badge variant="secondary">Нет в наличии</Badge>
               )}
               <Badge variant="outline" className="gap-1"><Truck className="w-3 h-3" />Доставка</Badge>
               {product.seller_type === "master" && (
-                <Badge className="bg-emerald-500 text-white gap-1"><Award className="w-3 h-3" />Товар от мастера</Badge>
+                <Badge className="bg-primary/10 text-primary border border-primary/20 gap-1"><Award className="w-3 h-3" />Товар от мастера</Badge>
               )}
             </div>
 
@@ -185,7 +230,7 @@ export default function ProductDetail() {
             {Object.keys(specs).length > 0 && (
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-foreground">Характеристики</h3>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {Object.entries(specs).map(([key, val]) => (
                     <div key={key} className="flex justify-between text-sm py-1.5 px-3 bg-muted/50 rounded-lg">
                       <span className="text-muted-foreground">{key}</span>
@@ -233,7 +278,7 @@ export default function ProductDetail() {
               </div>
               {withInstall && product.installation_price && (
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-muted-foreground">Установка</span>
+                  <span className="text-muted-foreground">Установка мастером</span>
                   <span>{product.installation_price} с.</span>
                 </div>
               )}
@@ -265,9 +310,13 @@ export default function ProductDetail() {
             <h2 className="text-xl font-bold text-foreground mb-6">Похожие товары</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {related.map(p => (
-                <Card key={p.id} className="hover:shadow-lg transition-all overflow-hidden border-border">
-                  <div className="aspect-square bg-muted/30 flex items-center justify-center p-4">
-                    {p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-contain" /> : <Package className="w-12 h-12 text-muted-foreground/30" />}
+                <Card key={p.id} className="hover:shadow-lg transition-all overflow-hidden border-border group">
+                  <div className="aspect-square bg-muted/20 flex items-center justify-center overflow-hidden">
+                    {p.image_url ? (
+                      <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    ) : (
+                      <Package className="w-12 h-12 text-muted-foreground/30" />
+                    )}
                   </div>
                   <CardContent className="p-3">
                     <Link to={`/shop/product/${p.id}`}>
