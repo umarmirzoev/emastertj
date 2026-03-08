@@ -784,6 +784,9 @@ export type Database = {
           name: string
           old_price: number | null
           price: number
+          promotion_end: string | null
+          promotion_label: string | null
+          promotion_start: string | null
           rating: number | null
           related_service_category: string | null
           reviews_count: number | null
@@ -808,6 +811,9 @@ export type Database = {
           name: string
           old_price?: number | null
           price?: number
+          promotion_end?: string | null
+          promotion_label?: string | null
+          promotion_start?: string | null
           rating?: number | null
           related_service_category?: string | null
           reviews_count?: number | null
@@ -832,6 +838,9 @@ export type Database = {
           name?: string
           old_price?: number | null
           price?: number
+          promotion_end?: string | null
+          promotion_label?: string | null
+          promotion_start?: string | null
           rating?: number | null
           related_service_category?: string | null
           reviews_count?: number | null
