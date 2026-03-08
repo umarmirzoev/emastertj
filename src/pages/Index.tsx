@@ -145,7 +145,7 @@ const Index = () => {
             </Link>
           </div>
         </div>
-        <Services onOrderService={handleOrderService} />
+        <Services />
       </section>
 
       {/* How it works */}

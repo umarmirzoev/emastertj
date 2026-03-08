@@ -325,6 +325,7 @@ const translations = {
     categoryEmergencyBadge: "Urgent",
     categoryPriceFrom: "from",
     categoryOrderButton: "Order a Master",
+    categoryChooseServices: "Choose Services",
     contactsTitle: "Contact Us",
     contactsDescription: "If you have questions, suggestions, or an urgent situation — we're always in touch.",
     contactsPhone: "Phone",
