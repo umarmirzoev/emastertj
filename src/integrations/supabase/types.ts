@@ -70,16 +70,25 @@ export type Database = {
           avatar_url: string | null
           average_rating: number | null
           bio: string | null
+          cancelled_orders: number | null
+          complaints: number | null
+          completed_orders: number | null
           created_at: string
           experience_years: number | null
           full_name: string
           id: string
           is_active: boolean | null
+          is_top_master: boolean | null
+          last_ranking_update: string | null
           latitude: number | null
           longitude: number | null
           phone: string | null
           price_max: number | null
           price_min: number | null
+          quality_flag: string | null
+          ranking_score: number | null
+          repeat_clients: number | null
+          response_time_avg: number | null
           service_categories: string[] | null
           total_reviews: number | null
           user_id: string | null
@@ -89,16 +98,25 @@ export type Database = {
           avatar_url?: string | null
           average_rating?: number | null
           bio?: string | null
+          cancelled_orders?: number | null
+          complaints?: number | null
+          completed_orders?: number | null
           created_at?: string
           experience_years?: number | null
           full_name: string
           id?: string
           is_active?: boolean | null
+          is_top_master?: boolean | null
+          last_ranking_update?: string | null
           latitude?: number | null
           longitude?: number | null
           phone?: string | null
           price_max?: number | null
           price_min?: number | null
+          quality_flag?: string | null
+          ranking_score?: number | null
+          repeat_clients?: number | null
+          response_time_avg?: number | null
           service_categories?: string[] | null
           total_reviews?: number | null
           user_id?: string | null
@@ -108,16 +126,25 @@ export type Database = {
           avatar_url?: string | null
           average_rating?: number | null
           bio?: string | null
+          cancelled_orders?: number | null
+          complaints?: number | null
+          completed_orders?: number | null
           created_at?: string
           experience_years?: number | null
           full_name?: string
           id?: string
           is_active?: boolean | null
+          is_top_master?: boolean | null
+          last_ranking_update?: string | null
           latitude?: number | null
           longitude?: number | null
           phone?: string | null
           price_max?: number | null
           price_min?: number | null
+          quality_flag?: string | null
+          ranking_score?: number | null
+          repeat_clients?: number | null
+          response_time_avg?: number | null
           service_categories?: string[] | null
           total_reviews?: number | null
           user_id?: string | null
@@ -350,6 +377,8 @@ export type Database = {
           phone: string | null
           price_max: number | null
           price_min: number | null
+          quality_flag: string | null
+          ranking_score: number | null
           service_categories: string[] | null
           total_reviews: number | null
           updated_at: string
@@ -371,6 +400,8 @@ export type Database = {
           phone?: string | null
           price_max?: number | null
           price_min?: number | null
+          quality_flag?: string | null
+          ranking_score?: number | null
           service_categories?: string[] | null
           total_reviews?: number | null
           updated_at?: string
@@ -392,6 +423,8 @@ export type Database = {
           phone?: string | null
           price_max?: number | null
           price_min?: number | null
+          quality_flag?: string | null
+          ranking_score?: number | null
           service_categories?: string[] | null
           total_reviews?: number | null
           updated_at?: string
@@ -553,6 +586,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_master_ranking: {
+        Args: {
+          p_avg_rating: number
+          p_cancelled_orders: number
+          p_complaints: number
+          p_completed_orders: number
+          p_repeat_clients: number
+          p_response_time_avg: number
+          p_total_reviews: number
+        }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
