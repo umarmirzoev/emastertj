@@ -27,8 +27,8 @@ const translations: Record<Language, Record<string, string>> = {
     subscription: "Подписка",
 
     // Hero homepage
-    heroTitle: "Усто ба хонаатон меояд",
-    heroSubtitle: "Устоони тасдиқшуда • Баромадан аз 30 дақиқа • Кафолати кор",
+    heroTitle: "Мастер приедет к вам сегодня",
+    heroSubtitle: "Проверенные мастера • Приезд от 30 минут • Гарантия работ",
     heroDescription: "Мастер Час — сервис вызова мастеров на дом в Душанбе. Электрика, сантехника, уборка, ремонт техники и другие услуги — быстро, надёжно, по честным ценам в сомони.",
     heroOrderButton: "Вызвать мастера",
     heroEmergencyButton: "🚨 Аварийный мастер 24/7",
