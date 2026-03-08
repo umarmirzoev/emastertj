@@ -237,10 +237,13 @@ export type Database = {
           description: string | null
           id: string
           master_id: string | null
+          master_payout: number | null
           materials_cost: number | null
           paid_at: string | null
           payment_method: string | null
           payment_status: string
+          payout_date: string | null
+          payout_status: string | null
           phone: string
           platform_commission: number | null
           preferred_time: string | null
@@ -265,10 +268,13 @@ export type Database = {
           description?: string | null
           id?: string
           master_id?: string | null
+          master_payout?: number | null
           materials_cost?: number | null
           paid_at?: string | null
           payment_method?: string | null
           payment_status?: string
+          payout_date?: string | null
+          payout_status?: string | null
           phone?: string
           platform_commission?: number | null
           preferred_time?: string | null
@@ -293,10 +299,13 @@ export type Database = {
           description?: string | null
           id?: string
           master_id?: string | null
+          master_payout?: number | null
           materials_cost?: number | null
           paid_at?: string | null
           payment_method?: string | null
           payment_status?: string
+          payout_date?: string | null
+          payout_status?: string | null
           phone?: string
           platform_commission?: number | null
           preferred_time?: string | null
