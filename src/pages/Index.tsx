@@ -246,7 +246,7 @@ const Index = () => {
               <Phone className="w-5 h-5 mr-2" />
               {t("heroOrderButton")}
             </Button>
-            <Button onClick={() => { setSelectedCategory("urgent"); setIsOrderModalOpen(true); }} variant="outline" size="lg" className="flex-1 border-2 border-destructive/30 text-destructive rounded-full px-6 py-6 text-base font-semibold group">
+            <Button onClick={() => setQuickBookOpen(true)} variant="outline" size="lg" className="flex-1 border-2 border-destructive/30 text-destructive rounded-full px-6 py-6 text-base font-semibold group">
               <Siren className="w-5 h-5 mr-2 group-hover:animate-pulse" />
               <span className="flex flex-col items-start sm:items-center">
                 <span>{t("heroEmergencyButton")}</span>
