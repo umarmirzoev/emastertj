@@ -15,7 +15,7 @@ import {
   ClipboardList, DollarSign, Star, Clock, User, CheckCircle, XCircle,
   Play, MapPin, Phone, Calendar, Image, Briefcase, Bell, TrendingUp,
   Navigation, Eye, Loader2, Camera, Upload, Trash2, Edit3, Award,
-  Zap, AlertCircle, BarChart3, WifiOff, Wifi, ArrowRight, Hash,
+  Zap, AlertCircle, BarChart3, WifiOff, Wifi, ArrowRight, Hash, Package,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import OrderChat from "@/components/OrderChat";
