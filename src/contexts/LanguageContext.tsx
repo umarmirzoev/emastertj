@@ -264,6 +264,7 @@ const translations = {
   en: {
     navAbout: "About Us",
     navCategories: "Categories",
+    navMasters: "Masters",
     navHowItWorks: "How It Works",
     navContacts: "Contacts",
     navBecomeMaster: "Become a Master",
