@@ -70,6 +70,7 @@ export default function ClientDashboard() {
   const [masterInfo, setMasterInfo] = useState<any>(null);
   const [myApplication, setMyApplication] = useState<any>(null);
   const { notifications, unreadCount } = useNotifications(user?.id);
+  const [chatOrderId, setChatOrderId] = useState<string | null>(null);
 
   // Profile editing
   const [editName, setEditName] = useState("");
