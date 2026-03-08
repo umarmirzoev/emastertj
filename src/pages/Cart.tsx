@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/hooks/useCart";
+import RecommendedProducts from "@/components/shop/RecommendedProducts";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -132,6 +133,9 @@ export default function CartPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Recommended Products */}
+        <RecommendedProducts excludeIds={items.map(i => i.product_id)} />
       </div>
       <Footer />
     </div>

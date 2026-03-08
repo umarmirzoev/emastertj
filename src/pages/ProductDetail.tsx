@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/hooks/useCart";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import RecentlyViewedProducts from "@/components/shop/RecentlyViewedProducts";
+import RecommendedProducts from "@/components/shop/RecommendedProducts";
 import { motion } from "framer-motion";
 import {
   ShoppingCart, Star, Package, Phone, Minus, Plus,
@@ -423,6 +424,9 @@ export default function ProductDetail() {
             </div>
           </motion.div>
         )}
+
+        {/* Recommended Products */}
+        <RecommendedProducts excludeIds={id ? [id] : []} />
 
         {/* Recently Viewed */}
         <RecentlyViewedProducts excludeId={id} />
