@@ -150,7 +150,7 @@ export default function SuperAdminDashboard() {
 
   // Charts
   const ordersByDay = useMemo(() => {
-    const days: { date: string; orders: number; completed: number; revenue: number }[] = [];
+    const days: { date: string; orders: number; completed: number; revenue: number; commission: number }[] = [];
     for (let i = 13; i >= 0; i--) {
       const d = new Date(today.getTime() - i * 86400000);
       const dateStr = d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
