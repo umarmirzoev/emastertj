@@ -12,6 +12,7 @@ const translations = {
   ru: {
     navAbout: "О компании",
     navCategories: "Категории",
+    navMasters: "Мастера",
     navHowItWorks: "Как это работает",
     navContacts: "Контакты",
     navBecomeMaster: "Стать мастером",
