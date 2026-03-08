@@ -34,6 +34,10 @@ export default function AdminShopManager() {
   const [imageUrl, setImageUrl] = useState("");
   const [stockQty, setStockQty] = useState("100");
   const [installPrice, setInstallPrice] = useState("");
+  const [isDiscounted, setIsDiscounted] = useState(false);
+  const [promoStart, setPromoStart] = useState("");
+  const [promoEnd, setPromoEnd] = useState("");
+  const [promoLabel, setPromoLabel] = useState("");
 
   const load = async () => {
     setLoading(true);
