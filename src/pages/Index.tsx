@@ -433,6 +433,7 @@ const Index = () => {
         category={selectedCategory}
         initialServiceName={selectedServiceName}
       />
+      <QuickBooking open={quickBookOpen} onOpenChange={setQuickBookOpen} />
     </div>
   );
 };
