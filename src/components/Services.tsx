@@ -50,6 +50,13 @@ const colorMap: Record<string, string> = {
   "Ремонт техники": "from-cyan-400 to-blue-500",
   "Кондиционеры": "from-cyan-400 to-blue-500",
   "Отопление": "from-orange-400 to-red-500",
+  "Окна и двери": "from-amber-400 to-orange-500",
+  "Малярные работы": "from-fuchsia-400 to-pink-500",
+  "Потолки": "from-indigo-400 to-violet-500",
+  "Полы и ламинат": "from-stone-400 to-amber-500",
+  "Срочный мастер 24/7": "from-red-500 to-rose-600",
+  "Бытовая техника": "from-blue-400 to-indigo-500",
+  "Другие услуги": "from-gray-400 to-slate-500",
 };
 
 interface Category {
