@@ -173,7 +173,7 @@ export function PaymentDialog({ order, open, onOpenChange, onPaymentComplete }: 
             supabase.from("notifications").insert({
               user_id: a.user_id,
               title: "Оплата заказа",
-              message: `Заказ #${order.id.slice(0, 8)} оплачен: ${total} сом.`,
+              message: `Заказ #${order.id.slice(0, 8)} оплачен: ${total} сомонӣ`,
               type: "payment_completed",
               related_id: order.id,
             })
