@@ -346,6 +346,60 @@ export default function SuperAdminDashboard() {
             </Card>
           </div>
 
+          {/* Platform Commission Analytics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <Card className="border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Комиссия платформы (всего)</p>
+                <p className="text-2xl font-bold text-emerald-600">{commissionRevenue.toLocaleString()} сомонӣ</p>
+                <p className="text-xs text-muted-foreground">{paidOrders.length} оплачено</p>
+              </CardContent>
+            </Card>
+            <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Выплаты мастерам</p>
+                <p className="text-2xl font-bold text-blue-600">{totalPayouts.toLocaleString()} сомонӣ</p>
+                <p className="text-xs text-muted-foreground">80% от оплаченных</p>
+              </CardContent>
+            </Card>
+            <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Средний чек</p>
+                <p className="text-2xl font-bold text-amber-600">{avgOrderValue.toLocaleString()} сомонӣ</p>
+                <p className="text-xs text-muted-foreground">{completedOrders.length} заказов</p>
+              </CardContent>
+            </Card>
+            <Card className="border-rose-200 dark:border-rose-800 bg-rose-50/50 dark:bg-rose-950/20">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Неоплаченных заказов</p>
+                <p className="text-2xl font-bold text-rose-600">{unpaidOrders.length}</p>
+                <p className="text-xs text-muted-foreground">{unpaidOrders.reduce((s, o) => s + (o.total_amount || o.budget || 0), 0).toLocaleString()} сомонӣ</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Commission breakdown row */}
+          <div className="grid grid-cols-3 gap-3">
+            <Card className="border-emerald-200 dark:border-emerald-800">
+              <CardContent className="p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Комиссия сегодня</p>
+                <p className="text-xl font-bold text-emerald-600">{todayCommission.toLocaleString()} сомонӣ</p>
+              </CardContent>
+            </Card>
+            <Card className="border-blue-200 dark:border-blue-800">
+              <CardContent className="p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Комиссия за неделю</p>
+                <p className="text-xl font-bold text-blue-600">{weekCommission.toLocaleString()} сомонӣ</p>
+              </CardContent>
+            </Card>
+            <Card className="border-violet-200 dark:border-violet-800">
+              <CardContent className="p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Комиссия за месяц</p>
+                <p className="text-xl font-bold text-violet-600">{monthCommission.toLocaleString()} сомонӣ</p>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Charts row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card>
