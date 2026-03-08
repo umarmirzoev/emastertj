@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import ReviewModal from "./ReviewModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import OrderChat from "@/components/OrderChat";
+import { PaymentDialog, PaymentStatusBadge, PriceBreakdown, ReceiptDialog } from "@/components/payment/PaymentComponents";
 
 const allStatuses = [
   { key: "new", label: "Новый заказ", icon: ClipboardList, color: "bg-blue-500" },
