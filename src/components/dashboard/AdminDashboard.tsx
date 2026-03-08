@@ -79,6 +79,7 @@ export default function AdminDashboard() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [appStatusFilter, setAppStatusFilter] = useState("all");
   const [appSpecFilter, setAppSpecFilter] = useState("all");
+  const [paymentFilter, setPaymentFilter] = useState("all");
   const [confirmAction, setConfirmAction] = useState<{ type: string; id: string; userId: string; name: string } | null>(null);
 
   // Assign master dialog
@@ -98,7 +99,7 @@ export default function AdminDashboard() {
       supabase.from("service_categories").select("*, services(count)").order("sort_order"),
       supabase.from("master_applications").select("*").order("created_at", { ascending: false }),
       supabase.from("reviews").select("*").order("created_at", { ascending: false }).limit(100),
-      supabase.from("master_listings").select("id, full_name, phone, service_categories, average_rating, user_id").eq("is_active", true).order("average_rating", { ascending: false }).limit(200),
+      supabase.from("master_listings").select("id, full_name, phone, service_categories, average_rating, user_id, working_districts, ranking_score, is_top_master, quality_flag, completed_orders").eq("is_active", true).order("ranking_score", { ascending: false }).limit(200),
     ]);
     setOrders(ordersRes.data || []);
     setAllUsers(usersRes.data || []);
@@ -197,13 +198,14 @@ export default function AdminDashboard() {
     return orders.filter(o => {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (categoryFilter !== "all" && o.category_id !== categoryFilter) return false;
+      if (paymentFilter !== "all" && (o as any).payment_status !== paymentFilter) return false;
       if (search && tab === "orders") {
         const q = search.toLowerCase();
         if (!o.address?.toLowerCase().includes(q) && !o.phone?.includes(q) && !o.services?.name_ru?.toLowerCase().includes(q)) return false;
       }
       return true;
     });
-  }, [orders, statusFilter, categoryFilter, search, tab]);
+  }, [orders, statusFilter, categoryFilter, paymentFilter, search, tab]);
 
   // Filtered applications
   const filteredApplications = useMemo(() => {
@@ -400,6 +402,16 @@ export default function AdminDashboard() {
                 {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name_ru}</SelectItem>)}
               </SelectContent>
             </Select>
+            <Select value={paymentFilter} onValueChange={setPaymentFilter}>
+              <SelectTrigger className="w-36 h-10"><SelectValue placeholder="Оплата" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все</SelectItem>
+                <SelectItem value="paid">Оплачен</SelectItem>
+                <SelectItem value="unpaid">Не оплачен</SelectItem>
+                <SelectItem value="pending">Ожидает</SelectItem>
+                <SelectItem value="failed">Ошибка</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -417,7 +429,11 @@ export default function AdminDashboard() {
                   <div className="md:grid md:grid-cols-12 md:gap-3 md:items-center space-y-2 md:space-y-0">
                     <div className="col-span-3 min-w-0">
                       <p className="font-medium text-sm truncate">{order.services?.name_ru || order.service_categories?.name_ru || "Заказ"}</p>
-                      <p className="text-[11px] text-muted-foreground">ID: {order.id.slice(0, 8)}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[11px] text-muted-foreground">ID: {order.id.slice(0, 8)}</p>
+                        {(order.total_amount || order.budget) > 0 && <span className="text-[10px] font-semibold text-primary">{(order.total_amount || order.budget || 0).toLocaleString()} с.</span>}
+                        <PaymentStatusBadge status={(order as any).payment_status || "unpaid"} />
+                      </div>
                     </div>
                     <div className="col-span-2 min-w-0">
                       <p className="text-sm truncate">{getClientName(order.client_id)}</p>
@@ -688,18 +704,70 @@ export default function AdminDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Assign master dialog */}
+      {/* Assign master dialog — Smart Recommendation */}
       <Dialog open={!!assignDialog} onOpenChange={() => setAssignDialog(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader><DialogTitle>Назначить мастера</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-sm text-muted-foreground mb-1">
             Заказ: {assignDialog?.services?.name_ru || assignDialog?.service_categories?.name_ru || "—"}
           </p>
+          {assignDialog?.address && <p className="text-xs text-muted-foreground mb-3">📍 {assignDialog.address}</p>}
+          
+          {/* Recommended masters section */}
+          {(() => {
+            const orderCat = assignDialog?.service_categories?.name_ru;
+            const recommended = masters
+              .filter((m: any) => {
+                if (m.quality_flag === "poor") return false;
+                if (orderCat && m.service_categories?.includes(orderCat)) return true;
+                return true;
+              })
+              .sort((a: any, b: any) => {
+                const aMatch = orderCat && a.service_categories?.includes(orderCat) ? 1 : 0;
+                const bMatch = orderCat && b.service_categories?.includes(orderCat) ? 1 : 0;
+                if (aMatch !== bMatch) return bMatch - aMatch;
+                return (b.ranking_score || 0) - (a.ranking_score || 0);
+              })
+              .slice(0, 5);
+            
+            return recommended.length > 0 ? (
+              <div className="mb-3">
+                <p className="text-xs font-semibold text-primary mb-2">⚡ Рекомендуемые мастера</p>
+                <div className="space-y-1.5">
+                  {recommended.map((m: any) => (
+                    <div
+                      key={m.id}
+                      className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-colors ${selectedMasterId === (m.user_id || m.id) ? "bg-primary/10 border border-primary/30" : "bg-muted/50 hover:bg-muted"}`}
+                      onClick={() => setSelectedMasterId(m.user_id || m.id)}
+                    >
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                          {m.full_name?.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1">
+                            <p className="text-sm font-medium truncate">{m.full_name}</p>
+                            {m.is_top_master && <Badge className="bg-amber-100 text-amber-800 text-[9px] px-1 py-0">Топ</Badge>}
+                            {m.quality_flag === "warning" && <Badge className="bg-orange-100 text-orange-800 text-[9px] px-1 py-0">⚠</Badge>}
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">★{m.average_rating} · {m.completed_orders || 0} работ · Ранг: {Math.round(m.ranking_score || 0)}</p>
+                        </div>
+                      </div>
+                      {selectedMasterId === (m.user_id || m.id) && <CheckCircle className="w-4 h-4 text-primary shrink-0" />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null;
+          })()}
+
           <Select value={selectedMasterId} onValueChange={setSelectedMasterId}>
-            <SelectTrigger><SelectValue placeholder="Выберите мастера" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder="Или выберите вручную" /></SelectTrigger>
             <SelectContent>
-              {masters.map(m => (
-                <SelectItem key={m.id} value={m.user_id || m.id}>{m.full_name} — ★{m.average_rating}</SelectItem>
+              {masters.map((m: any) => (
+                <SelectItem key={m.id} value={m.user_id || m.id}>
+                  {m.full_name} — ★{m.average_rating} {m.is_top_master ? "🏆" : ""} {m.quality_flag === "poor" ? "⚠️" : ""}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>

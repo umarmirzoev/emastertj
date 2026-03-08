@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import {
   Search, Star, MapPin, Clock, Phone, MessageCircle,
-  SlidersHorizontal, X, ChevronDown, Users,
+  SlidersHorizontal, X, ChevronDown, Users, Award, Shield,
 } from "lucide-react";
 
 interface MasterListing {
@@ -31,6 +31,10 @@ interface MasterListing {
   price_max: number;
   latitude: number | null;
   longitude: number | null;
+  ranking_score: number;
+  is_top_master: boolean;
+  quality_flag: string;
+  completed_orders: number;
 }
 
 const ALL_CATEGORIES = [
@@ -48,7 +52,7 @@ export default function Masters() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [district, setDistrict] = useState("all");
-  const [sortBy, setSortBy] = useState("rating");
+  const [sortBy, setSortBy] = useState("ranking");
   const [minRating, setMinRating] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -89,6 +93,7 @@ export default function Masters() {
 
     result = [...result].sort((a, b) => {
       switch (sortBy) {
+        case "ranking": return (b.ranking_score || 0) - (a.ranking_score || 0);
         case "rating": return b.average_rating - a.average_rating;
         case "price_low": return a.price_min - b.price_min;
         case "price_high": return b.price_max - a.price_max;
@@ -186,6 +191,7 @@ export default function Masters() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="ranking">По рекомендации</SelectItem>
                       <SelectItem value="rating">По рейтингу</SelectItem>
                       <SelectItem value="price_low">Цена: по возрастанию</SelectItem>
                       <SelectItem value="price_high">Цена: по убыванию</SelectItem>
@@ -291,17 +297,29 @@ function MasterCard({ master, index }: { master: MasterListing; index: number })
                   {initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-foreground text-base group-hover:text-primary transition-colors truncate">
-                    {master.full_name}
-                  </h3>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="font-bold text-foreground text-base group-hover:text-primary transition-colors truncate">
+                      {master.full_name}
+                    </h3>
+                    {master.is_top_master && (
+                      <Badge className="bg-amber-100 text-amber-800 gap-0.5 text-[10px] px-1.5 py-0 shrink-0">
+                        <Award className="w-3 h-3" /> Топ
+                      </Badge>
+                    )}
+                  </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                     <span className="text-sm font-semibold">{master.average_rating}</span>
                     <span className="text-xs text-muted-foreground">({master.total_reviews} отзывов)</span>
+                    {master.ranking_score > 0 && (
+                      <span className="text-[10px] text-muted-foreground/60 ml-1">#{Math.round(master.ranking_score)}</span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    {master.experience_years} лет опыта
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{master.experience_years} лет</span>
+                    {master.completed_orders > 0 && (
+                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" />{master.completed_orders} работ</span>
+                    )}
                   </div>
                 </div>
               </div>

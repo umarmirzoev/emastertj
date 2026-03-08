@@ -74,7 +74,7 @@ export default function SuperAdminDashboard() {
       supabase.from("service_categories").select("*, services(count)").order("sort_order"),
       supabase.from("master_applications").select("*").order("created_at", { ascending: false }),
       supabase.from("reviews").select("*").order("created_at", { ascending: false }).limit(200),
-      supabase.from("master_listings").select("id, full_name, average_rating, user_id, phone, service_categories").eq("is_active", true).limit(500),
+      supabase.from("master_listings").select("id, full_name, average_rating, user_id, phone, service_categories, ranking_score, is_top_master, quality_flag, completed_orders, cancelled_orders, complaints, response_time_avg").eq("is_active", true).limit(500),
     ]);
     setOrders(ordersRes.data || []);
     setAllUsers(usersRes.data || []);
@@ -658,21 +658,70 @@ export default function SuperAdminDashboard() {
         </>
       ) : tab === "masters" ? (
         <>
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Поиск мастеров..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+          <div className="flex flex-wrap gap-3 mb-4">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input placeholder="Поиск мастеров..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+            </div>
           </div>
+
+          {/* Quality overview cards */}
+          {(() => {
+            const topMasters = masters.filter((m: any) => m.is_top_master);
+            const warningMasters = masters.filter((m: any) => m.quality_flag === "warning");
+            const poorMasters = masters.filter((m: any) => m.quality_flag === "poor");
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <Card className="border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20">
+                  <CardContent className="p-3 text-center">
+                    <p className="text-xl font-bold text-emerald-600">{topMasters.length}</p>
+                    <p className="text-[10px] text-muted-foreground">🏆 Топ мастера</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-3 text-center">
+                    <p className="text-xl font-bold text-foreground">{masters.length - topMasters.length - warningMasters.length - poorMasters.length}</p>
+                    <p className="text-[10px] text-muted-foreground">✅ Хорошие</p>
+                  </CardContent>
+                </Card>
+                <Card className="border-orange-200 dark:border-orange-800 bg-orange-50/50 dark:bg-orange-950/20">
+                  <CardContent className="p-3 text-center">
+                    <p className="text-xl font-bold text-orange-600">{warningMasters.length}</p>
+                    <p className="text-[10px] text-muted-foreground">⚠️ Требуют внимания</p>
+                  </CardContent>
+                </Card>
+                <Card className="border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20">
+                  <CardContent className="p-3 text-center">
+                    <p className="text-xl font-bold text-red-600">{poorMasters.length}</p>
+                    <p className="text-[10px] text-muted-foreground">🚫 Низкое качество</p>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          })()}
+
           <div className="space-y-2">
-            {masters.filter(m => !search || m.full_name?.toLowerCase().includes(search.toLowerCase())).map(m => (
-              <Card key={m.id}>
+            {masters
+              .filter((m: any) => !search || m.full_name?.toLowerCase().includes(search.toLowerCase()))
+              .sort((a: any, b: any) => (b.ranking_score || 0) - (a.ranking_score || 0))
+              .map((m: any) => (
+              <Card key={m.id} className={m.quality_flag === "poor" ? "border-red-200 bg-red-50/30 dark:border-red-800 dark:bg-red-950/10" : m.quality_flag === "warning" ? "border-orange-200 bg-orange-50/30 dark:border-orange-800 dark:bg-orange-950/10" : ""}>
                 <CardContent className="p-3 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-orange-500/10 flex items-center justify-center"><Wrench className="w-4 h-4 text-orange-600" /></div>
                     <div>
-                      <p className="text-sm font-medium">{m.full_name}</p>
-                      <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                        <StarIcon className="w-3 h-3 fill-yellow-400 text-yellow-400" />{m.average_rating}
-                        {m.phone && <span>• {m.phone}</span>}
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-medium">{m.full_name}</p>
+                        {m.is_top_master && <Badge className="bg-amber-100 text-amber-800 text-[9px] px-1 py-0">🏆 Топ</Badge>}
+                        {m.quality_flag === "warning" && <Badge className="bg-orange-100 text-orange-800 text-[9px] px-1 py-0">⚠️ Внимание</Badge>}
+                        {m.quality_flag === "poor" && <Badge className="bg-red-100 text-red-800 text-[9px] px-1 py-0">🚫 Низкое</Badge>}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground flex items-center gap-2">
+                        <span className="flex items-center gap-0.5"><StarIcon className="w-3 h-3 fill-yellow-400 text-yellow-400" />{m.average_rating}</span>
+                        <span>Ранг: {Math.round(m.ranking_score || 0)}</span>
+                        <span>{m.completed_orders || 0} работ</span>
+                        {m.cancelled_orders > 0 && <span className="text-red-500">{m.cancelled_orders} отмен</span>}
+                        {m.complaints > 0 && <span className="text-red-500">{m.complaints} жалоб</span>}
                       </p>
                     </div>
                   </div>
