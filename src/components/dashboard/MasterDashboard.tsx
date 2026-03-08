@@ -203,10 +203,14 @@ export default function MasterDashboard() {
   const activeOrders = orders.filter(o => ["assigned", "accepted", "on_the_way", "arrived", "in_progress"].includes(o.status));
   const newOrders = orders.filter(o => o.status === "new" || o.status === "assigned");
   const cancelledOrders = orders.filter(o => o.status === "cancelled");
-  const totalEarnings = completedOrders.reduce((s, o) => s + (o.budget || 0), 0);
-  const todayEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).reduce((s, o) => s + (o.budget || 0), 0);
-  const weekEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo).reduce((s, o) => s + (o.budget || 0), 0);
-  const monthEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo).reduce((s, o) => s + (o.budget || 0), 0);
+  const COMMISSION_RATE = 0.2;
+  const getGross = (o: any) => (o.total_amount || o.budget || 0);
+  const getPayout = (o: any) => (o as any).master_payout || Math.round(getGross(o) * (1 - COMMISSION_RATE));
+  const totalGross = completedOrders.reduce((s, o) => s + getGross(o), 0);
+  const totalEarnings = completedOrders.reduce((s, o) => s + getPayout(o), 0);
+  const todayEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).reduce((s, o) => s + getPayout(o), 0);
+  const weekEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo).reduce((s, o) => s + getPayout(o), 0);
+  const monthEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo).reduce((s, o) => s + getPayout(o), 0);
   const avgRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : "—";
   const avgOrderValue = completedOrders.length > 0 ? Math.round(totalEarnings / completedOrders.length) : 0;
 
