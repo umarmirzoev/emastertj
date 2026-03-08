@@ -1231,7 +1231,7 @@ const translations: Record<Language, Record<string, string>> = {
     pendingTitle: "Application Under Review", pendingDesc: "Your master application is under review. We'll notify you by email when approved.",
     topMasters: "Top Masters in Dushanbe", topMastersDesc: "Highest rated professionals in your city",
     viewAllMasters: "View all masters", clientReviews: "What Dushanbe Clients Say",
-    yearsShort: "yrs", fromPrice: "from", aiMasterMatchBtn: "🤖 AI Master Match", aiMasterMatchNew: "New",
+    yearsShort: "yrs", fromPrice: "from", currencySomoni: "somoni", aiMasterMatchBtn: "🤖 AI Master Match", aiMasterMatchNew: "New",
     searchPlaceholder: "Describe your problem: leaky faucet, broken outlet...",
     matchingCategory: "matching category", pleaseLogin: "Please log in to your account",
     addressPlaceholder: "Address", preferredTimePlaceholder: "Preferred time",
