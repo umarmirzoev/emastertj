@@ -71,6 +71,7 @@ const translations = {
     categoryEmergencyBadge: "Срочно",
     categoryPriceFrom: "от",
     categoryOrderButton: "Заказать мастера",
+    categoryChooseServices: "Выбрать услуги",
     contactsTitle: "Свяжитесь с нами",
     contactsDescription: "Если у вас есть вопросы, предложения или срочная ситуация — мы всегда на связи.",
     contactsPhone: "Телефон",
