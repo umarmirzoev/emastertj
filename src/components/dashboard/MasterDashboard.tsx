@@ -65,6 +65,7 @@ export default function MasterDashboard() {
   const [tab, setTab] = useState<Tab>("overview");
   const [detailOrder, setDetailOrder] = useState<any>(null);
   const { notifications, unreadCount } = useNotifications(user?.id);
+  const [chatOrderId, setChatOrderId] = useState<string | null>(null);
 
   // Profile editing
   const [editBio, setEditBio] = useState("");
