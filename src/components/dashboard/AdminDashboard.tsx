@@ -198,13 +198,14 @@ export default function AdminDashboard() {
     return orders.filter(o => {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (categoryFilter !== "all" && o.category_id !== categoryFilter) return false;
+      if (paymentFilter !== "all" && (o as any).payment_status !== paymentFilter) return false;
       if (search && tab === "orders") {
         const q = search.toLowerCase();
         if (!o.address?.toLowerCase().includes(q) && !o.phone?.includes(q) && !o.services?.name_ru?.toLowerCase().includes(q)) return false;
       }
       return true;
     });
-  }, [orders, statusFilter, categoryFilter, search, tab]);
+  }, [orders, statusFilter, categoryFilter, paymentFilter, search, tab]);
 
   // Filtered applications
   const filteredApplications = useMemo(() => {
