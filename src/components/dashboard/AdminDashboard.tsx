@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import {
   LayoutDashboard, ClipboardList, Users, UserCheck, Wrench, Star as StarIcon,
   Search, DollarSign, CheckCircle, XCircle, TrendingUp, Eye, MapPin, Phone,
-  Calendar, ArrowRight, Filter,
+  Calendar, ArrowRight, Filter, FileText, Mail,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
@@ -46,9 +46,20 @@ const statusLabels: Record<string, string> = {
   cancelled: "Отменён",
 };
 
+const appStatusColors: Record<string, string> = {
+  pending: "bg-amber-100 text-amber-800",
+  approved: "bg-green-100 text-green-800",
+  rejected: "bg-red-100 text-red-800",
+};
+const appStatusLabels: Record<string, string> = {
+  pending: "Ожидает",
+  approved: "Одобрена",
+  rejected: "Отклонена",
+};
+
 const statusFlow = ["new", "accepted", "assigned", "on_the_way", "arrived", "in_progress", "completed", "cancelled"];
 
-type Tab = "overview" | "orders" | "pending" | "users" | "masters" | "reviews" | "notifications";
+type Tab = "overview" | "orders" | "applications" | "users" | "masters" | "reviews";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -58,14 +69,16 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
-  const [pendingMasters, setPendingMasters] = useState<any[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [masters, setMasters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [confirmAction, setConfirmAction] = useState<{ type: string; id: string; name: string } | null>(null);
+  const [appStatusFilter, setAppStatusFilter] = useState("all");
+  const [appSpecFilter, setAppSpecFilter] = useState("all");
+  const [confirmAction, setConfirmAction] = useState<{ type: string; id: string; userId: string; name: string } | null>(null);
 
   // Assign master dialog
   const [assignDialog, setAssignDialog] = useState<any>(null);
@@ -73,21 +86,23 @@ export default function AdminDashboard() {
 
   // Order detail
   const [detailOrder, setDetailOrder] = useState<any>(null);
+  // Application detail
+  const [detailApp, setDetailApp] = useState<any>(null);
 
   const loadData = async () => {
     setLoading(true);
-    const [ordersRes, usersRes, catsRes, pendingRes, reviewsRes, mastersRes] = await Promise.all([
+    const [ordersRes, usersRes, catsRes, appsRes, reviewsRes, mastersRes] = await Promise.all([
       supabase.from("orders").select("*, service_categories(name_ru), services(name_ru)").order("created_at", { ascending: false }).limit(500),
       supabase.from("profiles").select("*, user_roles(role)").limit(500),
       supabase.from("service_categories").select("*, services(count)").order("sort_order"),
-      supabase.from("profiles").select("*").eq("approval_status", "pending"),
+      supabase.from("master_applications").select("*").order("created_at", { ascending: false }),
       supabase.from("reviews").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("master_listings").select("id, full_name, phone, service_categories, average_rating, user_id").eq("is_active", true).order("average_rating", { ascending: false }).limit(200),
     ]);
     setOrders(ordersRes.data || []);
     setAllUsers(usersRes.data || []);
     setCategories(catsRes.data || []);
-    setPendingMasters(pendingRes.data || []);
+    setApplications(appsRes.data || []);
     setReviews(reviewsRes.data || []);
     setMasters(mastersRes.data || []);
     setLoading(false);
@@ -106,8 +121,6 @@ export default function AdminDashboard() {
     else {
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updateData } : o));
       toast({ title: "Статус обновлён" });
-
-      // Notify client
       const order = orders.find(o => o.id === orderId);
       if (order) {
         const statusMessages: Record<string, string> = {
@@ -120,11 +133,8 @@ export default function AdminDashboard() {
         };
         if (statusMessages[status]) {
           await supabase.from("notifications").insert({
-            user_id: order.client_id,
-            title: "Обновление заказа",
-            message: statusMessages[status],
-            type: "order_status",
-            related_id: orderId,
+            user_id: order.client_id, title: "Обновление заказа",
+            message: statusMessages[status], type: "order_status", related_id: orderId,
           });
         }
       }
@@ -134,40 +144,51 @@ export default function AdminDashboard() {
   const assignMaster = async () => {
     if (!assignDialog || !selectedMasterId) return;
     const { error } = await supabase.from("orders").update({
-      master_id: selectedMasterId,
-      status: "assigned",
+      master_id: selectedMasterId, status: "assigned",
     }).eq("id", assignDialog.id);
-
     if (error) {
       toast({ title: "Ошибка", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Мастер назначен" });
-
-      // Notify client
       await supabase.from("notifications").insert({
-        user_id: assignDialog.client_id,
-        title: "Мастер назначен",
-        message: "К вашему заказу назначен мастер",
-        type: "order_status",
-        related_id: assignDialog.id,
+        user_id: assignDialog.client_id, title: "Мастер назначен",
+        message: "К вашему заказу назначен мастер", type: "order_status", related_id: assignDialog.id,
       });
-
       loadData();
     }
     setAssignDialog(null);
     setSelectedMasterId("");
   };
 
-  const approveMaster = async (userId: string) => {
-    await supabase.from("profiles").update({ approval_status: "active" }).eq("user_id", userId);
-    await supabase.from("notifications").insert({ user_id: userId, title: "Заявка одобрена!", message: "Ваша заявка мастера одобрена.", type: "approval" });
-    toast({ title: "Мастер одобрен" }); loadData();
+  const approveApplication = async (appId: string, userId: string) => {
+    // Update application status
+    await supabase.from("master_applications").update({ status: "approved" }).eq("id", appId);
+    // Add master role
+    const { data: existingRole } = await supabase.from("user_roles").select("id").eq("user_id", userId).eq("role", "master");
+    if (!existingRole || existingRole.length === 0) {
+      await supabase.from("user_roles").insert({ user_id: userId, role: "master" as any });
+    }
+    // Update profile
+    await supabase.from("profiles").update({ approval_status: "approved" }).eq("user_id", userId);
+    // Notify user
+    await supabase.from("notifications").insert({
+      user_id: userId, title: "Заявка одобрена!",
+      message: "Ваша заявка мастера одобрена. Теперь вы можете работать как мастер.",
+      type: "application",
+    });
+    toast({ title: "Заявка одобрена" });
+    loadData();
   };
 
-  const rejectMaster = async (userId: string) => {
-    await supabase.from("profiles").update({ approval_status: "rejected" }).eq("user_id", userId);
-    await supabase.from("notifications").insert({ user_id: userId, title: "Заявка отклонена", message: "Ваша заявка мастера была отклонена.", type: "approval" });
-    toast({ title: "Мастер отклонён" }); loadData();
+  const rejectApplication = async (appId: string, userId: string) => {
+    await supabase.from("master_applications").update({ status: "rejected" }).eq("id", appId);
+    await supabase.from("notifications").insert({
+      user_id: userId, title: "Заявка отклонена",
+      message: "К сожалению, ваша заявка мастера была отклонена.",
+      type: "application",
+    });
+    toast({ title: "Заявка отклонена" });
+    loadData();
   };
 
   // Filtered orders
@@ -175,18 +196,31 @@ export default function AdminDashboard() {
     return orders.filter(o => {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (categoryFilter !== "all" && o.category_id !== categoryFilter) return false;
-      if (search) {
+      if (search && tab === "orders") {
         const q = search.toLowerCase();
         if (!o.address?.toLowerCase().includes(q) && !o.phone?.includes(q) && !o.services?.name_ru?.toLowerCase().includes(q)) return false;
       }
       return true;
     });
-  }, [orders, statusFilter, categoryFilter, search]);
+  }, [orders, statusFilter, categoryFilter, search, tab]);
 
+  // Filtered applications
+  const filteredApplications = useMemo(() => {
+    return applications.filter(a => {
+      if (appStatusFilter !== "all" && a.status !== appStatusFilter) return false;
+      if (appSpecFilter !== "all" && a.specialization !== appSpecFilter) return false;
+      if (search && tab === "applications") {
+        const q = search.toLowerCase();
+        if (!a.full_name?.toLowerCase().includes(q) && !a.phone?.includes(q) && !a.email?.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  }, [applications, appStatusFilter, appSpecFilter, search, tab]);
+
+  const pendingApps = applications.filter(a => a.status === "pending");
   const newOrders = orders.filter(o => o.status === "new");
   const activeOrders = orders.filter(o => !["completed", "cancelled", "reviewed"].includes(o.status));
   const completedOrds = orders.filter(o => o.status === "completed" || o.status === "reviewed");
-  const revenue = completedOrds.reduce((s, o) => s + (o.budget || 0), 0);
 
   const clientUsers = allUsers.filter(u => u.user_roles?.some((r: any) => r.role === "client"));
   const masterUsers = allUsers.filter(u => u.user_roles?.some((r: any) => r.role === "master"));
@@ -196,7 +230,7 @@ export default function AdminDashboard() {
     { path: "/dashboard/orders", label: "Заказы", icon: ClipboardList, badge: newOrders.length },
     { path: "/dashboard/users", label: "Клиенты", icon: Users },
     { path: "/dashboard/masters", label: "Мастера", icon: Wrench },
-    { path: "/dashboard/pending", label: "Заявки", icon: UserCheck, badge: pendingMasters.length },
+    { path: "/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
     { path: "/dashboard/reviews", label: "Отзывы", icon: StarIcon },
   ];
 
@@ -206,13 +240,13 @@ export default function AdminDashboard() {
     { label: "Завершённых", value: completedOrds.length, icon: CheckCircle, gradient: "from-emerald-500/10 to-green-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
     { label: "Клиентов", value: clientUsers.length, icon: Users, gradient: "from-violet-500/10 to-purple-500/10", iconColor: "text-violet-600", iconBg: "bg-violet-500/10" },
     { label: "Мастеров", value: masters.length, icon: Wrench, gradient: "from-orange-500/10 to-red-500/10", iconColor: "text-orange-600", iconBg: "bg-orange-500/10" },
-    { label: "Заявки", value: pendingMasters.length, icon: UserCheck, gradient: "from-rose-500/10 to-pink-500/10", iconColor: "text-rose-600", iconBg: "bg-rose-500/10" },
+    { label: "Заявки", value: pendingApps.length, icon: FileText, gradient: "from-rose-500/10 to-pink-500/10", iconColor: "text-rose-600", iconBg: "bg-rose-500/10" },
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ComponentType<{ className?: string }>; count?: number }[] = [
     { key: "overview", label: "Обзор", icon: LayoutDashboard },
     { key: "orders", label: "Заказы", icon: ClipboardList, count: orders.length },
-    { key: "pending", label: "Заявки", icon: UserCheck, count: pendingMasters.length },
+    { key: "applications", label: "Заявки мастеров", icon: FileText, count: pendingApps.length },
     { key: "users", label: "Клиенты", icon: Users },
     { key: "masters", label: "Мастера", icon: Wrench },
     { key: "reviews", label: "Отзывы", icon: StarIcon },
@@ -222,6 +256,12 @@ export default function AdminDashboard() {
     const u = allUsers.find(u => u.user_id === clientId);
     return u?.full_name || "—";
   };
+
+  // Unique specializations from applications for filter
+  const specOptions = useMemo(() => {
+    const specs = new Set(applications.map(a => a.specialization).filter(Boolean));
+    return Array.from(specs);
+  }, [applications]);
 
   return (
     <DashboardLayout title="Админ панель" navItems={navItems}>
@@ -245,7 +285,7 @@ export default function AdminDashboard() {
         {tabs.map(tb => {
           const Icon = tb.icon;
           return (
-            <Button key={tb.key} variant={tab === tb.key ? "default" : "ghost"} size="sm" onClick={() => setTab(tb.key)} className="rounded-full whitespace-nowrap gap-1.5 shrink-0 text-xs">
+            <Button key={tb.key} variant={tab === tb.key ? "default" : "ghost"} size="sm" onClick={() => { setTab(tb.key); setSearch(""); }} className="rounded-full whitespace-nowrap gap-1.5 shrink-0 text-xs">
               <Icon className="w-3.5 h-3.5" />
               {tb.label}
               {tb.count !== undefined && tb.count > 0 && (
@@ -277,16 +317,49 @@ export default function AdminDashboard() {
                     <p className="text-sm font-medium truncate">{o.services?.name_ru || o.service_categories?.name_ru || "Заказ"}</p>
                     <p className="text-xs text-muted-foreground">{o.address} • {new Date(o.created_at).toLocaleDateString("ru-RU")}</p>
                   </div>
-                  <div className="flex gap-1.5 shrink-0">
-                    <Button size="sm" className="h-7 text-xs rounded-full" onClick={e => { e.stopPropagation(); updateOrderStatus(o.id, "accepted"); }}>Принять</Button>
-                  </div>
+                  <Button size="sm" className="h-7 text-xs rounded-full shrink-0" onClick={e => { e.stopPropagation(); updateOrderStatus(o.id, "accepted"); }}>Принять</Button>
                 </div>
               ))}
             </CardContent>
           </Card>
 
-          {/* Recent activity */}
+          {/* Pending applications */}
           <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="w-4 h-4 text-amber-600" /> Заявки мастеров
+                {pendingApps.length > 0 && <Badge className="bg-amber-100 text-amber-800 text-xs">{pendingApps.length}</Badge>}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {pendingApps.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">Нет новых заявок</p>
+              ) : pendingApps.slice(0, 5).map(app => (
+                <div key={app.id} className="flex items-center justify-between p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors cursor-pointer" onClick={() => setDetailApp(app)}>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium truncate">{app.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{app.specialization} • {app.district}</p>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={e => { e.stopPropagation(); setConfirmAction({ type: "approve", id: app.id, userId: app.user_id, name: app.full_name }); }}>
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={e => { e.stopPropagation(); setConfirmAction({ type: "reject", id: app.id, userId: app.user_id, name: app.full_name }); }}>
+                      <XCircle className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {pendingApps.length > 5 && (
+                <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => setTab("applications")}>
+                  Показать все ({pendingApps.length}) <ArrowRight className="w-3 h-3 ml-1" />
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Active orders */}
+          <Card className="lg:col-span-2">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-primary" /> Активные заказы
@@ -304,42 +377,9 @@ export default function AdminDashboard() {
               ))}
             </CardContent>
           </Card>
-
-          {/* Pending masters */}
-          {pendingMasters.length > 0 && (
-            <Card className="lg:col-span-2">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-amber-600" /> Заявки мастеров
-                  <Badge className="bg-amber-100 text-amber-800 text-xs">{pendingMasters.length}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {pendingMasters.slice(0, 4).map(m => (
-                    <div key={m.id} className="flex items-center justify-between p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/20">
-                      <div>
-                        <p className="text-sm font-medium">{m.full_name || "—"}</p>
-                        <p className="text-xs text-muted-foreground">{m.phone} • {m.experience_years || 0} лет</p>
-                      </div>
-                      <div className="flex gap-1">
-                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setConfirmAction({ type: "approve", id: m.user_id, name: m.full_name }); }}>
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setConfirmAction({ type: "reject", id: m.user_id, name: m.full_name }); }}>
-                          <XCircle className="w-4 h-4 text-red-500" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
       ) : tab === "orders" ? (
         <>
-          {/* Filters */}
           <div className="flex flex-wrap gap-3 mb-4">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -361,9 +401,7 @@ export default function AdminDashboard() {
             </Select>
           </div>
 
-          {/* Orders table-like list */}
           <div className="space-y-2">
-            {/* Header */}
             <div className="hidden md:grid grid-cols-12 gap-3 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               <span className="col-span-3">Услуга</span>
               <span className="col-span-2">Клиент</span>
@@ -372,7 +410,6 @@ export default function AdminDashboard() {
               <span className="col-span-2">Статус</span>
               <span className="col-span-2">Действия</span>
             </div>
-
             {filteredOrders.map(order => (
               <Card key={order.id} className="hover:shadow-md transition-all">
                 <CardContent className="p-3 md:p-4">
@@ -385,20 +422,14 @@ export default function AdminDashboard() {
                       <p className="text-sm truncate">{getClientName(order.client_id)}</p>
                       <p className="text-[11px] text-muted-foreground">{order.phone}</p>
                     </div>
-                    <div className="col-span-2 min-w-0">
-                      <p className="text-sm truncate">{order.address}</p>
-                    </div>
-                    <div className="col-span-1">
-                      <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString("ru-RU")}</p>
-                    </div>
+                    <div className="col-span-2 min-w-0"><p className="text-sm truncate">{order.address}</p></div>
+                    <div className="col-span-1"><p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString("ru-RU")}</p></div>
                     <div className="col-span-2">
                       <Select value={order.status} onValueChange={v => updateOrderStatus(order.id, v)}>
                         <SelectTrigger className="h-8 text-xs">
                           <Badge className={`${statusColors[order.status]} text-[10px]`}>{statusLabels[order.status]}</Badge>
                         </SelectTrigger>
-                        <SelectContent>
-                          {statusFlow.map(s => <SelectItem key={s} value={s}>{statusLabels[s]}</SelectItem>)}
-                        </SelectContent>
+                        <SelectContent>{statusFlow.map(s => <SelectItem key={s} value={s}>{statusLabels[s]}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div className="col-span-2 flex gap-1.5">
@@ -406,9 +437,7 @@ export default function AdminDashboard() {
                         <Eye className="w-3 h-3 mr-1" /> Детали
                       </Button>
                       {!order.master_id && order.status !== "cancelled" && (
-                        <Button size="sm" className="h-7 text-xs rounded-full" onClick={() => setAssignDialog(order)}>
-                          Назначить
-                        </Button>
+                        <Button size="sm" className="h-7 text-xs rounded-full" onClick={() => setAssignDialog(order)}>Назначить</Button>
                       )}
                     </div>
                   </div>
@@ -417,34 +446,71 @@ export default function AdminDashboard() {
             ))}
           </div>
         </>
-      ) : tab === "pending" ? (
-        pendingMasters.length === 0 ? (
-          <Card><CardContent className="py-12 text-center text-muted-foreground"><UserCheck className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />Нет заявок на рассмотрении</CardContent></Card>
-        ) : (
-          <div className="space-y-3">
-            {pendingMasters.map(m => (
-              <Card key={m.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div>
-                      <p className="font-semibold text-foreground">{m.full_name || "—"}</p>
-                      <p className="text-sm text-muted-foreground">{m.phone}</p>
-                      {m.experience_years && <p className="text-sm text-muted-foreground">Опыт: {m.experience_years} лет</p>}
-                      {m.service_categories?.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">{m.service_categories.map((c: string) => <Badge key={c} variant="secondary" className="text-xs">{c}</Badge>)}</div>
+      ) : tab === "applications" ? (
+        <>
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3 mb-4">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input placeholder="Поиск по имени, телефону, email..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 h-10" />
+            </div>
+            <Select value={appStatusFilter} onValueChange={setAppStatusFilter}>
+              <SelectTrigger className="w-36 h-10"><SelectValue placeholder="Статус" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все статусы</SelectItem>
+                <SelectItem value="pending">Ожидает</SelectItem>
+                <SelectItem value="approved">Одобрена</SelectItem>
+                <SelectItem value="rejected">Отклонена</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={appSpecFilter} onValueChange={setAppSpecFilter}>
+              <SelectTrigger className="w-44 h-10"><SelectValue placeholder="Специализация" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все специализации</SelectItem>
+                {specOptions.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {filteredApplications.length === 0 ? (
+            <Card><CardContent className="py-12 text-center text-muted-foreground"><FileText className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />Нет заявок</CardContent></Card>
+          ) : (
+            <div className="space-y-3">
+              {filteredApplications.map(app => (
+                <Card key={app.id} className="hover:shadow-md transition-all cursor-pointer" onClick={() => setDetailApp(app)}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold text-foreground">{app.full_name || "—"}</p>
+                          <Badge className={`${appStatusColors[app.status]} text-[10px]`}>{appStatusLabels[app.status]}</Badge>
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1"><Wrench className="w-3 h-3" /> {app.specialization}</span>
+                          <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {app.district}</span>
+                          <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {app.phone}</span>
+                          {app.email && <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {app.email}</span>}
+                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(app.created_at).toLocaleDateString("ru-RU")}</span>
+                          {app.experience_years > 0 && <span>Опыт: {app.experience_years} лет</span>}
+                        </div>
+                      </div>
+                      {app.status === "pending" && (
+                        <div className="flex gap-1.5 shrink-0" onClick={e => e.stopPropagation()}>
+                          <Button size="sm" onClick={() => setConfirmAction({ type: "approve", id: app.id, userId: app.user_id, name: app.full_name })} className="rounded-full gap-1 h-8 text-xs">
+                            <CheckCircle className="w-3 h-3" /> Одобрить
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={() => setConfirmAction({ type: "reject", id: app.id, userId: app.user_id, name: app.full_name })} className="rounded-full gap-1 h-8 text-xs">
+                            <XCircle className="w-3 h-3" /> Отклонить
+                          </Button>
+                        </div>
                       )}
                     </div>
-                    <Badge className="bg-amber-100 text-amber-800">Ожидает</Badge>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => setConfirmAction({ type: "approve", id: m.user_id, name: m.full_name })} className="rounded-full gap-1"><CheckCircle className="w-3 h-3" /> Одобрить</Button>
-                    <Button size="sm" variant="destructive" onClick={() => setConfirmAction({ type: "reject", id: m.user_id, name: m.full_name })} className="rounded-full gap-1"><XCircle className="w-3 h-3" /> Отклонить</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
       ) : tab === "users" ? (
         <>
           <div className="relative mb-4">
@@ -541,9 +607,46 @@ export default function AdminDashboard() {
                 </Select>
               </div>
               {!detailOrder.master_id && detailOrder.status !== "cancelled" && (
-                <Button className="w-full rounded-full" onClick={() => { setAssignDialog(detailOrder); setDetailOrder(null); }}>
-                  Назначить мастера
-                </Button>
+                <Button className="w-full rounded-full" onClick={() => { setAssignDialog(detailOrder); setDetailOrder(null); }}>Назначить мастера</Button>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Application detail dialog */}
+      <Dialog open={!!detailApp} onOpenChange={() => setDetailApp(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader><DialogTitle>Заявка мастера</DialogTitle></DialogHeader>
+          {detailApp && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-foreground">{detailApp.full_name}</h3>
+                <Badge className={appStatusColors[detailApp.status]}>{appStatusLabels[detailApp.status]}</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div><span className="text-muted-foreground">Телефон:</span><p className="font-medium">{detailApp.phone}</p></div>
+                <div><span className="text-muted-foreground">Email:</span><p className="font-medium">{detailApp.email || "—"}</p></div>
+                <div><span className="text-muted-foreground">Район:</span><p className="font-medium">{detailApp.district}</p></div>
+                <div><span className="text-muted-foreground">Специализация:</span><p className="font-medium">{detailApp.specialization}</p></div>
+                <div><span className="text-muted-foreground">Опыт:</span><p className="font-medium">{detailApp.experience_years} лет</p></div>
+                <div><span className="text-muted-foreground">Дата подачи:</span><p className="font-medium">{new Date(detailApp.created_at).toLocaleDateString("ru-RU")}</p></div>
+              </div>
+              {detailApp.description && (
+                <div>
+                  <span className="text-sm text-muted-foreground">О себе:</span>
+                  <p className="text-sm text-foreground mt-1">{detailApp.description}</p>
+                </div>
+              )}
+              {detailApp.status === "pending" && (
+                <div className="flex gap-3 pt-2">
+                  <Button className="flex-1 rounded-full gap-1" onClick={() => { approveApplication(detailApp.id, detailApp.user_id); setDetailApp(null); }}>
+                    <CheckCircle className="w-4 h-4" /> Одобрить
+                  </Button>
+                  <Button variant="destructive" className="flex-1 rounded-full gap-1" onClick={() => { rejectApplication(detailApp.id, detailApp.user_id); setDetailApp(null); }}>
+                    <XCircle className="w-4 h-4" /> Отклонить
+                  </Button>
+                </div>
               )}
             </div>
           )}
@@ -561,9 +664,7 @@ export default function AdminDashboard() {
             <SelectTrigger><SelectValue placeholder="Выберите мастера" /></SelectTrigger>
             <SelectContent>
               {masters.map(m => (
-                <SelectItem key={m.id} value={m.user_id || m.id}>
-                  {m.full_name} — ★{m.average_rating}
-                </SelectItem>
+                <SelectItem key={m.id} value={m.user_id || m.id}>{m.full_name} — ★{m.average_rating}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -578,14 +679,20 @@ export default function AdminDashboard() {
       <AlertDialog open={!!confirmAction} onOpenChange={() => setConfirmAction(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{confirmAction?.type === "approve" ? "Одобрить мастера?" : "Отклонить мастера?"}</AlertDialogTitle>
+            <AlertDialogTitle>{confirmAction?.type === "approve" ? "Одобрить заявку?" : "Отклонить заявку?"}</AlertDialogTitle>
             <AlertDialogDescription>
-              {confirmAction?.type === "approve" ? `Мастер "${confirmAction?.name}" получит доступ.` : `Заявка "${confirmAction?.name}" будет отклонена.`}
+              {confirmAction?.type === "approve"
+                ? `Мастер "${confirmAction?.name}" получит роль мастера и доступ к кабинету.`
+                : `Заявка "${confirmAction?.name}" будет отклонена.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="rounded-full">Отмена</AlertDialogCancel>
-            <AlertDialogAction className="rounded-full" onClick={() => { if (confirmAction?.type === "approve") approveMaster(confirmAction.id); else if (confirmAction) rejectMaster(confirmAction.id); setConfirmAction(null); }}>
+            <AlertDialogAction className="rounded-full" onClick={() => {
+              if (confirmAction?.type === "approve") approveApplication(confirmAction.id, confirmAction.userId);
+              else if (confirmAction) rejectApplication(confirmAction.id, confirmAction.userId);
+              setConfirmAction(null);
+            }}>
               {confirmAction?.type === "approve" ? "Одобрить" : "Отклонить"}
             </AlertDialogAction>
           </AlertDialogFooter>
