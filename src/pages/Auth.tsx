@@ -37,13 +37,40 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    
+    console.log("[Auth] Attempting login for:", email);
+    
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    
     if (error) {
-      toast({ title: "Ошибка", description: error.message, variant: "destructive" });
-    } else {
-      navigate("/dashboard");
+      console.error("[Auth] Login error:", error.message, error.status);
+      
+      let description = error.message;
+      if (error.message.includes("Invalid login credentials")) {
+        description = "Неверный email или пароль. Проверьте данные и попробуйте снова.";
+      } else if (error.message.includes("Email not confirmed")) {
+        description = "Email не подтверждён. Проверьте почту для подтверждения.";
+      }
+      
+      toast({ title: "Ошибка входа", description, variant: "destructive" });
+      setLoading(false);
+      return;
     }
+    
+    console.log("[Auth] Login successful, user:", data.user?.id);
+    console.log("[Auth] Session created:", !!data.session);
+    
+    // Fetch roles to log
+    if (data.user) {
+      const { data: rolesData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id);
+      console.log("[Auth] User roles:", rolesData?.map(r => r.role));
+    }
+    
+    setLoading(false);
+    navigate("/dashboard");
   };
 
   const handleRegister = async (e: React.FormEvent) => {
