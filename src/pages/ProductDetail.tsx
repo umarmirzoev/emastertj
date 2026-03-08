@@ -144,6 +144,38 @@ export default function ProductDetail() {
                 <Badge variant="secondary">Нет в наличии</Badge>
               )}
               <Badge variant="outline" className="gap-1"><Truck className="w-3 h-3" />Доставка</Badge>
+              {product.seller_type === "master" && (
+                <Badge className="bg-emerald-500 text-white gap-1"><Award className="w-3 h-3" />Товар от мастера</Badge>
+              )}
+            </div>
+
+            {/* Seller card */}
+            {seller && (
+              <Card className="border-primary/20 bg-primary/5">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      {seller.avatar_url ? (
+                        <img src={seller.avatar_url} alt={seller.full_name} className="w-full h-full object-cover rounded-xl" />
+                      ) : (
+                        <User className="w-6 h-6 text-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground text-sm">{seller.full_name}</p>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                        <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-amber-400 text-amber-400" />{seller.average_rating || "—"}</span>
+                        <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3" />{seller.completed_orders || 0} заказов</span>
+                        {seller.experience_years > 0 && <span>{seller.experience_years} лет опыта</span>}
+                      </div>
+                    </div>
+                    <Link to={`/master-store/${seller.user_id}`}>
+                      <Button size="sm" variant="outline" className="rounded-full text-xs">Магазин</Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             </div>
 
             {product.description && (
