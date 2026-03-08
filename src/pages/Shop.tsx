@@ -315,7 +315,32 @@ export default function Shop() {
             </section>
           )}
 
-          {/* POPULAR */}
+          {/* HOT DEALS with countdown */}
+          {hotDeals.length > 0 && (
+            <section className="py-14">
+              <div className="container px-4 mx-auto">
+                <div className="mb-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2.5">
+                        <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">🔥</div>
+                        {t("shopHotDeals")}
+                      </h2>
+                      <p className="text-muted-foreground text-sm mt-1">{t("shopHotDealsDesc")}</p>
+                    </div>
+                    {hotDeals[0]?.promotion_end && (
+                      <CountdownTimer endDate={hotDeals[0].promotion_end} />
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {hotDeals.map(p => <ProductCard key={p.id} product={p} onAdd={addToCart} t={t} />)}
+                </div>
+              </div>
+            </section>
+          )}
+
+
           <section className="py-14">
             <div className="container px-4 mx-auto">
               <div className="mb-8">
