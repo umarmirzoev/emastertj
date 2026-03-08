@@ -789,7 +789,7 @@ const translations: Record<Language, Record<string, string>> = {
     shopProductNotFound: "Мол ёфт нашуд", shopSimilar: "Молҳои монанд", shopSimilarDesc: "Молҳо аз ҳамин категория",
     shopBoughtTogether: "Аксар вақт якҷоя мехаранд", shopBoughtTogetherDesc: "Молҳое, ки бо ин маҳсулот якҷоя мехаранд",
     shopRecentlyViewed: "Охирин молҳои дидашуда", shopRecentlyViewedDesc: "Молҳое, ки шумо наздикӣ дидед",
-    shopRecommended: "Барои шумо тавсия мешавад", shopRecommendedDesc: "Дар асоси таваҷҷӯҳи шумо интихоб шудааст", sellerOrders: "фармоишҳо",
+    shopRecommendedForYou: "Барои шумо тавсия мешавад", shopRecommendedForYouDesc: "Дар асоси таваҷҷӯҳи шумо интихоб шудааст", sellerOrders: "фармоишҳо",
     shopByPopularity: "Аз рӯи маъмулият", shopPriceAsc: "Нарх ↑", shopPriceDesc: "Нарх ↓",
     shopByRating: "Аз рӯи рейтинг", shopProductsCount: "мол", shopCategory: "Категория",
     shopRecentSearches: "Дархостҳои охирин", shopPopularSearches: "Дархостҳои маъмул",
