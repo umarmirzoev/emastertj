@@ -445,6 +445,7 @@ export default function SuperAdminDashboard() {
                     <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }} />
                     <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="#10b981" fillOpacity={0.15} name="Доход (сомонӣ)" />
+                    <Area type="monotone" dataKey="commission" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.1} name="Комиссия (сомонӣ)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
