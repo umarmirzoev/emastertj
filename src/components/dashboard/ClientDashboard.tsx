@@ -135,7 +135,7 @@ export default function ClientDashboard() {
         toast({ title: "🎉 Поздравляем!", description: "Ваша заявка одобрена! Переход в кабинет мастера..." });
         // Small delay for toast visibility, then reload to switch layout
         setTimeout(() => {
-          navigate("/dashboard", { replace: true });
+          navigate("/master-dashboard", { replace: true });
           window.location.reload();
         }, 1500);
       }
