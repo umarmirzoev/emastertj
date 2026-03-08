@@ -1101,6 +1101,9 @@ export default function MasterDashboard() {
         </div>
       ) : null}
 
+      {/* Products tab */}
+      {tab === "products" && <MasterProducts />}
+
       {/* Order detail dialog */}
       <Dialog open={!!detailOrder} onOpenChange={() => setDetailOrder(null)}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
