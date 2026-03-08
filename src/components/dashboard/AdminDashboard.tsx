@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import {
   LayoutDashboard, ClipboardList, Users, UserCheck, Wrench, Star as StarIcon,
   Search, DollarSign, CheckCircle, XCircle, TrendingUp, Eye, MapPin, Phone,
-  Calendar, ArrowRight, Filter, FileText, Mail,
+  Calendar, ArrowRight, Filter, FileText, Mail, ShoppingCart,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
@@ -22,6 +22,7 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { PaymentStatusBadge } from "@/components/payment/PaymentComponents";
+import AdminShopManager from "./AdminShopManager";
 
 const statusColors: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",
@@ -60,7 +61,7 @@ const appStatusLabels: Record<string, string> = {
 
 const statusFlow = ["new", "accepted", "assigned", "on_the_way", "arrived", "in_progress", "completed", "cancelled"];
 
-type Tab = "overview" | "orders" | "applications" | "users" | "masters" | "reviews";
+type Tab = "overview" | "orders" | "applications" | "users" | "masters" | "reviews" | "shop";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -255,6 +256,7 @@ export default function AdminDashboard() {
     { path: "/admin/dashboard/masters", label: "Мастера", icon: Wrench },
     { path: "/admin/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
     { path: "/admin/dashboard/reviews", label: "Отзывы", icon: StarIcon },
+    { path: "/admin/dashboard/shop", label: "Магазин", icon: ShoppingCart },
   ];
 
   const stats = [
@@ -273,6 +275,7 @@ export default function AdminDashboard() {
     { key: "users", label: "Клиенты", icon: Users },
     { key: "masters", label: "Мастера", icon: Wrench },
     { key: "reviews", label: "Отзывы", icon: StarIcon },
+    { key: "shop", label: "Магазин", icon: ShoppingCart },
   ];
 
   const getClientName = (clientId: string) => {
@@ -619,6 +622,8 @@ export default function AdminDashboard() {
             </Card>
           ))}
         </div>
+      ) : tab === "shop" ? (
+        <AdminShopManager />
       ) : null}
 
       {/* Order detail dialog */}

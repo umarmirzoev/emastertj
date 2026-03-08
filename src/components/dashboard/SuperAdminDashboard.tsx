@@ -12,10 +12,11 @@ import {
   LayoutDashboard, ClipboardList, Users, UserCheck, Wrench, Star as StarIcon,
   Shield, Settings, BarChart3, Search, DollarSign,
   CheckCircle, XCircle, TrendingUp, Calendar, FileText,
-  MapPin, Phone, Mail,
+  MapPin, Phone, Mail, ShoppingCart,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
+import AdminShopManager from "./AdminShopManager";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
@@ -48,7 +49,7 @@ const appStatusLabels: Record<string, string> = {
 
 const chartColors = ["#10b981", "#3b82f6", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#84cc16"];
 
-type Tab = "overview" | "analytics" | "orders" | "admins" | "users" | "masters" | "reviews" | "applications";
+type Tab = "overview" | "analytics" | "orders" | "admins" | "users" | "masters" | "reviews" | "applications" | "shop";
 
 export default function SuperAdminDashboard() {
   const { user } = useAuth();
@@ -200,6 +201,7 @@ export default function SuperAdminDashboard() {
     { path: "/super-admin/dashboard/admins", label: "Админы", icon: Shield },
     { path: "/super-admin/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
     { path: "/super-admin/dashboard/reviews", label: "Отзывы", icon: StarIcon },
+    { path: "/super-admin/dashboard/shop", label: "Магазин", icon: ShoppingCart },
   ];
 
   // Extended stats grid
@@ -230,6 +232,7 @@ export default function SuperAdminDashboard() {
     { key: "admins", label: "Админы", icon: Shield },
     { key: "applications", label: "Заявки", icon: FileText, count: pendingApps.length },
     { key: "reviews", label: "Отзывы", icon: StarIcon },
+    { key: "shop", label: "Магазин", icon: ShoppingCart },
   ];
 
   return (
@@ -802,6 +805,8 @@ export default function SuperAdminDashboard() {
             </Card>
           ))}
         </div>
+      ) : tab === "shop" ? (
+        <AdminShopManager />
       ) : null}
 
       {/* Application detail dialog */}
