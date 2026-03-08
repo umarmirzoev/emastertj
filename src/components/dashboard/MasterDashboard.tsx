@@ -695,7 +695,7 @@ export default function MasterDashboard() {
               ) : completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).map(o => (
                 <div key={o.id} className="flex items-center justify-between p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20">
                   <p className="text-sm font-medium">{o.services?.name_ru || "Заказ"}</p>
-                  {o.budget > 0 && <span className="font-bold text-emerald-600 text-sm">+{o.budget} сом.</span>}
+                  {o.budget > 0 && <span className="font-bold text-emerald-600 text-sm">+{o.budget} сомонӣ</span>}
                 </div>
               ))}
             </CardContent>
