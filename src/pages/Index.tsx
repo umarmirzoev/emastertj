@@ -266,8 +266,8 @@ const Index = () => {
               className="rounded-full px-8 py-5 text-base font-semibold border-2 border-primary/30 hover:border-primary hover:bg-primary/5 gap-2 shadow-md"
             >
               <Brain className="w-5 h-5 text-primary" />
-              <span>🤖 AI подбор мастера</span>
-              <Badge className="bg-primary/10 text-primary border-0 text-[10px]">Новинка</Badge>
+              <span>{t("aiMasterMatchBtn")}</span>
+              <Badge className="bg-primary/10 text-primary border-0 text-[10px]">{t("aiMasterMatchNew")}</Badge>
             </Button>
           </motion.div>
 
