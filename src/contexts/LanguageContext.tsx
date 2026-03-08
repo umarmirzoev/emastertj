@@ -138,6 +138,7 @@ const translations = {
   tj: {
     navAbout: "Дар бораи мо",
     navCategories: "Категорияҳо",
+    navMasters: "Устоҳо",
     navHowItWorks: "Чӣ тавр кор мекунад",
     navContacts: "Тамосҳо",
     navBecomeMaster: "Усто шудан",
