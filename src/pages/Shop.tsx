@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/hooks/useCart";
+import RecentlyViewedProducts from "@/components/shop/RecentlyViewedProducts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import {
@@ -445,7 +446,11 @@ export default function Shop() {
               </div>
             </div>
           </section>
-        </>
+        {/* Recently Viewed */}
+        <div className="container px-4 mx-auto">
+          <RecentlyViewedProducts />
+        </div>
+      </>
       )}
 
       <Footer />

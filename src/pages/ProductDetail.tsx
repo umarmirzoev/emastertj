@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/hooks/useCart";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import RecentlyViewedProducts from "@/components/shop/RecentlyViewedProducts";
 import { motion } from "framer-motion";
 import {
   ShoppingCart, Star, Package, Phone, Minus, Plus,
@@ -94,6 +96,7 @@ export default function ProductDetail() {
   const [withInstall, setWithInstall] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const { addToCart } = useCart();
+  const { addProduct: addToRecentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
     const load = async () => {
@@ -144,6 +147,18 @@ export default function ProductDetail() {
         }
       }
       setLoading(false);
+
+      // Track recently viewed
+      if (data) {
+        addToRecentlyViewed({
+          id: data.id,
+          name: data.name,
+          image_url: data.image_url,
+          price: data.price,
+          old_price: data.old_price,
+          rating: data.rating,
+        });
+      }
     };
     if (id) load();
   }, [id]);
@@ -408,6 +423,9 @@ export default function ProductDetail() {
             </div>
           </motion.div>
         )}
+
+        {/* Recently Viewed */}
+        <RecentlyViewedProducts excludeId={id} />
       </div>
       <Footer />
     </div>

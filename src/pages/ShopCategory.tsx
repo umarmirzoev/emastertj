@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCart } from "@/hooks/useCart";
+import RecentlyViewedProducts from "@/components/shop/RecentlyViewedProducts";
 import { ShoppingCart, Star, ArrowLeft, Package, Phone } from "lucide-react";
 
 export default function ShopCategory() {
@@ -116,6 +117,8 @@ export default function ShopCategory() {
             })}
           </div>
         )}
+
+        <RecentlyViewedProducts />
       </div>
       <Footer />
     </div>
