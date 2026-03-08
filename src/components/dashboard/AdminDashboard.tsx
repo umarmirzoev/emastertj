@@ -79,6 +79,7 @@ export default function AdminDashboard() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [appStatusFilter, setAppStatusFilter] = useState("all");
   const [appSpecFilter, setAppSpecFilter] = useState("all");
+  const [paymentFilter, setPaymentFilter] = useState("all");
   const [confirmAction, setConfirmAction] = useState<{ type: string; id: string; userId: string; name: string } | null>(null);
 
   // Assign master dialog
