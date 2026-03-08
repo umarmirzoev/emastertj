@@ -67,6 +67,7 @@ export default function ClientDashboard() {
   const [reviewOrder, setReviewOrder] = useState<any>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [masterInfo, setMasterInfo] = useState<any>(null);
+  const [myApplication, setMyApplication] = useState<any>(null);
   const { notifications, unreadCount } = useNotifications(user?.id);
 
   // Profile editing
