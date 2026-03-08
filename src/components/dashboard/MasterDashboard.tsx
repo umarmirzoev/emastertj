@@ -203,12 +203,17 @@ export default function MasterDashboard() {
   const activeOrders = orders.filter(o => ["assigned", "accepted", "on_the_way", "arrived", "in_progress"].includes(o.status));
   const newOrders = orders.filter(o => o.status === "new" || o.status === "assigned");
   const cancelledOrders = orders.filter(o => o.status === "cancelled");
-  const totalEarnings = completedOrders.reduce((s, o) => s + (o.budget || 0), 0);
-  const todayEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).reduce((s, o) => s + (o.budget || 0), 0);
-  const weekEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo).reduce((s, o) => s + (o.budget || 0), 0);
-  const monthEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo).reduce((s, o) => s + (o.budget || 0), 0);
+  const COMMISSION_RATE = 0.2;
+  const getGross = (o: any) => (o.total_amount || o.budget || 0);
+  const getPayout = (o: any) => (o as any).master_payout || Math.round(getGross(o) * (1 - COMMISSION_RATE));
+  const totalGross = completedOrders.reduce((s, o) => s + getGross(o), 0);
+  const totalEarnings = completedOrders.reduce((s, o) => s + getPayout(o), 0);
+  const todayEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).reduce((s, o) => s + getPayout(o), 0);
+  const weekEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo).reduce((s, o) => s + getPayout(o), 0);
+  const monthEarnings = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo).reduce((s, o) => s + getPayout(o), 0);
   const avgRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : "—";
-  const avgOrderValue = completedOrders.length > 0 ? Math.round(totalEarnings / completedOrders.length) : 0;
+  const avgOrderValue = completedOrders.length > 0 ? Math.round(totalGross / completedOrders.length) : 0;
+  const totalCommission = Math.round(totalGross * COMMISSION_RATE);
 
   // Rating distribution
   const ratingDist = useMemo(() => {
@@ -224,7 +229,7 @@ export default function MasterDashboard() {
       const d = new Date(today.getTime() - i * 86400000);
       const dateStr = d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
       const dayCompleted = completedOrders.filter(o => new Date(o.completed_at || o.created_at).toDateString() === d.toDateString());
-      days.push({ date: dateStr, amount: dayCompleted.reduce((s, o) => s + (o.budget || 0), 0), orders: dayCompleted.length });
+      days.push({ date: dateStr, amount: dayCompleted.reduce((s, o) => s + getPayout(o), 0), orders: dayCompleted.length });
     }
     return days;
   }, [completedOrders]);
@@ -234,7 +239,7 @@ export default function MasterDashboard() {
     const map: Record<string, number> = {};
     completedOrders.forEach(o => {
       const cat = o.service_categories?.name_ru || "Другое";
-      map[cat] = (map[cat] || 0) + (o.budget || 0);
+      map[cat] = (map[cat] || 0) + getPayout(o);
     });
     return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([name, value]) => ({ name, value }));
   }, [completedOrders]);
@@ -742,7 +747,7 @@ export default function MasterDashboard() {
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{avgOrderValue.toLocaleString()}</p><p className="text-xs text-muted-foreground">Ср. чек (сомонӣ)</p></CardContent></Card>
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{completedOrders.length}</p><p className="text-xs text-muted-foreground">Выполнено заказов</p></CardContent></Card>
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-emerald-600">{completedOrders.filter(o => (o as any).payment_status === "paid").length}</p><p className="text-xs text-muted-foreground">Оплачено</p></CardContent></Card>
-            <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{Math.round(totalEarnings * 0.9).toLocaleString()}</p><p className="text-xs text-muted-foreground">Чистый доход</p></CardContent></Card>
+            <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{totalEarnings.toLocaleString()}</p><p className="text-xs text-muted-foreground">Чистый доход (сомонӣ)</p></CardContent></Card>
           </div>
 
           {/* Commission breakdown */}
@@ -750,16 +755,16 @@ export default function MasterDashboard() {
             <CardContent className="p-4">
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-lg font-bold text-foreground">{totalEarnings.toLocaleString()}</p>
-                  <p className="text-[11px] text-muted-foreground">Валовый доход</p>
+                  <p className="text-lg font-bold text-foreground">{totalGross.toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">Валовый доход (сомонӣ)</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-amber-600">{Math.round(totalEarnings * 0.1).toLocaleString()}</p>
-                  <p className="text-[11px] text-muted-foreground">Комиссия (10%)</p>
+                  <p className="text-lg font-bold text-amber-600">{totalCommission.toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">Комиссия (20%)</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-emerald-600">{Math.round(totalEarnings * 0.9).toLocaleString()}</p>
-                  <p className="text-[11px] text-muted-foreground">На руки</p>
+                  <p className="text-lg font-bold text-emerald-600">{totalEarnings.toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">На руки (сомонӣ)</p>
                 </div>
               </div>
             </CardContent>
@@ -814,7 +819,12 @@ export default function MasterDashboard() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <PaymentStatusBadge status={(o as any).payment_status || "unpaid"} />
-                        <span className="font-bold text-emerald-600 text-sm">+{o.budget || 0} сомонӣ</span>
+                        <div className="text-right">
+                          <span className="font-bold text-emerald-600 text-sm">+{getPayout(o).toLocaleString()} сомонӣ</span>
+                          {getGross(o) !== getPayout(o) && (
+                            <p className="text-[10px] text-muted-foreground">из {getGross(o).toLocaleString()}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

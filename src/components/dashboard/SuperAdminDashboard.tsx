@@ -117,18 +117,27 @@ export default function SuperAdminDashboard() {
   const weekAgo = new Date(today.getTime() - 7 * 86400000);
   const monthAgo = new Date(today.getTime() - 30 * 86400000);
 
+  const COMMISSION_RATE = 0.2;
   const completedOrders = orders.filter(o => o.status === "completed" || o.status === "reviewed");
   const cancelledOrders = orders.filter(o => o.status === "cancelled");
   const activeOrders = orders.filter(o => !["completed", "cancelled", "reviewed"].includes(o.status));
-  const revenue = completedOrders.reduce((s, o) => s + (o.budget || 0), 0);
+  const paidOrders = completedOrders.filter(o => (o as any).payment_status === "paid");
+  const unpaidOrders = completedOrders.filter(o => (o as any).payment_status !== "paid");
+  const revenue = completedOrders.reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+  const commissionRevenue = paidOrders.reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
+  const totalPayouts = paidOrders.reduce((s, o) => s + ((o as any).master_payout || Math.round((o.total_amount || o.budget || 0) * (1 - COMMISSION_RATE))), 0);
+  const avgOrderValue = completedOrders.length > 0 ? Math.round(revenue / completedOrders.length) : 0;
 
   const todayOrders = orders.filter(o => new Date(o.created_at) >= today);
   const weekOrders = orders.filter(o => new Date(o.created_at) >= weekAgo);
   const monthOrders = orders.filter(o => new Date(o.created_at) >= monthAgo);
 
-  const todayRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).reduce((s, o) => s + (o.budget || 0), 0);
-  const weekRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo).reduce((s, o) => s + (o.budget || 0), 0);
-  const monthRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo).reduce((s, o) => s + (o.budget || 0), 0);
+  const todayRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+  const weekRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo).reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+  const monthRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo).reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+  const todayCommission = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today && (o as any).payment_status === "paid").reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
+  const weekCommission = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo && (o as any).payment_status === "paid").reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
+  const monthCommission = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo && (o as any).payment_status === "paid").reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
 
   const clients = allUsers.filter(u => u.user_roles?.some((r: any) => r.role === "client"));
   const admins = allUsers.filter(u => u.user_roles?.some((r: any) => r.role === "admin"));
@@ -141,14 +150,15 @@ export default function SuperAdminDashboard() {
 
   // Charts
   const ordersByDay = useMemo(() => {
-    const days: { date: string; orders: number; completed: number; revenue: number }[] = [];
+    const days: { date: string; orders: number; completed: number; revenue: number; commission: number }[] = [];
     for (let i = 13; i >= 0; i--) {
       const d = new Date(today.getTime() - i * 86400000);
       const dateStr = d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
       const dayOrders = orders.filter(o => new Date(o.created_at).toDateString() === d.toDateString());
       const dayCompleted = dayOrders.filter(o => o.status === "completed" || o.status === "reviewed");
-      const dayRev = dayCompleted.reduce((s, o) => s + (o.budget || 0), 0);
-      days.push({ date: dateStr, orders: dayOrders.length, completed: dayCompleted.length, revenue: dayRev });
+      const dayRev = dayCompleted.reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+      const dayCommission = dayCompleted.filter(o => (o as any).payment_status === "paid").reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
+      days.push({ date: dateStr, orders: dayOrders.length, completed: dayCompleted.length, revenue: dayRev, commission: dayCommission });
     }
     return days;
   }, [orders]);
@@ -336,6 +346,60 @@ export default function SuperAdminDashboard() {
             </Card>
           </div>
 
+          {/* Platform Commission Analytics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <Card className="border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Комиссия платформы (всего)</p>
+                <p className="text-2xl font-bold text-emerald-600">{commissionRevenue.toLocaleString()} сомонӣ</p>
+                <p className="text-xs text-muted-foreground">{paidOrders.length} оплачено</p>
+              </CardContent>
+            </Card>
+            <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Выплаты мастерам</p>
+                <p className="text-2xl font-bold text-blue-600">{totalPayouts.toLocaleString()} сомонӣ</p>
+                <p className="text-xs text-muted-foreground">80% от оплаченных</p>
+              </CardContent>
+            </Card>
+            <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Средний чек</p>
+                <p className="text-2xl font-bold text-amber-600">{avgOrderValue.toLocaleString()} сомонӣ</p>
+                <p className="text-xs text-muted-foreground">{completedOrders.length} заказов</p>
+              </CardContent>
+            </Card>
+            <Card className="border-rose-200 dark:border-rose-800 bg-rose-50/50 dark:bg-rose-950/20">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Неоплаченных заказов</p>
+                <p className="text-2xl font-bold text-rose-600">{unpaidOrders.length}</p>
+                <p className="text-xs text-muted-foreground">{unpaidOrders.reduce((s, o) => s + (o.total_amount || o.budget || 0), 0).toLocaleString()} сомонӣ</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Commission breakdown row */}
+          <div className="grid grid-cols-3 gap-3">
+            <Card className="border-emerald-200 dark:border-emerald-800">
+              <CardContent className="p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Комиссия сегодня</p>
+                <p className="text-xl font-bold text-emerald-600">{todayCommission.toLocaleString()} сомонӣ</p>
+              </CardContent>
+            </Card>
+            <Card className="border-blue-200 dark:border-blue-800">
+              <CardContent className="p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Комиссия за неделю</p>
+                <p className="text-xl font-bold text-blue-600">{weekCommission.toLocaleString()} сомонӣ</p>
+              </CardContent>
+            </Card>
+            <Card className="border-violet-200 dark:border-violet-800">
+              <CardContent className="p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-1">Комиссия за месяц</p>
+                <p className="text-xl font-bold text-violet-600">{monthCommission.toLocaleString()} сомонӣ</p>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Charts row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card>
@@ -381,6 +445,7 @@ export default function SuperAdminDashboard() {
                     <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }} />
                     <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="#10b981" fillOpacity={0.15} name="Доход (сомонӣ)" />
+                    <Area type="monotone" dataKey="commission" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.1} name="Комиссия (сомонӣ)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>

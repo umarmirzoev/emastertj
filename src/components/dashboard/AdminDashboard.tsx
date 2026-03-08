@@ -600,6 +600,40 @@ export default function AdminDashboard() {
                 <div><span className="text-muted-foreground">Дата:</span><p className="font-medium">{new Date(detailOrder.created_at).toLocaleDateString("ru-RU")}</p></div>
                 <div className="col-span-2"><span className="text-muted-foreground">Описание:</span><p className="font-medium">{detailOrder.description || "—"}</p></div>
               </div>
+
+              {/* Financial breakdown */}
+              {(detailOrder.total_amount > 0 || detailOrder.budget > 0) && (
+                <Card className="border-primary/20 bg-primary/5">
+                  <CardContent className="p-4 space-y-2">
+                    <p className="text-sm font-semibold text-foreground mb-2">💰 Финансы</p>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Сумма заказа</span>
+                      <span className="font-medium">{(detailOrder.total_amount || detailOrder.budget || 0).toLocaleString()} сомонӣ</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Комиссия (20%)</span>
+                      <span className="font-medium text-amber-600">{((detailOrder as any).platform_commission || Math.round((detailOrder.total_amount || detailOrder.budget || 0) * 0.2)).toLocaleString()} сомонӣ</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Выплата мастеру</span>
+                      <span className="font-medium text-emerald-600">{((detailOrder as any).master_payout || Math.round((detailOrder.total_amount || detailOrder.budget || 0) * 0.8)).toLocaleString()} сомонӣ</span>
+                    </div>
+                    <div className="flex justify-between text-sm pt-1 border-t border-border">
+                      <span className="text-muted-foreground">Статус оплаты</span>
+                      <PaymentStatusBadge status={(detailOrder as any).payment_status || "unpaid"} />
+                    </div>
+                    {(detailOrder as any).payout_status && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Статус выплаты</span>
+                        <Badge className={(detailOrder as any).payout_status === "paid" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}>
+                          {(detailOrder as any).payout_status === "paid" ? "Выплачено" : "Ожидает"}
+                        </Badge>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               <div>
                 <span className="text-sm text-muted-foreground">Статус:</span>
                 <Select value={detailOrder.status} onValueChange={v => { updateOrderStatus(detailOrder.id, v); setDetailOrder({ ...detailOrder, status: v }); }}>
