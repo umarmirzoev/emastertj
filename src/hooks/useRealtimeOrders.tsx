@@ -21,10 +21,10 @@ export function useRealtimeOrders({ userId, role, onUpdate }: UseRealtimeOrdersO
         { event: "INSERT", schema: "public", table: "orders" },
         (payload) => {
           if (role === "admin") {
-            toast({ title: "Новый заказ", description: "Поступил новый заказ" });
+            toast({ title: "🔔 Новый заказ", description: "Поступил новый заказ" });
             onUpdate();
           } else if (role === "master") {
-            toast({ title: "Новый заказ доступен!", description: "Проверьте список заказов" });
+            toast({ title: "Новый заказ доступен!" });
             onUpdate();
           } else if (role === "client" && payload.new.client_id === userId) {
             onUpdate();
@@ -38,10 +38,13 @@ export function useRealtimeOrders({ userId, role, onUpdate }: UseRealtimeOrdersO
           if (role === "client" && payload.new.client_id === userId) {
             const status = payload.new.status as string;
             const statusMessages: Record<string, string> = {
-              accepted: "Ваш заказ принят мастером!",
-              in_progress: "Мастер начал работу",
-              completed: "Заказ завершён!",
-              cancelled: "Заказ отменён",
+              accepted: "✅ Ваш заказ принят",
+              assigned: "👷 К заказу назначен мастер",
+              on_the_way: "🚗 Мастер выехал к вам",
+              arrived: "📍 Мастер прибыл",
+              in_progress: "🔧 Мастер начал работу",
+              completed: "🎉 Заказ завершён!",
+              cancelled: "❌ Заказ отменён",
             };
             if (statusMessages[status]) {
               toast({ title: "Обновление заказа", description: statusMessages[status] });
