@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,15 +9,9 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
 import {
-  Star, MapPin, Clock, Phone, MessageCircle, Camera, Briefcase,
-  ArrowLeft, CheckCircle, Shield, Award, Zap, ThumbsUp,
-  Loader2, ChevronRight, User,
+  Star, MapPin, Phone, MessageCircle,
+  ArrowLeft, CheckCircle, Zap,
 } from "lucide-react";
 
 import MasterProfileCard from "@/components/master-profile/ProfileCard";
@@ -48,7 +42,6 @@ export default function MasterProfile() {
     const load = async () => {
       if (!id) return;
 
-      // Try master_listings first, then profiles
       let masterData: any = null;
       const { data: listingData } = await supabase
         .from("master_listings").select("*").eq("id", id).maybeSingle();
@@ -56,56 +49,37 @@ export default function MasterProfile() {
       if (listingData) {
         masterData = listingData;
       } else {
-        // Try by user_id in master_listings
         const { data: listingByUser } = await supabase
           .from("master_listings").select("*").eq("user_id", id).maybeSingle();
         if (listingByUser) {
           masterData = listingByUser;
         } else {
-          // Fallback to profiles
           const { data: profileData } = await supabase
             .from("profiles").select("*").eq("user_id", id).maybeSingle();
           masterData = profileData;
         }
       }
 
-      if (!masterData) {
-        setLoading(false);
-        return;
-      }
-
+      if (!masterData) { setLoading(false); return; }
       setMaster(masterData);
 
       const masterId = masterData.user_id || masterData.id;
-
-      // Load reviews, portfolio, and similar masters in parallel
       const [reviewsRes, portfolioRes] = await Promise.all([
-        supabase.from("reviews")
-          .select("*")
-          .eq("master_id", masterId)
-          .order("created_at", { ascending: false }),
-        supabase.from("master_portfolio")
-          .select("*")
-          .eq("master_id", masterId)
-          .order("created_at", { ascending: false }),
+        supabase.from("reviews").select("*").eq("master_id", masterId).order("created_at", { ascending: false }),
+        supabase.from("master_portfolio").select("*").eq("master_id", masterId).order("created_at", { ascending: false }),
       ]);
 
       setReviews(reviewsRes.data || []);
       setPortfolio(portfolioRes.data || []);
 
-      // Load similar masters from same categories
       if (masterData.service_categories?.length > 0) {
         const { data: similar } = await supabase
-          .from("master_listings")
-          .select("*")
-          .eq("is_active", true)
-          .neq("id", masterData.id)
+          .from("master_listings").select("*")
+          .eq("is_active", true).neq("id", masterData.id)
           .contains("service_categories", [masterData.service_categories[0]])
-          .order("average_rating", { ascending: false })
-          .limit(4);
+          .order("average_rating", { ascending: false }).limit(4);
         setSimilarMasters(similar || []);
       }
-
       setLoading(false);
     };
     load();
@@ -139,18 +113,17 @@ export default function MasterProfile() {
   const completedOrders = Math.round((master.total_reviews || 0) * 2.5 + (master.experience_years || 0) * 15);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/30">
       <Header />
-      
+
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-5xl">
-        {/* Back */}
-        <Button variant="ghost" className="mb-4 rounded-full" onClick={() => navigate(-1)}>
+        <Button variant="ghost" className="mb-4 rounded-full text-muted-foreground hover:text-foreground" onClick={() => navigate(-1)}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Назад
         </Button>
 
-        <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-6">
+        <div className="lg:grid lg:grid-cols-[1fr_340px] lg:gap-6">
           {/* Main content */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             <MasterProfileCard
               master={master}
               reviews={reviews}
@@ -159,55 +132,56 @@ export default function MasterProfile() {
             />
 
             <MasterTrust />
-
             <MasterAbout master={master} />
-
             <MasterServices master={master} />
-
             {portfolio.length > 0 && <MasterPortfolio portfolio={portfolio} />}
-
             <MasterReviews reviews={reviews} master={master} />
-
             <MasterDistricts master={master} />
           </div>
 
           {/* Sidebar booking card (desktop) */}
           <div className="hidden lg:block">
             <div className="sticky top-6 space-y-4">
-              <Card className="overflow-hidden shadow-lg border-primary/20">
+              <Card className="overflow-hidden shadow-xl border-0 ring-1 ring-primary/10">
                 <div className="h-1.5 bg-gradient-to-r from-primary to-emerald-400" />
-                <CardContent className="p-5">
-                  <div className="text-center mb-4">
-                    <p className="text-sm text-muted-foreground">Стоимость услуг</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">
-                      аз {master.price_min || 50} <span className="text-lg font-normal text-muted-foreground">сомонӣ</span>
-                    </p>
+                <CardContent className="p-6">
+                  <div className="text-center mb-5">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Нархи хизмат</p>
+                    <div className="flex items-baseline justify-center gap-1 mt-2">
+                      <span className="text-sm text-muted-foreground">аз</span>
+                      <span className="text-4xl font-bold text-foreground tracking-tight">{master.price_min || 50}</span>
+                      <span className="text-lg text-muted-foreground">сомонӣ</span>
+                    </div>
                   </div>
 
-                  <div className="space-y-2 mb-4 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" /> Рейтинг
-                      </span>
-                      <span className="font-semibold">{master.average_rating || "5.0"}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <Zap className="w-3.5 h-3.5 text-primary" /> Ответ
-                      </span>
-                      <span className="font-semibold">~30 мин</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-primary" /> Заказов
-                      </span>
-                      <span className="font-semibold">{completedOrders}</span>
-                    </div>
+                  {/* Stats */}
+                  <div className="space-y-3 mb-5">
+                    {[
+                      { icon: Star, label: "Рейтинг", value: master.average_rating || "5.0", iconClass: "fill-yellow-400 text-yellow-400" },
+                      { icon: Zap, label: "Вақти ҷавоб", value: "~30 дақиқа", iconClass: "text-primary" },
+                      { icon: CheckCircle, label: "Фармоишҳо", value: String(completedOrders), iconClass: "text-primary" },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+                        <span className="text-sm text-muted-foreground flex items-center gap-2">
+                          <item.icon className={`w-4 h-4 ${item.iconClass}`} /> {item.label}
+                        </span>
+                        <span className="text-sm font-bold text-foreground">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Online status */}
+                  <div className="flex items-center justify-center gap-2 mb-4 text-sm text-muted-foreground">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                    </span>
+                    Онлайн
                   </div>
 
                   <Button
                     size="lg"
-                    className="w-full rounded-full h-12 text-base font-semibold shadow-lg bg-gradient-to-r from-primary to-emerald-500"
+                    className="w-full rounded-full h-13 text-base font-semibold shadow-lg bg-gradient-to-r from-primary to-emerald-500 hover:shadow-xl transition-all hover:scale-[1.02]"
                     onClick={() => setBookingOpen(true)}
                   >
                     Заказать мастера
@@ -216,12 +190,12 @@ export default function MasterProfile() {
                   <div className="flex gap-2 mt-3">
                     {master.phone && (
                       <>
-                        <Button size="sm" variant="outline" className="flex-1 rounded-full gap-1.5" asChild>
+                        <Button size="sm" variant="outline" className="flex-1 rounded-full gap-1.5 h-10" asChild>
                           <a href={`tel:${master.phone}`}>
                             <Phone className="w-3.5 h-3.5" /> Звонок
                           </a>
                         </Button>
-                        <Button size="sm" variant="outline" className="flex-1 rounded-full gap-1.5" asChild>
+                        <Button size="sm" variant="outline" className="flex-1 rounded-full gap-1.5 h-10" asChild>
                           <a href={`https://wa.me/${master.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
                             <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                           </a>
@@ -231,26 +205,28 @@ export default function MasterProfile() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Social proof nudge */}
+              <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-emerald-500/5">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm font-medium text-foreground">
+                    🔥 {Math.floor(Math.random() * 5 + 3)} нафар имрӯз фармоиш доданд
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Зудтар фармоиш диҳед!</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
 
-        {/* Similar masters */}
-        {similarMasters.length > 0 && (
-          <SimilarMasters masters={similarMasters} />
-        )}
+        {similarMasters.length > 0 && <SimilarMasters masters={similarMasters} />}
       </div>
 
-      {/* Mobile booking bar */}
       <MasterBookingBar master={master} onBook={() => setBookingOpen(true)} />
+      <MasterBookingDialog open={bookingOpen} onOpenChange={setBookingOpen} master={master} />
 
-      {/* Booking dialog */}
-      <MasterBookingDialog
-        open={bookingOpen}
-        onOpenChange={setBookingOpen}
-        master={master}
-      />
-
+      {/* Extra bottom padding for mobile booking bar */}
+      <div className="h-20 lg:hidden" />
       <Footer />
     </div>
   );
