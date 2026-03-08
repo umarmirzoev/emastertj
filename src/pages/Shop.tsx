@@ -159,20 +159,22 @@ function ProductCard({ product: p, onAdd }: { product: any; onAdd: (id: string) 
   const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
   return (
     <Card className="group hover:shadow-lg transition-all hover:-translate-y-1 overflow-hidden border-border">
-      <div className="relative aspect-square bg-muted/30 flex items-center justify-center p-4">
+      <div className="relative aspect-square bg-muted/20 overflow-hidden">
         {p.image_url ? (
-          <img src={p.image_url} alt={p.name} className="w-full h-full object-contain" />
+          <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         ) : (
-          <Package className="w-16 h-16 text-muted-foreground/30" />
+          <div className="w-full h-full flex items-center justify-center">
+            <Package className="w-16 h-16 text-muted-foreground/30" />
+          </div>
         )}
         {discount > 0 && (
-          <Badge className="absolute top-2 left-2 bg-red-500 text-white">-{discount}%</Badge>
+          <Badge className="absolute top-2 left-2 bg-destructive text-destructive-foreground">-{discount}%</Badge>
         )}
         {p.installation_price && (
           <Badge className="absolute top-2 right-2 bg-primary/90 text-primary-foreground text-[10px]">+ установка</Badge>
         )}
         {p.seller_type === "master" && (
-          <Badge className="absolute bottom-2 left-2 bg-emerald-500 text-white text-[10px]">От мастера</Badge>
+          <Badge className="absolute bottom-2 left-2 bg-primary text-primary-foreground text-[10px]">От мастера</Badge>
         )}
       </div>
       <CardContent className="p-3">

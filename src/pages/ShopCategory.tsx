@@ -81,9 +81,13 @@ export default function ShopCategory() {
               const discount = p.old_price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
               return (
                 <Card key={p.id} className="group hover:shadow-lg transition-all overflow-hidden border-border">
-                  <div className="relative aspect-square bg-muted/30 flex items-center justify-center p-4">
-                    {p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-contain" /> : <Package className="w-16 h-16 text-muted-foreground/30" />}
-                    {discount > 0 && <Badge className="absolute top-2 left-2 bg-red-500 text-white">-{discount}%</Badge>}
+                  <div className="relative aspect-square bg-muted/20 overflow-hidden">
+                    {p.image_url ? (
+                      <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center"><Package className="w-16 h-16 text-muted-foreground/30" /></div>
+                    )}
+                    {discount > 0 && <Badge className="absolute top-2 left-2 bg-destructive text-destructive-foreground">-{discount}%</Badge>}
                   </div>
                   <CardContent className="p-3">
                     <Link to={`/shop/product/${p.id}`}>
