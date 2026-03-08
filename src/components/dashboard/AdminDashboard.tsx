@@ -61,7 +61,7 @@ const appStatusLabels: Record<string, string> = {
 
 const statusFlow = ["new", "accepted", "assigned", "on_the_way", "arrived", "in_progress", "completed", "cancelled"];
 
-type Tab = "overview" | "orders" | "applications" | "users" | "masters" | "reviews";
+type Tab = "overview" | "orders" | "applications" | "users" | "masters" | "reviews" | "shop";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
