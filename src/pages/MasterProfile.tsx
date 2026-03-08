@@ -84,7 +84,7 @@ export default function MasterProfile() {
                   </div>
                   {master.experience_years && (
                     <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-                      <Clock className="w-3.5 h-3.5" /> {master.experience_years} лет опыта
+                      <Clock className="w-3.5 h-3.5" /> {master.experience_years} сол таҷриба
                     </div>
                   )}
                   {master.bio && (
