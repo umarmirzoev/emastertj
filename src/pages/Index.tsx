@@ -297,10 +297,10 @@ const Index = () => {
           <div className="container px-4 mx-auto">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-                {language === "en" ? "Top Masters" : "Лучшие мастера"}
+                {language === "en" ? "Top Masters in Dushanbe" : language === "tj" ? "Беҳтарин устоони Душанбе" : "Лучшие мастера Душанбе"}
               </h2>
               <p className="text-muted-foreground">
-                {language === "en" ? "Highest rated professionals" : "Мастера с наивысшим рейтингом"}
+                {language === "en" ? "Highest rated professionals in your city" : language === "tj" ? "Устоон бо баландтарин рейтинг дар шаҳри шумо" : "Мастера с наивысшим рейтингом в вашем городе"}
               </p>
             </motion.div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
