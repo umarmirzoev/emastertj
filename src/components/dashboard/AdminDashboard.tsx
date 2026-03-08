@@ -163,6 +163,7 @@ export default function AdminDashboard() {
   };
 
   const approveApplication = async (appId: string, userId: string) => {
+    const app = applications.find(a => a.id === appId);
     // Update application status
     await supabase.from("master_applications").update({ status: "approved" }).eq("id", appId);
     // Add master role
@@ -170,8 +171,27 @@ export default function AdminDashboard() {
     if (!existingRole || existingRole.length === 0) {
       await supabase.from("user_roles").insert({ user_id: userId, role: "master" as any });
     }
-    // Update profile
-    await supabase.from("profiles").update({ approval_status: "approved" }).eq("user_id", userId);
+    // Update profile with master data
+    await supabase.from("profiles").update({
+      approval_status: "approved",
+      service_categories: app ? [app.specialization] : [],
+      experience_years: app?.experience_years || 0,
+      working_districts: app ? [app.district] : [],
+    }).eq("user_id", userId);
+    // Create master_listings entry
+    const { data: existingListing } = await supabase.from("master_listings").select("id").eq("user_id", userId).limit(1);
+    if (!existingListing || existingListing.length === 0) {
+      await supabase.from("master_listings").insert({
+        user_id: userId,
+        full_name: app?.full_name || "",
+        phone: app?.phone || "",
+        service_categories: app ? [app.specialization] : [],
+        working_districts: app ? [app.district] : [],
+        experience_years: app?.experience_years || 0,
+        bio: app?.description || "",
+        is_active: true,
+      });
+    }
     // Notify user
     await supabase.from("notifications").insert({
       user_id: userId, title: "Заявка одобрена!",
