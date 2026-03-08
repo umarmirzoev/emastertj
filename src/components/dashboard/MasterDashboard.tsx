@@ -20,6 +20,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import OrderChat from "@/components/OrderChat";
 import { useToast } from "@/hooks/use-toast";
+import { PaymentStatusBadge } from "@/components/payment/PaymentComponents";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 import { useNotifications } from "@/hooks/useNotifications";
 import {
