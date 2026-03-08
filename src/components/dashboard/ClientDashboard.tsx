@@ -496,6 +496,29 @@ export default function ClientDashboard() {
                 <p className="text-sm font-semibold text-foreground mb-2">Статус заказа</p>
                 <OrderTimeline order={selectedOrder} />
               </div>
+
+              {/* Chat button */}
+              {selectedOrder.master_id && !["cancelled"].includes(selectedOrder.status) && (
+                <Button
+                  variant="outline"
+                  className="w-full rounded-xl gap-2"
+                  onClick={() => setChatOrderId(selectedOrder.id)}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Чат с мастером
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Inline chat */}
+          {chatOrderId === selectedOrder?.id && (
+            <div className="h-80 mt-2 -mx-6 -mb-6 border-t border-border">
+              <OrderChat
+                orderId={chatOrderId}
+                isOpen={true}
+                onClose={() => setChatOrderId(null)}
+              />
             </div>
           )}
         </DialogContent>
