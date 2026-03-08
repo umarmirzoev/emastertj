@@ -150,7 +150,7 @@ export default function Header() {
                   <nav className="flex-1 p-4 space-y-1 overflow-auto">
                     {user && (
                       <SheetClose asChild>
-                        <Link to="/dashboard" className="flex items-center justify-between px-4 py-3 rounded-xl bg-primary/10 text-primary mb-2">
+                        <Link to={getDashboardPath()} className="flex items-center justify-between px-4 py-3 rounded-xl bg-primary/10 text-primary mb-2">
                           <div className="flex items-center gap-3">
                             <LayoutDashboard className="w-5 h-5" />
                             <span className="font-medium">{t("cabinet")}</span>
