@@ -81,14 +81,18 @@ export const Footer = () => {
               {t("footerContacts")}
             </h3>
             <div className="space-y-3">
-              <a href="tel:+992000000000" className="flex items-center gap-2 text-background/70 hover:text-background transition-colors text-sm">
+              <a href="tel:+992900000000" className="flex items-center gap-2 text-background/70 hover:text-background transition-colors text-sm">
                 <Phone className="w-4 h-4" />
-                <span>+992 000 000 000</span>
+                <span>+992 900 00 00 00</span>
               </a>
               <a href="mailto:support@masterchas.tj" className="flex items-center gap-2 text-background/70 hover:text-background transition-colors text-sm">
                 <Mail className="w-4 h-4" />
                 <span>support@masterchas.tj</span>
               </a>
+              <span className="flex items-center gap-2 text-background/70 text-sm">
+                <MapPin className="w-4 h-4" />
+                <span>Душанбе, Тоҷикистон</span>
+              </span>
             </div>
             <h4 className="text-sm font-semibold text-background/40 mt-6 mb-3">{t("footerDistricts")}</h4>
             <div className="flex flex-wrap gap-2">
