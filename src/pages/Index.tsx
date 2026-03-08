@@ -379,7 +379,7 @@ const Index = () => {
         <div className="container px-4 mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {language === "en" ? "What Our Clients Say" : "Отзывы клиентов"}
+              {language === "en" ? "What Dushanbe Clients Say" : language === "tj" ? "Фикрҳои муштариёни Душанбе" : "Отзывы клиентов из Душанбе"}
             </h2>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
