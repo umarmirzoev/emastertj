@@ -550,6 +550,37 @@ export default function ClientDashboard() {
                 <OrderTimeline order={selectedOrder} />
               </div>
 
+              {/* Payment section */}
+              {["completed", "reviewed"].includes(selectedOrder.status) && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold">Оплата</span>
+                    <PaymentStatusBadge status={(selectedOrder as any).payment_status || "unpaid"} />
+                  </div>
+                  {(selectedOrder as any).total_amount > 0 && (
+                    <PriceBreakdown
+                      servicePrice={(selectedOrder as any).service_price || (selectedOrder as any).total_amount || selectedOrder.budget}
+                      materialsCost={(selectedOrder as any).materials_cost || 0}
+                      urgencySurcharge={(selectedOrder as any).urgency_surcharge || 0}
+                      totalAmount={(selectedOrder as any).total_amount || selectedOrder.budget || 0}
+                      compact
+                    />
+                  )}
+                  <div className="flex gap-2">
+                    {(!(selectedOrder as any).payment_status || (selectedOrder as any).payment_status === "unpaid" || (selectedOrder as any).payment_status === "failed") && (
+                      <Button className="flex-1 rounded-xl gap-1.5" onClick={() => setPayOrder(selectedOrder)}>
+                        <CreditCard className="w-4 h-4" /> Оплатить сейчас
+                      </Button>
+                    )}
+                    {(selectedOrder as any).payment_status === "paid" && (
+                      <Button variant="outline" className="flex-1 rounded-xl gap-1.5" onClick={() => setReceiptOrder(selectedOrder)}>
+                        <FileText className="w-4 h-4" /> Скачать чек
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Chat button */}
               {selectedOrder.master_id && !["cancelled"].includes(selectedOrder.status) && (
                 <Button
