@@ -18,6 +18,7 @@ import {
   Zap, AlertCircle, BarChart3, WifiOff, Wifi, ArrowRight, Hash,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import OrderChat from "@/components/OrderChat";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 import { useNotifications } from "@/hooks/useNotifications";
