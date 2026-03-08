@@ -147,6 +147,18 @@ export default function ProductDetail() {
         }
       }
       setLoading(false);
+
+      // Track recently viewed
+      if (data) {
+        addToRecentlyViewed({
+          id: data.id,
+          name: data.name,
+          image_url: data.image_url,
+          price: data.price,
+          old_price: data.old_price,
+          rating: data.rating,
+        });
+      }
     };
     if (id) load();
   }, [id]);
