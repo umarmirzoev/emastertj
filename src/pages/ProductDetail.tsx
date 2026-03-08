@@ -425,6 +425,9 @@ export default function ProductDetail() {
           </motion.div>
         )}
 
+        {/* Recommended Products */}
+        <RecommendedProducts excludeIds={id ? [id] : []} />
+
         {/* Recently Viewed */}
         <RecentlyViewedProducts excludeId={id} />
       </div>

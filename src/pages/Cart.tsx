@@ -133,6 +133,9 @@ export default function CartPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Recommended Products */}
+        <RecommendedProducts excludeIds={items.map(i => i.product_id)} />
       </div>
       <Footer />
     </div>
