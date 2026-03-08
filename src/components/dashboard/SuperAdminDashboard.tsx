@@ -201,6 +201,7 @@ export default function SuperAdminDashboard() {
     { path: "/super-admin/dashboard/admins", label: "Админы", icon: Shield },
     { path: "/super-admin/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
     { path: "/super-admin/dashboard/reviews", label: "Отзывы", icon: StarIcon },
+    { path: "/super-admin/dashboard/shop", label: "Магазин", icon: ShoppingCart },
   ];
 
   // Extended stats grid
