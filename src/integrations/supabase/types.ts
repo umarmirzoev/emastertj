@@ -217,6 +217,63 @@ export type Database = {
         }
         Relationships: []
       }
+      master_product_sales: {
+        Row: {
+          commission_amount: number
+          created_at: string
+          id: string
+          include_installation: boolean | null
+          installation_price: number | null
+          master_earnings: number
+          master_id: string
+          order_id: string | null
+          product_id: string
+          product_price: number
+          quantity: number
+        }
+        Insert: {
+          commission_amount?: number
+          created_at?: string
+          id?: string
+          include_installation?: boolean | null
+          installation_price?: number | null
+          master_earnings?: number
+          master_id: string
+          order_id?: string | null
+          product_id: string
+          product_price?: number
+          quantity?: number
+        }
+        Update: {
+          commission_amount?: number
+          created_at?: string
+          id?: string
+          include_installation?: boolean | null
+          installation_price?: number | null
+          master_earnings?: number
+          master_id?: string
+          order_id?: string | null
+          product_id?: string
+          product_price?: number
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_product_sales_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "shop_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_product_sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -712,6 +769,7 @@ export type Database = {
       shop_products: {
         Row: {
           category_id: string
+          commission_rate: number | null
           created_at: string
           description: string | null
           id: string
@@ -719,19 +777,23 @@ export type Database = {
           images: string[] | null
           in_stock: boolean | null
           installation_price: number | null
+          is_approved: boolean | null
           is_discounted: boolean | null
           is_popular: boolean | null
+          master_id: string | null
           name: string
           old_price: number | null
           price: number
           rating: number | null
           related_service_category: string | null
           reviews_count: number | null
+          seller_type: string | null
           specs: Json | null
           stock_qty: number | null
         }
         Insert: {
           category_id: string
+          commission_rate?: number | null
           created_at?: string
           description?: string | null
           id?: string
@@ -739,19 +801,23 @@ export type Database = {
           images?: string[] | null
           in_stock?: boolean | null
           installation_price?: number | null
+          is_approved?: boolean | null
           is_discounted?: boolean | null
           is_popular?: boolean | null
+          master_id?: string | null
           name: string
           old_price?: number | null
           price?: number
           rating?: number | null
           related_service_category?: string | null
           reviews_count?: number | null
+          seller_type?: string | null
           specs?: Json | null
           stock_qty?: number | null
         }
         Update: {
           category_id?: string
+          commission_rate?: number | null
           created_at?: string
           description?: string | null
           id?: string
@@ -759,14 +825,17 @@ export type Database = {
           images?: string[] | null
           in_stock?: boolean | null
           installation_price?: number | null
+          is_approved?: boolean | null
           is_discounted?: boolean | null
           is_popular?: boolean | null
+          master_id?: string | null
           name?: string
           old_price?: number | null
           price?: number
           rating?: number | null
           related_service_category?: string | null
           reviews_count?: number | null
+          seller_type?: string | null
           specs?: Json | null
           stock_qty?: number | null
         }

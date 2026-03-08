@@ -31,6 +31,7 @@ import Shop from "./pages/Shop";
 import ShopCategory from "./pages/ShopCategory";
 import ProductDetail from "./pages/ProductDetail";
 import CartPage from "./pages/Cart";
+import MasterStore from "./pages/MasterStore";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const AnimatedRoutes = () => {
         <Route path="/shop/category/:id" element={<PageTransition><ShopCategory /></PageTransition>} />
         <Route path="/shop/product/:id" element={<PageTransition><ProductDetail /></PageTransition>} />
         <Route path="/cart" element={<PageTransition><CartPage /></PageTransition>} />
+        <Route path="/master-store/:masterId" element={<PageTransition><MasterStore /></PageTransition>} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
         <Route path="/master-dashboard" element={<MasterDashboardPage />} />

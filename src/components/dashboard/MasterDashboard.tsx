@@ -15,13 +15,14 @@ import {
   ClipboardList, DollarSign, Star, Clock, User, CheckCircle, XCircle,
   Play, MapPin, Phone, Calendar, Image, Briefcase, Bell, TrendingUp,
   Navigation, Eye, Loader2, Camera, Upload, Trash2, Edit3, Award,
-  Zap, AlertCircle, BarChart3, WifiOff, Wifi, ArrowRight, Hash,
+  Zap, AlertCircle, BarChart3, WifiOff, Wifi, ArrowRight, Hash, Package,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import OrderChat from "@/components/OrderChat";
 import { useToast } from "@/hooks/use-toast";
 import { PaymentStatusBadge } from "@/components/payment/PaymentComponents";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
+import MasterProducts from "./MasterProducts";
 import { useNotifications } from "@/hooks/useNotifications";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -51,7 +52,7 @@ const DISTRICTS = [
   "Пригород", "Рудакӣ", "Варзоб",
 ];
 
-type Tab = "overview" | "available" | "active" | "completed" | "earnings" | "profile" | "reviews" | "portfolio" | "notifications" | "schedule";
+type Tab = "overview" | "available" | "active" | "completed" | "earnings" | "profile" | "reviews" | "portfolio" | "notifications" | "schedule" | "products";
 
 export default function MasterDashboard() {
   const { user, profile } = useAuth();
@@ -264,6 +265,7 @@ export default function MasterDashboard() {
     { path: "/master-dashboard/portfolio", label: "Портфолио", icon: Image },
     { path: "/master-dashboard/profile", label: "Профиль мастера", icon: User },
     { path: "/master-dashboard/notifications", label: "Уведомления", icon: Bell, badge: unreadCount },
+    { path: "/master-dashboard/products", label: "Мои товары", icon: Package },
   ];
 
   const stats = [
@@ -288,6 +290,7 @@ export default function MasterDashboard() {
     { key: "portfolio", label: "Портфолио", icon: Image },
     { key: "profile", label: "Профиль", icon: User },
     { key: "notifications", label: "Уведомления", icon: Bell, count: unreadCount },
+    { key: "products", label: "Мои товары", icon: Package },
   ];
 
   const StatusActionButtons = ({ order }: { order: any }) => (
@@ -1097,6 +1100,9 @@ export default function MasterDashboard() {
           ))}
         </div>
       ) : null}
+
+      {/* Products tab */}
+      {tab === "products" && <MasterProducts />}
 
       {/* Order detail dialog */}
       <Dialog open={!!detailOrder} onOpenChange={() => setDetailOrder(null)}>
