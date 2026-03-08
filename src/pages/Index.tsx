@@ -341,7 +341,7 @@ const Index = () => {
             <div className="text-center mt-8">
               <Link to="/masters">
                 <Button variant="outline" size="lg" className="rounded-full px-8">
-                  {language === "en" ? "View all masters" : "Все мастера"}
+                  {language === "en" ? "View all masters" : language === "tj" ? "Ҳамаи устоон" : "Все мастера Душанбе"}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
