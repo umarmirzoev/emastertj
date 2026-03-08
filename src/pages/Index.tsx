@@ -15,7 +15,7 @@ import { Services } from "@/components/Services";
 import OrderModal from "@/components/OrderModal";
 import {
   Clock, Shield, Star, CheckCircle,
-  Phone, Siren, Search, FileText, Truck, ArrowRight, Users, MapPin, Quote,
+  Phone, Siren, Search, FileText, Truck, ArrowRight, Users, MapPin, Quote, Brain,
 } from "lucide-react";
 
 interface PopularMaster {
