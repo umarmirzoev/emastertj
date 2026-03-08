@@ -31,7 +31,7 @@ const Auth = () => {
   const [newUserId, setNewUserId] = useState<string | null>(null);
 
   if (user && !loading && mode !== "master_details") {
-    setTimeout(() => navigate("/dashboard"), 0);
+    setTimeout(() => navigate(getDashboardPath()), 0);
   }
 
   const handleLogin = async (e: React.FormEvent) => {
