@@ -1048,7 +1048,7 @@ export default function MasterDashboard() {
                     <Input type="number" value={editPriceMin} onChange={e => setEditPriceMin(e.target.value)} className="h-11" />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Макс. цена (сом.)</label>
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Макс. цена (сомонӣ)</label>
                     <Input type="number" value={editPriceMax} onChange={e => setEditPriceMax(e.target.value)} className="h-11" />
                   </div>
                 </div>

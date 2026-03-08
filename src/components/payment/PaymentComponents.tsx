@@ -289,7 +289,7 @@ export function PaymentDialog({ order, open, onOpenChange, onPaymentComplete }: 
               ) : method === "cash" ? (
                 <><Banknote className="w-5 h-5" /> Подтвердить (наличные)</>
               ) : (
-                <><CreditCard className="w-5 h-5" /> Оплатить {total.toLocaleString()} сом.</>
+                <><CreditCard className="w-5 h-5" /> Оплатить {total.toLocaleString()} сомонӣ</>
               )}
             </Button>
           </div>
