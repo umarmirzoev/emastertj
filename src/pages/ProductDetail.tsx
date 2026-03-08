@@ -272,6 +272,10 @@ export default function ProductDetail() {
               {product.old_price && <span className="text-lg text-muted-foreground line-through">{product.old_price} с.</span>}
             </div>
 
+            {product.promotion_end && new Date(product.promotion_end) > new Date() && (
+              <CountdownTimer endDate={product.promotion_end} />
+            )}
+
             <div className="flex items-center gap-2 flex-wrap">
               {product.in_stock ? (
                 <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"><CheckCircle className="w-3 h-3 mr-1" />{t("shopInStock")}</Badge>
