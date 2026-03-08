@@ -32,8 +32,8 @@ export default function RecommendedProducts({ excludeIds = [], limit = 8 }: Prop
           <Sparkles className="w-4 h-4 text-primary" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-foreground">{t("shopRecommended")}</h2>
-          <p className="text-sm text-muted-foreground">{t("shopRecommendedDesc")}</p>
+          <h2 className="text-xl font-bold text-foreground">{t("shopRecommendedForYou")}</h2>
+          <p className="text-sm text-muted-foreground">{t("shopRecommendedForYouDesc")}</p>
         </div>
       </div>
 

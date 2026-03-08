@@ -1069,7 +1069,7 @@ const translations: Record<Language, Record<string, string>> = {
     shopProductNotFound: "Product not found", shopSimilar: "Similar products", shopSimilarDesc: "Products from the same category",
     shopBoughtTogether: "Frequently bought together", shopBoughtTogetherDesc: "Products often purchased with this item",
     shopRecentlyViewed: "Recently viewed", shopRecentlyViewedDesc: "Products you recently looked at",
-    shopRecommended: "Recommended for you", shopRecommendedDesc: "Selected based on your interests", sellerOrders: "orders",
+    shopRecommendedForYou: "Recommended for you", shopRecommendedForYouDesc: "Selected based on your interests", sellerOrders: "orders",
     shopByPopularity: "By popularity", shopPriceAsc: "Price ↑", shopPriceDesc: "Price ↓",
     shopByRating: "By rating", shopProductsCount: "products", shopCategory: "Category",
     shopRecentSearches: "Recent searches", shopPopularSearches: "Popular searches",
