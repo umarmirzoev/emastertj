@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import QuickBooking from "@/components/QuickBooking";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
