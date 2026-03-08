@@ -48,7 +48,7 @@ export default function Header() {
     { path: "/about", labelKey: "navAbout", icon: Building2 },
     { path: "/categories", labelKey: "navCategories", icon: Wrench },
     { path: "/masters", labelKey: "navMasters", icon: User },
-    { path: "/shop", label: "Магазин", icon: ShoppingBag },
+    { path: "/shop", labelKey: "navShop", icon: ShoppingBag },
     { path: "/services", labelKey: "servicesTitle", icon: Wrench },
     { path: "/how-it-works", labelKey: "navHowItWorks", icon: HelpCircle },
     { path: "/contacts", labelKey: "navContacts", icon: Phone },
