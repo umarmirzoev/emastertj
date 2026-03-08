@@ -289,6 +289,7 @@ export default function MasterDashboard() {
     { key: "portfolio", label: "Портфолио", icon: Image },
     { key: "profile", label: "Профиль", icon: User },
     { key: "notifications", label: "Уведомления", icon: Bell, count: unreadCount },
+    { key: "products", label: "Мои товары", icon: Package },
   ];
 
   const StatusActionButtons = ({ order }: { order: any }) => (
