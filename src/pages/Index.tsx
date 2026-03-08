@@ -133,7 +133,7 @@ const Index = () => {
             const cat = allCategories.find((c: any) => c.name_ru === catName);
             if (cat) {
               const name = language === "tj" ? cat.name_tj : language === "en" ? cat.name_en : cat.name_ru;
-              results.push({ type: "category", id: cat.id, name: `${name} — подходящая категория` });
+              results.push({ type: "category", id: cat.id, name: `${name} — ${t("matchingCategory")}` });
               // Also find matching services
               const matchingSvcs = allServices.filter((s: any) => s.category_id === cat.id).slice(0, 3);
               for (const svc of matchingSvcs) {

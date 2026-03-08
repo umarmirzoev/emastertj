@@ -154,9 +154,9 @@ const translations: Record<Language, Record<string, string>> = {
     // Common
     viewAllCategories: "Все категории услуг",
     learnMore: "Подробнее",
-    qualityGuarantee: "Кафолати сифат",
+    qualityGuarantee: "Гарантия качества",
     qualityGuaranteeDesc: "Если работа не устроит — мастер вернётся и исправит бесплатно",
-    step: "Қадам",
+    step: "Шаг",
     orderModalTitle: "Вызвать мастера",
     orderModalDesc: "Заполните форму — мы подберём мастера в вашем районе",
     orderModalSubmit: "Отправить",
