@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Zap, Droplets, Paintbrush, Sofa, Hammer, Camera, Flame, Wrench, Home, Cpu, MoreHorizontal, ArrowRight,
+  Zap, Droplets, Paintbrush, Sofa, Hammer, Camera, Flame, Wrench, Home, Cpu, MoreHorizontal, ArrowRight, Wind,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -23,6 +23,8 @@ const iconMap: Record<string, React.ElementType> = {
   "Ремонт под ключ": Home,
   "Аварийные 24/7": Wrench,
   "Ремонт техники": Wrench,
+  "Кондиционеры": Wind,
+  "Отопление": Flame,
 };
 
 const colorMap: Record<string, string> = {
@@ -39,6 +41,8 @@ const colorMap: Record<string, string> = {
   "Ремонт под ключ": "from-pink-400 to-rose-500",
   "Аварийные 24/7": "from-rose-500 to-red-600",
   "Ремонт техники": "from-cyan-400 to-blue-500",
+  "Кондиционеры": "from-cyan-400 to-blue-500",
+  "Отопление": "from-orange-400 to-red-500",
 };
 
 interface Category {
