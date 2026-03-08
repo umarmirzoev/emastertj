@@ -182,14 +182,14 @@ export default function SuperAdminDashboard() {
   const specOptions = useMemo(() => Array.from(new Set(applications.map(a => a.specialization).filter(Boolean))), [applications]);
 
   const navItems = [
-    { path: "/dashboard", label: "Панель", icon: LayoutDashboard },
-    { path: "/dashboard/analytics", label: "Аналитика", icon: BarChart3 },
-    { path: "/dashboard/orders", label: "Все заказы", icon: ClipboardList },
-    { path: "/dashboard/users", label: "Все пользователи", icon: Users },
-    { path: "/dashboard/masters", label: "Все мастера", icon: Wrench },
-    { path: "/dashboard/admins", label: "Админы", icon: Shield },
-    { path: "/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
-    { path: "/dashboard/reviews", label: "Отзывы", icon: StarIcon },
+    { path: "/super-admin/dashboard", label: "Панель", icon: LayoutDashboard },
+    { path: "/super-admin/dashboard/analytics", label: "Аналитика", icon: BarChart3 },
+    { path: "/super-admin/dashboard/orders", label: "Все заказы", icon: ClipboardList },
+    { path: "/super-admin/dashboard/users", label: "Все пользователи", icon: Users },
+    { path: "/super-admin/dashboard/masters", label: "Все мастера", icon: Wrench },
+    { path: "/super-admin/dashboard/admins", label: "Админы", icon: Shield },
+    { path: "/super-admin/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
+    { path: "/super-admin/dashboard/reviews", label: "Отзывы", icon: StarIcon },
   ];
 
   // Extended stats grid

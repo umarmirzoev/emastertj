@@ -247,15 +247,15 @@ export default function MasterDashboard() {
   });
 
   const navItems = [
-    { path: "/dashboard", label: "Обзор", icon: Briefcase },
-    { path: "/dashboard/available", label: "Новые заказы", icon: ClipboardList, badge: newOrders.length },
-    { path: "/dashboard/active", label: "Активные", icon: Clock, badge: activeOrders.length },
-    { path: "/dashboard/completed", label: "Завершённые", icon: CheckCircle },
-    { path: "/dashboard/earnings", label: "Доход", icon: DollarSign },
-    { path: "/dashboard/reviews", label: "Отзывы", icon: Star },
-    { path: "/dashboard/portfolio", label: "Портфолио", icon: Image },
-    { path: "/dashboard/profile", label: "Профиль мастера", icon: User },
-    { path: "/dashboard/notifications", label: "Уведомления", icon: Bell, badge: unreadCount },
+    { path: "/master-dashboard", label: "Обзор", icon: Briefcase },
+    { path: "/master-dashboard/available", label: "Новые заказы", icon: ClipboardList, badge: newOrders.length },
+    { path: "/master-dashboard/active", label: "Активные", icon: Clock, badge: activeOrders.length },
+    { path: "/master-dashboard/completed", label: "Завершённые", icon: CheckCircle },
+    { path: "/master-dashboard/earnings", label: "Доход", icon: DollarSign },
+    { path: "/master-dashboard/reviews", label: "Отзывы", icon: Star },
+    { path: "/master-dashboard/portfolio", label: "Портфолио", icon: Image },
+    { path: "/master-dashboard/profile", label: "Профиль мастера", icon: User },
+    { path: "/master-dashboard/notifications", label: "Уведомления", icon: Bell, badge: unreadCount },
   ];
 
   const stats = [
