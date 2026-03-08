@@ -133,7 +133,7 @@ const Index = () => {
             const cat = allCategories.find((c: any) => c.name_ru === catName);
             if (cat) {
               const name = language === "tj" ? cat.name_tj : language === "en" ? cat.name_en : cat.name_ru;
-              results.push({ type: "category", id: cat.id, name: `${name} — подходящая категория` });
+              results.push({ type: "category", id: cat.id, name: `${name} — ${t("matchingCategory")}` });
               // Also find matching services
               const matchingSvcs = allServices.filter((s: any) => s.category_id === cat.id).slice(0, 3);
               for (const svc of matchingSvcs) {
@@ -217,7 +217,7 @@ const Index = () => {
                 onChange={e => setSearchQuery(e.target.value)}
                 onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
                 onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
-                placeholder={language === "en" ? "Describe your problem: leaky faucet, broken outlet..." : language === "tj" ? "Мушкилиро тавсиф кунед: кран мечакад, розетка кор намекунад..." : "Опишите проблему: течёт кран, не работает розетка, нужна уборка..."}
+                placeholder={t("searchPlaceholder")}
                 className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border focus:border-primary shadow-lg"
               />
             </div>
@@ -266,8 +266,8 @@ const Index = () => {
               className="rounded-full px-8 py-5 text-base font-semibold border-2 border-primary/30 hover:border-primary hover:bg-primary/5 gap-2 shadow-md"
             >
               <Brain className="w-5 h-5 text-primary" />
-              <span>🤖 AI подбор мастера</span>
-              <Badge className="bg-primary/10 text-primary border-0 text-[10px]">Новинка</Badge>
+              <span>{t("aiMasterMatchBtn")}</span>
+              <Badge className="bg-primary/10 text-primary border-0 text-[10px]">{t("aiMasterMatchNew")}</Badge>
             </Button>
           </motion.div>
 
@@ -315,10 +315,10 @@ const Index = () => {
           <div className="container px-4 mx-auto">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-                {language === "en" ? "Top Masters in Dushanbe" : language === "tj" ? "Беҳтарин устоони Душанбе" : "Лучшие мастера Душанбе"}
+                {t("topMasters")}
               </h2>
               <p className="text-muted-foreground">
-                {language === "en" ? "Highest rated professionals in your city" : language === "tj" ? "Устоон бо баландтарин рейтинг дар шаҳри шумо" : "Мастера с наивысшим рейтингом в вашем городе"}
+                {t("topMastersDesc")}
               </p>
             </motion.div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
@@ -345,9 +345,9 @@ const Index = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {master.experience_years} {language === "en" ? "yrs" : "сол"}</span>
+                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {master.experience_years} {t("yearsShort")}</span>
                             <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {master.working_districts?.[0]}</span>
-                            <span className="ml-auto font-semibold text-foreground">аз {master.price_min} сомонӣ</span>
+                            <span className="ml-auto font-semibold text-foreground">{t("fromPrice")} {master.price_min} {t("currencySomoni")}</span>
                           </div>
                         </CardContent>
                       </Card>
@@ -359,7 +359,7 @@ const Index = () => {
             <div className="text-center mt-8">
               <Link to="/masters">
                 <Button variant="outline" size="lg" className="rounded-full px-8">
-                  {language === "en" ? "View all masters" : language === "tj" ? "Ҳамаи устоон" : "Все мастера Душанбе"}
+                  {t("viewAllMasters")}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
@@ -397,7 +397,7 @@ const Index = () => {
         <div className="container px-4 mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {language === "en" ? "What Dushanbe Clients Say" : language === "tj" ? "Фикрҳои муштариёни Душанбе" : "Отзывы клиентов из Душанбе"}
+              {t("clientReviews")}
             </h2>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
