@@ -812,7 +812,10 @@ export default function MasterDashboard() {
                         <p className="text-sm font-medium truncate">{o.services?.name_ru || "Заказ"}</p>
                         <p className="text-xs text-muted-foreground">{new Date(o.completed_at || o.created_at).toLocaleDateString("ru-RU")}</p>
                       </div>
-                      <span className="font-bold text-emerald-600 text-sm shrink-0">+{o.budget || 0} сом.</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <PaymentStatusBadge status={(o as any).payment_status || "unpaid"} />
+                        <span className="font-bold text-emerald-600 text-sm">+{o.budget || 0} сом.</span>
+                      </div>
                     </div>
                   ))}
                 </div>
