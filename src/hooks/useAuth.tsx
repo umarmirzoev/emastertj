@@ -13,6 +13,7 @@ interface AuthContextType {
   profile: { full_name: string; phone: string; avatar_url: string } | null;
   hasRole: (role: AppRole) => boolean;
   signOut: () => Promise<void>;
+  refetchUserData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
