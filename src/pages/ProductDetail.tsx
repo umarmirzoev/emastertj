@@ -11,13 +11,14 @@ import { useCart } from "@/hooks/useCart";
 import { motion } from "framer-motion";
 import {
   ShoppingCart, Star, ArrowLeft, Package, Phone, Minus, Plus,
-  CheckCircle, Wrench, Truck,
+  CheckCircle, Wrench, Truck, User, Briefcase, Award,
 } from "lucide-react";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
   const [related, setRelated] = useState<any[]>([]);
+  const [seller, setSeller] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [withInstall, setWithInstall] = useState(false);
@@ -32,6 +33,17 @@ export default function ProductDetail() {
         .eq("id", id!)
         .single();
       setProduct(data);
+      // Fetch seller info if master product
+      if (data?.master_id) {
+        const { data: masterData } = await supabase
+          .from("master_listings")
+          .select("*")
+          .eq("user_id", data.master_id)
+          .single();
+        setSeller(masterData);
+      } else {
+        setSeller(null);
+      }
       if (data?.category_id) {
         const { data: rel } = await supabase
           .from("shop_products")
