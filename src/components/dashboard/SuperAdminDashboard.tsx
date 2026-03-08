@@ -12,7 +12,7 @@ import {
   LayoutDashboard, ClipboardList, Users, UserCheck, Wrench, Star as StarIcon,
   Shield, Settings, BarChart3, Search, DollarSign,
   CheckCircle, XCircle, TrendingUp, Calendar, FileText,
-  MapPin, Phone, Mail,
+  MapPin, Phone, Mail, ShoppingCart,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
