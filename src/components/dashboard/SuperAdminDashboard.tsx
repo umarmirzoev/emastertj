@@ -380,7 +380,7 @@ export default function SuperAdminDashboard() {
                     <XAxis dataKey="date" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }} />
-                    <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="#10b981" fillOpacity={0.15} name="Доход (сом.)" />
+                    <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="#10b981" fillOpacity={0.15} name="Доход (сомонӣ)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
