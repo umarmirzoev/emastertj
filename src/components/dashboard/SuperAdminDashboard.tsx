@@ -117,18 +117,27 @@ export default function SuperAdminDashboard() {
   const weekAgo = new Date(today.getTime() - 7 * 86400000);
   const monthAgo = new Date(today.getTime() - 30 * 86400000);
 
+  const COMMISSION_RATE = 0.2;
   const completedOrders = orders.filter(o => o.status === "completed" || o.status === "reviewed");
   const cancelledOrders = orders.filter(o => o.status === "cancelled");
   const activeOrders = orders.filter(o => !["completed", "cancelled", "reviewed"].includes(o.status));
-  const revenue = completedOrders.reduce((s, o) => s + (o.budget || 0), 0);
+  const paidOrders = completedOrders.filter(o => (o as any).payment_status === "paid");
+  const unpaidOrders = completedOrders.filter(o => (o as any).payment_status !== "paid");
+  const revenue = completedOrders.reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+  const commissionRevenue = paidOrders.reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
+  const totalPayouts = paidOrders.reduce((s, o) => s + ((o as any).master_payout || Math.round((o.total_amount || o.budget || 0) * (1 - COMMISSION_RATE))), 0);
+  const avgOrderValue = completedOrders.length > 0 ? Math.round(revenue / completedOrders.length) : 0;
 
   const todayOrders = orders.filter(o => new Date(o.created_at) >= today);
   const weekOrders = orders.filter(o => new Date(o.created_at) >= weekAgo);
   const monthOrders = orders.filter(o => new Date(o.created_at) >= monthAgo);
 
-  const todayRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).reduce((s, o) => s + (o.budget || 0), 0);
-  const weekRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo).reduce((s, o) => s + (o.budget || 0), 0);
-  const monthRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo).reduce((s, o) => s + (o.budget || 0), 0);
+  const todayRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+  const weekRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo).reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+  const monthRevenue = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo).reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+  const todayCommission = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today && (o as any).payment_status === "paid").reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
+  const weekCommission = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= weekAgo && (o as any).payment_status === "paid").reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
+  const monthCommission = completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= monthAgo && (o as any).payment_status === "paid").reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
 
   const clients = allUsers.filter(u => u.user_roles?.some((r: any) => r.role === "client"));
   const admins = allUsers.filter(u => u.user_roles?.some((r: any) => r.role === "admin"));
