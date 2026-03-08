@@ -324,7 +324,7 @@ export default function ClientDashboard() {
                   <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString("ru-RU")}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm">{((o as any).total_amount || o.budget || 0).toLocaleString()} сом.</span>
+                  <span className="font-bold text-sm">{((o as any).total_amount || o.budget || 0).toLocaleString()} сомонӣ</span>
                   <PaymentStatusBadge status={(o as any).payment_status} />
                   {(o as any).payment_status === "paid" && (
                     <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => setReceiptOrder(o)}>
