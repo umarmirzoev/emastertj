@@ -239,7 +239,7 @@ export default function MasterDashboard() {
     const map: Record<string, number> = {};
     completedOrders.forEach(o => {
       const cat = o.service_categories?.name_ru || "Другое";
-      map[cat] = (map[cat] || 0) + (o.budget || 0);
+      map[cat] = (map[cat] || 0) + getPayout(o);
     });
     return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([name, value]) => ({ name, value }));
   }, [completedOrders]);
