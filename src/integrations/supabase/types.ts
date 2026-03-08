@@ -237,12 +237,20 @@ export type Database = {
           description: string | null
           id: string
           master_id: string | null
+          materials_cost: number | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_status: string
           phone: string
+          platform_commission: number | null
           preferred_time: string | null
           service_id: string | null
+          service_price: number | null
           started_at: string | null
           status: string
+          total_amount: number | null
           updated_at: string
+          urgency_surcharge: number | null
         }
         Insert: {
           accepted_at?: string | null
@@ -257,12 +265,20 @@ export type Database = {
           description?: string | null
           id?: string
           master_id?: string | null
+          materials_cost?: number | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_status?: string
           phone?: string
+          platform_commission?: number | null
           preferred_time?: string | null
           service_id?: string | null
+          service_price?: number | null
           started_at?: string | null
           status?: string
+          total_amount?: number | null
           updated_at?: string
+          urgency_surcharge?: number | null
         }
         Update: {
           accepted_at?: string | null
@@ -277,12 +293,20 @@ export type Database = {
           description?: string | null
           id?: string
           master_id?: string | null
+          materials_cost?: number | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_status?: string
           phone?: string
+          platform_commission?: number | null
           preferred_time?: string | null
           service_id?: string | null
+          service_price?: number | null
           started_at?: string | null
           status?: string
+          total_amount?: number | null
           updated_at?: string
+          urgency_surcharge?: number | null
         }
         Relationships: [
           {
