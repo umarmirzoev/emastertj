@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import {
   Languages,
   LogIn,
@@ -29,6 +31,8 @@ import {
   Wrench,
   LayoutDashboard,
   User,
+  ShoppingBag,
+  ShoppingCart,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 
