@@ -438,7 +438,7 @@ export default function ServiceDetail() {
                               </div>
                               <div className="space-y-1.5 text-xs text-muted-foreground mb-3">
                                 <div className="flex items-center gap-1.5">
-                                  <Clock className="w-3.5 h-3.5" /> {master.experience_years} лет опыта
+                                  <Clock className="w-3.5 h-3.5" /> {master.experience_years} сол таҷриба
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <MapPin className="w-3.5 h-3.5" />
@@ -447,9 +447,9 @@ export default function ServiceDetail() {
                               </div>
                               <div className="flex items-center justify-between pt-3 border-t border-border/50">
                                 <div>
-                                  <p className="text-xs text-muted-foreground">от</p>
+                                  <p className="text-xs text-muted-foreground">аз</p>
                                   <p className="text-base font-bold text-foreground">
-                                    {master.price_min} <span className="text-xs font-normal text-muted-foreground">сом.</span>
+                                    {master.price_min} <span className="text-xs font-normal text-muted-foreground">сомонӣ</span>
                                   </p>
                                 </div>
                                 <div className="flex gap-1.5">

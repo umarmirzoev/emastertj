@@ -169,9 +169,9 @@ const Index = () => {
   ];
 
   const testimonials = [
-    { name: "Мадина Р.", text: "Мастер приехал через 40 минут и починил всё за час. Очень довольна!", rating: 5 },
-    { name: "Фирдавс К.", text: "Отличный сервис! Электрик решил проблему, которую другие не могли найти.", rating: 5 },
-    { name: "Нигора С.", text: "Заказывала уборку квартиры — всё блестит! Буду пользоваться ещё.", rating: 5 },
+    { name: "Мадина Раҳимова", text: "Усто дар 40 дақиқа расид ва дар як соат ҳамаашро таъмир кард. Нарх — 150 сомонӣ, бе ягон доплата. Хеле мамнунам!", rating: 5 },
+    { name: "Фирдавс Каримов", text: "Барқкор мушкилиро пайдо кард, ки дигарон наметавонистанд. 3 розетка насб кард — ҳар кадом 30 сомонӣ. Тавсия медиҳам!", rating: 5 },
+    { name: "Нигора Саидова", text: "Тозакунии хонаро фармоиш додам — ҳама чиз медурахшад! 15 сомонӣ/м². Боз истифода мебарам.", rating: 5 },
   ];
 
   const gradients = [
@@ -213,7 +213,7 @@ const Index = () => {
                 onChange={e => setSearchQuery(e.target.value)}
                 onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
                 onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
-                placeholder={language === "en" ? "Describe your problem: leaky faucet, broken outlet..." : "Опишите проблему: течёт кран, не работает розетка..."}
+                placeholder={language === "en" ? "Describe your problem: leaky faucet, broken outlet..." : language === "tj" ? "Мушкилиро тавсиф кунед: кран мечакад, розетка кор намекунад..." : "Опишите проблему: течёт кран, не работает розетка, нужна уборка..."}
                 className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border focus:border-primary shadow-lg"
               />
             </div>
@@ -297,10 +297,10 @@ const Index = () => {
           <div className="container px-4 mx-auto">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-                {language === "en" ? "Top Masters" : "Лучшие мастера"}
+                {language === "en" ? "Top Masters in Dushanbe" : language === "tj" ? "Беҳтарин устоони Душанбе" : "Лучшие мастера Душанбе"}
               </h2>
               <p className="text-muted-foreground">
-                {language === "en" ? "Highest rated professionals" : "Мастера с наивысшим рейтингом"}
+                {language === "en" ? "Highest rated professionals in your city" : language === "tj" ? "Устоон бо баландтарин рейтинг дар шаҳри шумо" : "Мастера с наивысшим рейтингом в вашем городе"}
               </p>
             </motion.div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
@@ -327,9 +327,9 @@ const Index = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {master.experience_years} лет</span>
+                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {master.experience_years} {language === "en" ? "yrs" : "сол"}</span>
                             <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {master.working_districts?.[0]}</span>
-                            <span className="ml-auto font-semibold text-foreground">от {master.price_min} сом.</span>
+                            <span className="ml-auto font-semibold text-foreground">аз {master.price_min} сом.</span>
                           </div>
                         </CardContent>
                       </Card>
@@ -341,7 +341,7 @@ const Index = () => {
             <div className="text-center mt-8">
               <Link to="/masters">
                 <Button variant="outline" size="lg" className="rounded-full px-8">
-                  {language === "en" ? "View all masters" : "Все мастера"}
+                  {language === "en" ? "View all masters" : language === "tj" ? "Ҳамаи устоон" : "Все мастера Душанбе"}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
@@ -379,7 +379,7 @@ const Index = () => {
         <div className="container px-4 mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {language === "en" ? "What Our Clients Say" : "Отзывы клиентов"}
+              {language === "en" ? "What Dushanbe Clients Say" : language === "tj" ? "Фикрҳои муштариёни Душанбе" : "Отзывы клиентов из Душанбе"}
             </h2>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
