@@ -51,7 +51,7 @@ const DISTRICTS = [
   "Пригород", "Рудакӣ", "Варзоб",
 ];
 
-type Tab = "overview" | "available" | "active" | "completed" | "earnings" | "profile" | "reviews" | "portfolio" | "notifications" | "schedule";
+type Tab = "overview" | "available" | "active" | "completed" | "earnings" | "profile" | "reviews" | "portfolio" | "notifications" | "schedule" | "products";
 
 export default function MasterDashboard() {
   const { user, profile } = useAuth();
