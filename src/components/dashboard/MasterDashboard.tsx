@@ -973,7 +973,7 @@ export default function MasterDashboard() {
                     <span>•</span>
                     <span>{completedOrders.length} заказов</span>
                     <span>•</span>
-                    <span>{totalEarnings.toLocaleString()} сом.</span>
+                    <span>{totalEarnings.toLocaleString()} сомонӣ</span>
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     <Switch checked={isAvailable} onCheckedChange={setIsAvailable} />
