@@ -24,6 +24,7 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   hasRole: () => false,
   signOut: async () => {},
+  refetchUserData: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
