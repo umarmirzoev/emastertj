@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ClipboardList, Plus, Star, Clock, User, XCircle, MapPin, Phone,
   CheckCircle, ChevronRight, Bell, MessageSquare, Loader2, Calendar, FileText,
+  CreditCard, DollarSign,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
