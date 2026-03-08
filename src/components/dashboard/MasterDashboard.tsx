@@ -1089,6 +1089,28 @@ export default function MasterDashboard() {
               <div className="border-t border-border pt-4">
                 <StatusActionButtons order={detailOrder} />
               </div>
+              {/* Chat with client */}
+              {!["cancelled", "new"].includes(detailOrder.status) && (
+                <Button
+                  variant="outline"
+                  className="w-full rounded-xl gap-2"
+                  onClick={() => setChatOrderId(detailOrder.id)}
+                >
+                  <Bell className="w-4 h-4" />
+                  Чат с клиентом
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Inline chat */}
+          {chatOrderId === detailOrder?.id && (
+            <div className="h-80 mt-2 -mx-6 -mb-6 border-t border-border">
+              <OrderChat
+                orderId={chatOrderId}
+                isOpen={true}
+                onClose={() => setChatOrderId(null)}
+              />
             </div>
           )}
         </DialogContent>
