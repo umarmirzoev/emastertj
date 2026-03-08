@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCart } from "@/hooks/useCart";
 import RecentlyViewedProducts from "@/components/shop/RecentlyViewedProducts";
-import { ShoppingCart, Star, ArrowLeft, Package, Phone } from "lucide-react";
+import { ShoppingCart, Star, ArrowLeft, Package, Phone, Percent } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ShopCategory() {
   const { id } = useParams();
