@@ -98,7 +98,7 @@ export default function AdminDashboard() {
       supabase.from("service_categories").select("*, services(count)").order("sort_order"),
       supabase.from("master_applications").select("*").order("created_at", { ascending: false }),
       supabase.from("reviews").select("*").order("created_at", { ascending: false }).limit(100),
-      supabase.from("master_listings").select("id, full_name, phone, service_categories, average_rating, user_id").eq("is_active", true).order("average_rating", { ascending: false }).limit(200),
+      supabase.from("master_listings").select("id, full_name, phone, service_categories, average_rating, user_id, working_districts, ranking_score, is_top_master, quality_flag, completed_orders").eq("is_active", true).order("ranking_score", { ascending: false }).limit(200),
     ]);
     setOrders(ordersRes.data || []);
     setAllUsers(usersRes.data || []);
