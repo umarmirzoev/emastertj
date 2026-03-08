@@ -105,6 +105,27 @@ export default function ClientDashboard() {
     }
   }, [profile]);
 
+  // Poll for role change after application approval — switch to master dashboard immediately
+  useEffect(() => {
+    if (!myApplication || myApplication.status !== "pending") return;
+    const interval = setInterval(async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("master_applications")
+        .select("status")
+        .eq("user_id", user.id)
+        .eq("status", "approved")
+        .limit(1);
+      if (data && data.length > 0) {
+        await refetchUserData();
+        // Force navigation to dashboard which will now render MasterDashboard
+        navigate("/dashboard", { replace: true });
+        window.location.reload();
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [myApplication, user, refetchUserData, navigate]);
+
   useRealtimeOrders({ userId: user?.id, role: "client", onUpdate: fetchOrders });
 
   const cancelOrder = async (orderId: string) => {
