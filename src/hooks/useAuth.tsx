@@ -14,6 +14,7 @@ interface AuthContextType {
   hasRole: (role: AppRole) => boolean;
   signOut: () => Promise<void>;
   refetchUserData: () => Promise<void>;
+  getDashboardPath: () => string;
 }
 
 const AuthContext = createContext<AuthContextType>({
