@@ -176,7 +176,6 @@ export default function ProductDetail() {
                 </CardContent>
               </Card>
             )}
-            </div>
 
             {product.description && (
               <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
