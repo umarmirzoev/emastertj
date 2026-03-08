@@ -64,17 +64,19 @@ export default function Shop() {
 
   useEffect(() => {
     const load = async () => {
-      const [catsRes, popRes, discRes, recRes, allRes] = await Promise.all([
+      const [catsRes, popRes, discRes, recRes, allRes, hotRes] = await Promise.all([
         supabase.from("shop_categories").select("*").order("sort_order"),
         supabase.from("shop_products").select("*, shop_categories(name)").eq("is_popular", true).eq("is_approved", true).limit(12),
         supabase.from("shop_products").select("*, shop_categories(name)").eq("is_discounted", true).eq("is_approved", true).limit(8),
         supabase.from("shop_products").select("*, shop_categories(name)").eq("is_approved", true).gte("rating", 4.5).order("reviews_count", { ascending: false }).limit(8),
         supabase.from("shop_products").select("*, shop_categories(name)").eq("is_approved", true).order("created_at", { ascending: false }).limit(200),
+        supabase.from("shop_products").select("*, shop_categories(name)").eq("is_discounted", true).eq("is_approved", true).not("promotion_end", "is", null).gte("promotion_end", new Date().toISOString()).order("promotion_end").limit(6),
       ]);
       const cats = catsRes.data || [];
       setCategories(cats);
       setPopular(popRes.data || []);
       setDiscounted(discRes.data || []);
+      setHotDeals(hotRes.data || []);
       setRecommended(recRes.data || []);
       const all = allRes.data || [];
       setAllProducts(all);
