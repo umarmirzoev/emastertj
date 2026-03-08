@@ -191,6 +191,7 @@ export default function Masters() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="ranking">По рекомендации</SelectItem>
                       <SelectItem value="rating">По рейтингу</SelectItem>
                       <SelectItem value="price_low">Цена: по возрастанию</SelectItem>
                       <SelectItem value="price_high">Цена: по убыванию</SelectItem>
