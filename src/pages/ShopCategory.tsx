@@ -18,7 +18,9 @@ export default function ShopCategory() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState("popular");
+  const [discountOnly, setDiscountOnly] = useState(false);
   const { addToCart } = useCart();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const load = async () => {
