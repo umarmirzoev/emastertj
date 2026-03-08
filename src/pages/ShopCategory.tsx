@@ -56,17 +56,25 @@ export default function ShopCategory() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3 flex-wrap mb-4">
           <Select value={sort} onValueChange={setSort}>
             <SelectTrigger className="w-48 rounded-full"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="popular">По популярности</SelectItem>
-              <SelectItem value="price_asc">Цена ↑</SelectItem>
-              <SelectItem value="price_desc">Цена ↓</SelectItem>
-              <SelectItem value="rating">По рейтингу</SelectItem>
+              <SelectItem value="popular">{t("shopByPopularity")}</SelectItem>
+              <SelectItem value="price_asc">{t("shopPriceAsc")}</SelectItem>
+              <SelectItem value="price_desc">{t("shopPriceDesc")}</SelectItem>
+              <SelectItem value="rating">{t("shopByRating")}</SelectItem>
             </SelectContent>
           </Select>
-          <a href="tel:+992979117007" className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1">
+          <Button
+            variant={discountOnly ? "default" : "outline"}
+            size="sm"
+            className="rounded-full gap-1.5"
+            onClick={() => setDiscountOnly(!discountOnly)}
+          >
+            <Percent className="w-3.5 h-3.5" /> {t("shopDiscountOnly")}
+          </Button>
+          <a href="tel:+992979117007" className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1 ml-auto">
             <Phone className="w-3 h-3" /> +992 979 117 007
           </a>
         </div>
