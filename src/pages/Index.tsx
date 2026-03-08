@@ -217,7 +217,7 @@ const Index = () => {
                 onChange={e => setSearchQuery(e.target.value)}
                 onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
                 onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
-                placeholder={language === "en" ? "Describe your problem: leaky faucet, broken outlet..." : language === "tj" ? "Мушкилиро тавсиф кунед: кран мечакад, розетка кор намекунад..." : "Опишите проблему: течёт кран, не работает розетка, нужна уборка..."}
+                placeholder={t("searchPlaceholder")}
                 className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border focus:border-primary shadow-lg"
               />
             </div>
