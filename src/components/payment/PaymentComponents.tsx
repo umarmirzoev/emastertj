@@ -82,7 +82,7 @@ export function PriceBreakdown({ servicePrice, materialsCost, urgencySurcharge, 
         {items.map((item, i) => (
           <div key={i} className="flex justify-between text-sm">
             <span className="text-muted-foreground">{item.label}</span>
-            <span className="font-medium">{item.value.toLocaleString()} сом.</span>
+            <span className="font-medium">{item.value.toLocaleString()} сомонӣ</span>
           </div>
         ))}
         <Separator />
