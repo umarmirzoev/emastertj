@@ -183,8 +183,11 @@ export default function ClientDashboard() {
   const completedOrders = orders.filter(o => ["completed", "reviewed"].includes(o.status));
   const clientReviews = orders.filter(o => o.status === "reviewed");
 
+  const paidOrders = orders.filter(o => (o as any).payment_status === "paid");
+
   const navItems = [
     { path: "/dashboard", label: "Мои заказы", icon: ClipboardList, badge: activeOrders.length },
+    { path: "/dashboard/payments", label: "Оплата", icon: CreditCard },
     { path: "/dashboard/profile", label: "Профиль", icon: User },
     { path: "/dashboard/notifications", label: "Уведомления", icon: Bell, badge: unreadCount },
   ];
@@ -193,13 +196,14 @@ export default function ClientDashboard() {
     { label: "Всего", value: orders.length, icon: ClipboardList, gradient: "from-blue-500/10 to-sky-500/10", iconColor: "text-blue-600", iconBg: "bg-blue-500/10" },
     { label: "Активных", value: activeOrders.length, icon: Clock, gradient: "from-amber-500/10 to-yellow-500/10", iconColor: "text-amber-600", iconBg: "bg-amber-500/10" },
     { label: "Завершённых", value: completedOrders.length, icon: CheckCircle, gradient: "from-emerald-500/10 to-green-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
-    { label: "Отзывов", value: clientReviews.length, icon: Star, gradient: "from-orange-500/10 to-red-500/10", iconColor: "text-orange-600", iconBg: "bg-orange-500/10" },
+    { label: "Оплачено", value: paidOrders.length, icon: DollarSign, gradient: "from-emerald-500/10 to-teal-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ComponentType<{ className?: string }>; count?: number }[] = [
     { key: "orders", label: "Все заказы", icon: ClipboardList, count: orders.length },
     { key: "active", label: "Активные", icon: Clock, count: activeOrders.length },
     { key: "completed", label: "Завершённые", icon: CheckCircle, count: completedOrders.length },
+    { key: "payments", label: "Оплата", icon: CreditCard, count: paidOrders.length },
     ...(myApplication ? [{ key: "application" as Tab, label: "Заявка мастера", icon: FileText }] : []),
     { key: "profile", label: "Профиль", icon: User },
     { key: "notifications", label: "Уведомления", icon: Bell, count: unreadCount },
