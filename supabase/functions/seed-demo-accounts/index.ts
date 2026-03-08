@@ -28,7 +28,45 @@ Deno.serve(async (req) => {
       const existing = existingUsers?.users?.find(u => u.email === account.email);
 
       if (existing) {
-        results.push({ email: account.email, status: "already_exists", id: existing.id });
+        // Update password to ensure it matches
+        const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(existing.id, {
+          password: account.password,
+          email_confirm: true,
+        });
+
+        if (updateError) {
+          results.push({ email: account.email, status: "password_update_error", error: updateError.message });
+          continue;
+        }
+
+        // Ensure role exists
+        const { data: existingRoles } = await supabaseAdmin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", existing.id)
+          .eq("role", account.role);
+
+        if (!existingRoles || existingRoles.length === 0) {
+          await supabaseAdmin.from("user_roles").insert({
+            user_id: existing.id,
+            role: account.role,
+          });
+        }
+
+        // Ensure profile exists
+        const { data: profileData } = await supabaseAdmin
+          .from("profiles")
+          .select("id")
+          .eq("user_id", existing.id);
+
+        if (!profileData || profileData.length === 0) {
+          await supabaseAdmin.from("profiles").insert({
+            user_id: existing.id,
+            full_name: account.name,
+          });
+        }
+
+        results.push({ email: account.email, status: "updated", id: existing.id });
         continue;
       }
 
@@ -53,7 +91,6 @@ Deno.serve(async (req) => {
           role: account.role,
         });
 
-        // Update profile name
         await supabaseAdmin.from("profiles").update({
           full_name: account.name,
         }).eq("user_id", newUser.user.id);
