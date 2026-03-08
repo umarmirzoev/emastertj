@@ -82,8 +82,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) await fetchUserData(user.id);
   };
 
+  const getDashboardPath = () => {
+    if (roles.includes("super_admin")) return "/super-admin/dashboard";
+    if (roles.includes("admin")) return "/admin/dashboard";
+    if (roles.includes("master")) return "/master-dashboard";
+    return "/dashboard";
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, roles, profile, hasRole, signOut, refetchUserData }}>
+    <AuthContext.Provider value={{ user, session, loading, roles, profile, hasRole, signOut, refetchUserData, getDashboardPath }}>
       {children}
     </AuthContext.Provider>
   );
