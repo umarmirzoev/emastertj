@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      master_listings: {
+        Row: {
+          avatar_url: string | null
+          average_rating: number | null
+          bio: string | null
+          created_at: string
+          experience_years: number | null
+          full_name: string
+          id: string
+          is_active: boolean | null
+          latitude: number | null
+          longitude: number | null
+          phone: string | null
+          price_max: number | null
+          price_min: number | null
+          service_categories: string[] | null
+          total_reviews: number | null
+          user_id: string | null
+          working_districts: string[] | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          average_rating?: number | null
+          bio?: string | null
+          created_at?: string
+          experience_years?: number | null
+          full_name: string
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          phone?: string | null
+          price_max?: number | null
+          price_min?: number | null
+          service_categories?: string[] | null
+          total_reviews?: number | null
+          user_id?: string | null
+          working_districts?: string[] | null
+        }
+        Update: {
+          avatar_url?: string | null
+          average_rating?: number | null
+          bio?: string | null
+          created_at?: string
+          experience_years?: number | null
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          phone?: string | null
+          price_max?: number | null
+          price_min?: number | null
+          service_categories?: string[] | null
+          total_reviews?: number | null
+          user_id?: string | null
+          working_districts?: string[] | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -130,12 +190,17 @@ export type Database = {
           approval_status: string | null
           avatar_url: string | null
           average_rating: number | null
+          bio: string | null
           created_at: string
           documents: Json | null
           experience_years: number | null
           full_name: string
           id: string
+          latitude: number | null
+          longitude: number | null
           phone: string | null
+          price_max: number | null
+          price_min: number | null
           service_categories: string[] | null
           total_reviews: number | null
           updated_at: string
@@ -146,12 +211,17 @@ export type Database = {
           approval_status?: string | null
           avatar_url?: string | null
           average_rating?: number | null
+          bio?: string | null
           created_at?: string
           documents?: Json | null
           experience_years?: number | null
           full_name?: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           phone?: string | null
+          price_max?: number | null
+          price_min?: number | null
           service_categories?: string[] | null
           total_reviews?: number | null
           updated_at?: string
@@ -162,12 +232,17 @@ export type Database = {
           approval_status?: string | null
           avatar_url?: string | null
           average_rating?: number | null
+          bio?: string | null
           created_at?: string
           documents?: Json | null
           experience_years?: number | null
           full_name?: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           phone?: string | null
+          price_max?: number | null
+          price_min?: number | null
           service_categories?: string[] | null
           total_reviews?: number | null
           updated_at?: string

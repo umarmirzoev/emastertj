@@ -17,6 +17,8 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import PriceList from "./pages/PriceList";
 import MasterProfile from "./pages/MasterProfile";
+import Masters from "./pages/Masters";
+import MasterDetail from "./pages/MasterDetail";
 import VerifyEmail from "./pages/VerifyEmail";
 import PendingApproval from "./pages/PendingApproval";
 
@@ -47,6 +49,8 @@ const AnimatedRoutes = () => {
         <Route path="/become-master" element={<PageTransition><BecomeMaster /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
         <Route path="/master/:id" element={<PageTransition><MasterProfile /></PageTransition>} />
+        <Route path="/masters" element={<PageTransition><Masters /></PageTransition>} />
+        <Route path="/masters/:id" element={<PageTransition><MasterDetail /></PageTransition>} />
         <Route path="/verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="/pending-approval" element={<PageTransition><PendingApproval /></PageTransition>} />
         <Route path="/dashboard" element={<Dashboard />} />

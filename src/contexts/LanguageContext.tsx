@@ -12,6 +12,7 @@ const translations = {
   ru: {
     navAbout: "О компании",
     navCategories: "Категории",
+    navMasters: "Мастера",
     navHowItWorks: "Как это работает",
     navContacts: "Контакты",
     navBecomeMaster: "Стать мастером",
@@ -137,6 +138,7 @@ const translations = {
   tj: {
     navAbout: "Дар бораи мо",
     navCategories: "Категорияҳо",
+    navMasters: "Устоҳо",
     navHowItWorks: "Чӣ тавр кор мекунад",
     navContacts: "Тамосҳо",
     navBecomeMaster: "Усто шудан",
@@ -262,6 +264,7 @@ const translations = {
   en: {
     navAbout: "About Us",
     navCategories: "Categories",
+    navMasters: "Masters",
     navHowItWorks: "How It Works",
     navContacts: "Contacts",
     navBecomeMaster: "Become a Master",
