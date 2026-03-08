@@ -446,7 +446,11 @@ export default function Shop() {
               </div>
             </div>
           </section>
-        </>
+        {/* Recently Viewed */}
+        <div className="container px-4 mx-auto">
+          <RecentlyViewedProducts />
+        </div>
+      </>
       )}
 
       <Footer />

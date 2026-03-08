@@ -117,6 +117,8 @@ export default function ShopCategory() {
             })}
           </div>
         )}
+
+        <RecentlyViewedProducts />
       </div>
       <Footer />
     </div>
