@@ -142,7 +142,8 @@ export function PaymentDialog({ order, open, onOpenChange, onPaymentComplete }: 
         service_price: servicePrice,
         materials_cost: materialsCost,
         urgency_surcharge: urgencySurcharge,
-        platform_commission: Math.round(total * 0.1),
+        platform_commission: Math.round(total * 0.2),
+        master_payout: Math.round(total * 0.8),
       } as any)
       .eq("id", order.id);
 

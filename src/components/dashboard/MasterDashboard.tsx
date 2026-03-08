@@ -819,7 +819,12 @@ export default function MasterDashboard() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <PaymentStatusBadge status={(o as any).payment_status || "unpaid"} />
-                        <span className="font-bold text-emerald-600 text-sm">+{o.budget || 0} сомонӣ</span>
+                        <div className="text-right">
+                          <span className="font-bold text-emerald-600 text-sm">+{getPayout(o).toLocaleString()} сомонӣ</span>
+                          {getGross(o) !== getPayout(o) && (
+                            <p className="text-[10px] text-muted-foreground">из {getGross(o).toLocaleString()}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
