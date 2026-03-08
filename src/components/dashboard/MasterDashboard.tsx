@@ -630,7 +630,7 @@ export default function MasterDashboard() {
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    {o.budget > 0 && <p className="font-bold text-emerald-600">{o.budget} сом.</p>}
+                    {o.budget > 0 && <p className="font-bold text-emerald-600">{o.budget} сомонӣ</p>}
                     <Badge className={`${statusColors[o.status]} text-[10px] mt-1`}>{statusLabels[o.status]}</Badge>
                   </div>
                 </div>
