@@ -96,6 +96,14 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="rounded-full relative">
+                <ShoppingCart className="w-4 h-4" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">{itemCount}</span>
+                )}
+              </Button>
+            </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-1 rounded-full px-3">
