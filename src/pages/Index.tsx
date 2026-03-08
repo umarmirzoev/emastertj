@@ -44,11 +44,7 @@ const Index = () => {
     setIsOrderModalOpen(true);
   };
 
-  const handleOrderService = (serviceName: string, categoryKey: string) => {
-    setSelectedCategory("other");
-    setSelectedServiceName(serviceName);
-    setIsOrderModalOpen(true);
-  };
+  // removed - Services component now navigates directly
 
   const steps = [
     { icon: Search, titleKey: "howItWorksStep1Title", descKey: "howItWorksStep1Desc" },
@@ -149,7 +145,7 @@ const Index = () => {
             </Link>
           </div>
         </div>
-        <Services onOrderService={handleOrderService} />
+        <Services />
       </section>
 
       {/* How it works */}
