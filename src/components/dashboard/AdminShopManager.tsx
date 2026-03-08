@@ -57,6 +57,7 @@ export default function AdminShopManager() {
   const resetForm = () => {
     setName(""); setDesc(""); setPrice(""); setOldPrice("");
     setCatId(""); setImageUrl(""); setStockQty("100"); setInstallPrice("");
+    setIsDiscounted(false); setPromoStart(""); setPromoEnd(""); setPromoLabel("");
     setEditing(null);
   };
 
@@ -66,6 +67,10 @@ export default function AdminShopManager() {
     setOldPrice(p.old_price?.toString() || ""); setCatId(p.category_id);
     setImageUrl(p.image_url || ""); setStockQty((p.stock_qty || 0).toString());
     setInstallPrice(p.installation_price?.toString() || "");
+    setIsDiscounted(!!p.is_discounted);
+    setPromoStart(p.promotion_start ? p.promotion_start.slice(0, 16) : "");
+    setPromoEnd(p.promotion_end ? p.promotion_end.slice(0, 16) : "");
+    setPromoLabel(p.promotion_label || "");
     setShowForm(true);
   };
 
