@@ -747,7 +747,7 @@ export default function MasterDashboard() {
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{avgOrderValue.toLocaleString()}</p><p className="text-xs text-muted-foreground">Ср. чек (сомонӣ)</p></CardContent></Card>
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{completedOrders.length}</p><p className="text-xs text-muted-foreground">Выполнено заказов</p></CardContent></Card>
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-emerald-600">{completedOrders.filter(o => (o as any).payment_status === "paid").length}</p><p className="text-xs text-muted-foreground">Оплачено</p></CardContent></Card>
-            <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{Math.round(totalEarnings * 0.9).toLocaleString()}</p><p className="text-xs text-muted-foreground">Чистый доход</p></CardContent></Card>
+            <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{totalEarnings.toLocaleString()}</p><p className="text-xs text-muted-foreground">Чистый доход (сомонӣ)</p></CardContent></Card>
           </div>
 
           {/* Commission breakdown */}
