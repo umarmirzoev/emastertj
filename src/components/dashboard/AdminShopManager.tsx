@@ -269,6 +269,29 @@ export default function AdminShopManager() {
               <Input type="number" placeholder="Кол-во" value={stockQty} onChange={e => setStockQty(e.target.value)} />
               <Input type="number" placeholder="Цена установки" value={installPrice} onChange={e => setInstallPrice(e.target.value)} />
             </div>
+
+            {/* Promotion section */}
+            <div className="border-t border-border pt-4 space-y-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox checked={isDiscounted} onCheckedChange={(v) => setIsDiscounted(!!v)} />
+                <span className="text-sm font-medium text-foreground">Товар со скидкой</span>
+              </label>
+              {isDiscounted && (
+                <>
+                  <Input placeholder="Название акции (напр. Летняя распродажа)" value={promoLabel} onChange={e => setPromoLabel(e.target.value)} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Начало акции</label>
+                      <Input type="datetime-local" value={promoStart} onChange={e => setPromoStart(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Конец акции</label>
+                      <Input type="datetime-local" value={promoEnd} onChange={e => setPromoEnd(e.target.value)} />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setShowForm(false); resetForm(); }}>Отмена</Button>
