@@ -171,6 +171,9 @@ function ProductCard({ product: p, onAdd }: { product: any; onAdd: (id: string) 
         {p.installation_price && (
           <Badge className="absolute top-2 right-2 bg-primary/90 text-primary-foreground text-[10px]">+ установка</Badge>
         )}
+        {p.seller_type === "master" && (
+          <Badge className="absolute bottom-2 left-2 bg-emerald-500 text-white text-[10px]">От мастера</Badge>
+        )}
       </div>
       <CardContent className="p-3">
         <p className="text-xs text-muted-foreground mb-1">{p.shop_categories?.name || ""}</p>
