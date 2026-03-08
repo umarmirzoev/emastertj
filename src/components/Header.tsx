@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import {
   Languages,
   LogIn,
@@ -29,12 +31,15 @@ import {
   Wrench,
   LayoutDashboard,
   User,
+  ShoppingBag,
+  ShoppingCart,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 
 export default function Header() {
   const { language, setLanguage, t } = useLanguage();
   const { user, profile, signOut, loading, getDashboardPath } = useAuth();
+  const { itemCount } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -43,6 +48,7 @@ export default function Header() {
     { path: "/about", labelKey: "navAbout", icon: Building2 },
     { path: "/categories", labelKey: "navCategories", icon: Wrench },
     { path: "/masters", labelKey: "navMasters", icon: User },
+    { path: "/shop", label: "Магазин", icon: ShoppingBag },
     { path: "/services", labelKey: "servicesTitle", icon: Wrench },
     { path: "/how-it-works", labelKey: "navHowItWorks", icon: HelpCircle },
     { path: "/contacts", labelKey: "navContacts", icon: Phone },
@@ -74,7 +80,7 @@ export default function Header() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => (
+            {navItems.map((item: any) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -84,12 +90,20 @@ export default function Header() {
                     : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 }`}
               >
-                {t(item.labelKey)}
+                {item.label || t(item.labelKey)}
               </Link>
             ))}
           </nav>
 
           <div className="flex items-center gap-2">
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="rounded-full relative">
+                <ShoppingCart className="w-4 h-4" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">{itemCount}</span>
+                )}
+              </Button>
+            </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-1 rounded-full px-3">
@@ -171,7 +185,7 @@ export default function Header() {
                           >
                             <div className="flex items-center gap-3">
                               <Icon className="w-5 h-5" />
-                              <span className="font-medium">{t(item.labelKey)}</span>
+                              <span className="font-medium">{(item as any).label || t((item as any).labelKey)}</span>
                             </div>
                             <ChevronRight className="w-4 h-4 opacity-50" />
                           </Link>
