@@ -86,7 +86,18 @@ export default function ClientDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchOrders(); }, [user]);
+  const fetchApplication = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("master_applications")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (data && data.length > 0) setMyApplication(data[0]);
+  };
+
+  useEffect(() => { fetchOrders(); fetchApplication(); }, [user]);
   useEffect(() => {
     if (profile) {
       setEditName(profile.full_name || "");
