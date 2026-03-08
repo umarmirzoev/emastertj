@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      cart_items: {
+        Row: {
+          created_at: string
+          id: string
+          include_installation: boolean | null
+          product_id: string
+          quantity: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          include_installation?: boolean | null
+          product_id: string
+          quantity?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          include_installation?: boolean | null
+          product_id?: string
+          quantity?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       master_applications: {
         Row: {
           admin_note: string | null
@@ -556,6 +591,191 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_categories: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          image_url: string | null
+          name: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          image_url?: string | null
+          name: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      shop_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          include_installation: boolean | null
+          installation_price: number | null
+          order_id: string
+          price: number
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          include_installation?: boolean | null
+          installation_price?: number | null
+          order_id: string
+          price?: number
+          product_id: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          include_installation?: boolean | null
+          installation_price?: number | null
+          order_id?: string
+          price?: number
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "shop_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_orders: {
+        Row: {
+          comments: string | null
+          created_at: string
+          customer_name: string | null
+          delivery_address: string | null
+          id: string
+          phone: string | null
+          status: string
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string
+          customer_name?: string | null
+          delivery_address?: string | null
+          id?: string
+          phone?: string | null
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string
+          customer_name?: string | null
+          delivery_address?: string | null
+          id?: string
+          phone?: string | null
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shop_products: {
+        Row: {
+          category_id: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          images: string[] | null
+          in_stock: boolean | null
+          installation_price: number | null
+          is_discounted: boolean | null
+          is_popular: boolean | null
+          name: string
+          old_price: number | null
+          price: number
+          rating: number | null
+          related_service_category: string | null
+          reviews_count: number | null
+          specs: Json | null
+          stock_qty: number | null
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          in_stock?: boolean | null
+          installation_price?: number | null
+          is_discounted?: boolean | null
+          is_popular?: boolean | null
+          name: string
+          old_price?: number | null
+          price?: number
+          rating?: number | null
+          related_service_category?: string | null
+          reviews_count?: number | null
+          specs?: Json | null
+          stock_qty?: number | null
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          in_stock?: boolean | null
+          installation_price?: number | null
+          is_discounted?: boolean | null
+          is_popular?: boolean | null
+          name?: string
+          old_price?: number | null
+          price?: number
+          rating?: number | null
+          related_service_category?: string | null
+          reviews_count?: number | null
+          specs?: Json | null
+          stock_qty?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "shop_categories"
             referencedColumns: ["id"]
           },
         ]
