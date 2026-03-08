@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,7 +57,7 @@ const statusLabels: Record<string, string> = {
 type Tab = "orders" | "active" | "completed" | "profile" | "reviews" | "notifications" | "application";
 
 export default function ClientDashboard() {
-  const { user, profile } = useAuth();
+  const { user, profile, refetchUserData, hasRole } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -104,6 +104,27 @@ export default function ClientDashboard() {
       setEditPhone(profile.phone || "");
     }
   }, [profile]);
+
+  // Poll for role change after application approval — switch to master dashboard immediately
+  useEffect(() => {
+    if (!myApplication || myApplication.status !== "pending") return;
+    const interval = setInterval(async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("master_applications")
+        .select("status")
+        .eq("user_id", user.id)
+        .eq("status", "approved")
+        .limit(1);
+      if (data && data.length > 0) {
+        await refetchUserData();
+        // Force navigation to dashboard which will now render MasterDashboard
+        navigate("/dashboard", { replace: true });
+        window.location.reload();
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [myApplication, user, refetchUserData, navigate]);
 
   useRealtimeOrders({ userId: user?.id, role: "client", onUpdate: fetchOrders });
 
