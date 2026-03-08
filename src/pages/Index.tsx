@@ -450,6 +450,7 @@ const Index = () => {
         initialServiceName={selectedServiceName}
       />
       <QuickBooking open={quickBookOpen} onOpenChange={setQuickBookOpen} />
+      <AiMasterMatch open={aiMatchOpen} onOpenChange={setAiMatchOpen} />
     </div>
   );
 };
