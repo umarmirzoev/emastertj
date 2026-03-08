@@ -372,7 +372,7 @@ export default function MasterDashboard() {
   );
 
   return (
-    <DashboardLayout title="Кабинет мастера" navItems={navItems}>
+    <MasterDashboardLayout title="Кабинет мастера" navItems={navItems} isAvailable={isAvailable} onToggleAvailability={() => setIsAvailable(!isAvailable)}>
       {/* Welcome Banner */}
       <Card className="mb-6 border-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent overflow-hidden relative">
         <CardContent className="p-6 flex items-center justify-between">
