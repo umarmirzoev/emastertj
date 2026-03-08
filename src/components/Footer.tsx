@@ -33,7 +33,7 @@ export const Footer = () => {
               {t("footerAboutText")}
             </p>
             <a
-              href="https://wa.me/992000000000"
+              href="https://wa.me/992900000000"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-sm font-medium transition-colors"
