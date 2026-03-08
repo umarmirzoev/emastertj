@@ -108,7 +108,7 @@ export default function Header() {
               {!loading && user ? (
                 <>
                   <NotificationBell />
-                  <Button onClick={() => navigate("/dashboard")} size="sm" variant="ghost" className="rounded-full gap-2">
+                  <Button onClick={() => navigate(getDashboardPath())} size="sm" variant="ghost" className="rounded-full gap-2">
                     <LayoutDashboard className="w-4 h-4" />
                     {t("cabinet")}
                   </Button>
