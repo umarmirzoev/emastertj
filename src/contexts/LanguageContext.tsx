@@ -955,7 +955,7 @@ const translations: Record<Language, Record<string, string>> = {
     pendingTitle: "Дархост дар баррасӣ", pendingDesc: "Дархости устои шумо дар баррасӣ аст. Мо ба email огоҳ мекунем.",
     topMasters: "Беҳтарин устоони Душанбе", topMastersDesc: "Устоон бо баландтарин рейтинг дар шаҳри шумо",
     viewAllMasters: "Ҳамаи устоон", clientReviews: "Фикрҳои муштариёни Душанбе",
-    yearsShort: "сол", fromPrice: "аз", aiMasterMatchBtn: "🤖 AI интихоби усто", aiMasterMatchNew: "Навигарӣ",
+    yearsShort: "сол", fromPrice: "аз", currencySomoni: "сомонӣ", aiMasterMatchBtn: "🤖 AI интихоби усто", aiMasterMatchNew: "Навигарӣ",
     searchPlaceholder: "Мушкилиро тавсиф кунед: кран мечакад, розетка кор намекунад...",
     matchingCategory: "категорияи мувофиқ", pleaseLogin: "Лутфан ба аккаунт ворид шавед",
     addressPlaceholder: "Суроға", preferredTimePlaceholder: "Вақти муносиб",
