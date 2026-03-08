@@ -447,6 +447,10 @@ export default function Shop() {
               </div>
             </div>
           </section>
+        {/* Recommended Products */}
+        <div className="container px-4 mx-auto">
+          <RecommendedProducts />
+        </div>
         {/* Recently Viewed */}
         <div className="container px-4 mx-auto">
           <RecentlyViewedProducts />
