@@ -791,7 +791,7 @@ export default function MasterDashboard() {
                 {earningsByCategory.map((c, i) => (
                   <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
                     <span className="text-sm font-medium">{c.name}</span>
-                    <span className="font-bold text-primary text-sm">{c.value.toLocaleString()} сом.</span>
+                    <span className="font-bold text-primary text-sm">{c.value.toLocaleString()} сомонӣ</span>
                   </div>
                 ))}
               </CardContent>
