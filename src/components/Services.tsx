@@ -23,6 +23,8 @@ const iconMap: Record<string, React.ElementType> = {
   "Ремонт под ключ": Home,
   "Аварийные 24/7": Wrench,
   "Ремонт техники": Wrench,
+  "Кондиционеры": Wind,
+  "Отопление": Flame,
 };
 
 const colorMap: Record<string, string> = {
