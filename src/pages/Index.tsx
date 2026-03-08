@@ -1,41 +1,159 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Services } from "@/components/Services";
 import OrderModal from "@/components/OrderModal";
 import {
-  Zap, Droplets, DoorOpen, Tv, MoreHorizontal,
   Clock, Shield, Star, CheckCircle,
-  Phone, Siren, Search, FileText, Truck, ArrowRight,
+  Phone, Siren, Search, FileText, Truck, ArrowRight, Users, MapPin, Quote,
 } from "lucide-react";
+
+interface PopularMaster {
+  id: string;
+  full_name: string;
+  average_rating: number;
+  total_reviews: number;
+  experience_years: number;
+  service_categories: string[];
+  working_districts: string[];
+  price_min: number;
+}
+
+interface SearchResult {
+  type: "category" | "service";
+  id: string;
+  name: string;
+  parentName?: string;
+  parentId?: string;
+}
 
 const Index = () => {
   const { language, t } = useLanguage();
+  const navigate = useNavigate();
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedServiceName, setSelectedServiceName] = useState("");
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
-  const categories = [
-    { id: "electric", icon: Zap, labelRu: "Свет", labelTj: "Барқ", labelEn: "Electric", color: "from-amber-400 to-yellow-500", bgColor: "bg-amber-50 dark:bg-amber-950/30" },
-    { id: "plumbing", icon: Droplets, labelRu: "Вода", labelTj: "Об", labelEn: "Water", color: "from-sky-400 to-blue-500", bgColor: "bg-sky-50 dark:bg-sky-950/30" },
-    { id: "doors", icon: DoorOpen, labelRu: "Дверь", labelTj: "Дар", labelEn: "Door", color: "from-amber-600 to-orange-600", bgColor: "bg-orange-50 dark:bg-orange-950/30" },
-    { id: "appliances", icon: Tv, labelRu: "Техника", labelTj: "Техника", labelEn: "Appliances", color: "from-violet-400 to-purple-500", bgColor: "bg-violet-50 dark:bg-violet-950/30" },
-    { id: "other", icon: MoreHorizontal, labelRu: "Другое", labelTj: "Дигар", labelEn: "Other", color: "from-slate-400 to-slate-600", bgColor: "bg-slate-50 dark:bg-slate-900/30" },
-  ];
+  // Popular masters
+  const [popularMasters, setPopularMasters] = useState<PopularMaster[]>([]);
 
-  const getLabel = (cat: (typeof categories)[0]) => {
-    if (language === "ru") return cat.labelRu;
-    if (language === "tj") return cat.labelTj;
-    return cat.labelEn;
-  };
+  // Search
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [allCategories, setAllCategories] = useState<any[]>([]);
+  const [allServices, setAllServices] = useState<any[]>([]);
 
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setIsOrderModalOpen(true);
+  useEffect(() => {
+    // Load popular masters
+    supabase
+      .from("master_listings")
+      .select("id, full_name, average_rating, total_reviews, experience_years, service_categories, working_districts, price_min")
+      .eq("is_active", true)
+      .order("average_rating", { ascending: false })
+      .limit(6)
+      .then(({ data }) => setPopularMasters((data as PopularMaster[]) || []));
+
+    // Load categories and services for search
+    Promise.all([
+      supabase.from("service_categories").select("id, name_ru, name_tj, name_en"),
+      supabase.from("services").select("id, name_ru, name_tj, name_en, category_id"),
+    ]).then(([catRes, svcRes]) => {
+      setAllCategories(catRes.data || []);
+      setAllServices(svcRes.data || []);
+    });
+  }, []);
+
+  // Smart search
+  useEffect(() => {
+    if (searchQuery.length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    const q = searchQuery.toLowerCase();
+    const results: SearchResult[] = [];
+
+    // Search categories
+    for (const cat of allCategories) {
+      const name = language === "tj" ? cat.name_tj : language === "en" ? cat.name_en : cat.name_ru;
+      if (name.toLowerCase().includes(q)) {
+        results.push({ type: "category", id: cat.id, name });
+      }
+    }
+
+    // Search services
+    for (const svc of allServices) {
+      const name = language === "tj" ? svc.name_tj : language === "en" ? svc.name_en : svc.name_ru;
+      if (name.toLowerCase().includes(q)) {
+        const cat = allCategories.find((c: any) => c.id === svc.category_id);
+        const catName = cat ? (language === "tj" ? cat.name_tj : language === "en" ? cat.name_en : cat.name_ru) : "";
+        results.push({ type: "service", id: svc.id, name, parentName: catName, parentId: cat?.id });
+      }
+    }
+
+    // Keyword mapping for common problems
+    const keywordMap: Record<string, string[]> = {
+      "течет": ["Сантехника"],
+      "кран": ["Сантехника"],
+      "труб": ["Сантехника"],
+      "унитаз": ["Сантехника"],
+      "розетк": ["Электрика"],
+      "свет": ["Электрика"],
+      "провод": ["Электрика"],
+      "мебел": ["Мебель и двери"],
+      "шкаф": ["Мебель и двери"],
+      "дверь": ["Мебель и двери"],
+      "стирал": ["Ремонт техники"],
+      "холодил": ["Ремонт техники"],
+      "кондиционер": ["Кондиционеры"],
+      "отоплен": ["Отопление"],
+      "убор": ["Уборка"],
+      "камер": ["Видеонаблюдение"],
+      "сварк": ["Сварочные работы"],
+    };
+
+    if (results.length === 0) {
+      for (const [keyword, catNames] of Object.entries(keywordMap)) {
+        if (q.includes(keyword)) {
+          for (const catName of catNames) {
+            const cat = allCategories.find((c: any) => c.name_ru === catName);
+            if (cat) {
+              const name = language === "tj" ? cat.name_tj : language === "en" ? cat.name_en : cat.name_ru;
+              results.push({ type: "category", id: cat.id, name: `${name} — подходящая категория` });
+              // Also find matching services
+              const matchingSvcs = allServices.filter((s: any) => s.category_id === cat.id).slice(0, 3);
+              for (const svc of matchingSvcs) {
+                const svcName = language === "tj" ? svc.name_tj : language === "en" ? svc.name_en : svc.name_ru;
+                results.push({ type: "service", id: svc.id, name: svcName, parentName: name, parentId: cat.id });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    setSearchResults(results.slice(0, 8));
+    setShowSearchResults(results.length > 0);
+  }, [searchQuery, allCategories, allServices, language]);
+
+  const handleSearchSelect = (result: SearchResult) => {
+    setShowSearchResults(false);
+    setSearchQuery("");
+    if (result.type === "category") {
+      navigate(`/category/${result.id}`);
+    } else {
+      navigate(`/service/${result.id}`);
+    }
   };
 
   const handleQuickOrder = () => {
@@ -44,12 +162,25 @@ const Index = () => {
     setIsOrderModalOpen(true);
   };
 
-  // removed - Services component now navigates directly
-
   const steps = [
     { icon: Search, titleKey: "howItWorksStep1Title", descKey: "howItWorksStep1Desc" },
     { icon: FileText, titleKey: "howItWorksStep2Title", descKey: "howItWorksStep2Desc" },
     { icon: Truck, titleKey: "howItWorksStep3Title", descKey: "howItWorksStep3Desc" },
+  ];
+
+  const testimonials = [
+    { name: "Мадина Р.", text: "Мастер приехал через 40 минут и починил всё за час. Очень довольна!", rating: 5 },
+    { name: "Фирдавс К.", text: "Отличный сервис! Электрик решил проблему, которую другие не могли найти.", rating: 5 },
+    { name: "Нигора С.", text: "Заказывала уборку квартиры — всё блестит! Буду пользоваться ещё.", rating: 5 },
+  ];
+
+  const gradients = [
+    "from-primary to-emerald-400",
+    "from-blue-500 to-cyan-400",
+    "from-violet-500 to-purple-400",
+    "from-amber-500 to-orange-400",
+    "from-rose-500 to-pink-400",
+    "from-teal-500 to-green-400",
   ];
 
   return (
@@ -61,41 +192,53 @@ const Index = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="relative pt-8 pb-12 md:pt-16 md:pb-20 overflow-hidden"
+        className="relative pt-10 pb-16 md:pt-20 md:pb-28 overflow-hidden"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
         <div className="container px-4 mx-auto relative">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="text-center max-w-4xl mx-auto mb-8 md:mb-12">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-4 md:mb-6 tracking-tight leading-tight">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="text-center max-w-3xl mx-auto mb-10">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-4 tracking-tight leading-[1.1]">
               {t("heroTitle")}
             </h1>
             <p className="text-lg md:text-xl font-medium text-primary mb-3">{t("heroSubtitle")}</p>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">{t("heroDescription")}</p>
           </motion.div>
 
-          {/* Category buttons */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-5 max-w-4xl mx-auto mb-8">
-            {categories.map((cat, index) => {
-              const Icon = cat.icon;
-              return (
-                <motion.button
-                  key={cat.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: 0.1 * index }}
-                  onClick={() => handleCategoryClick(cat.id)}
-                  className={`group relative p-5 md:p-6 rounded-2xl ${cat.bgColor} border-2 border-transparent hover:border-primary/30 transition-all duration-300 hover:scale-105 hover:shadow-xl`}
-                >
-                  <div className={`w-12 h-12 md:w-14 md:h-14 mx-auto mb-2 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all`}>
-                    <Icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
-                  </div>
-                  <span className="text-sm md:text-base font-semibold text-foreground">{getLabel(cat)}</span>
-                </motion.button>
-              );
-            })}
+          {/* Search bar */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="max-w-2xl mx-auto mb-10 relative">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
+                onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                placeholder={language === "en" ? "Describe your problem: leaky faucet, broken outlet..." : "Опишите проблему: течёт кран, не работает розетка..."}
+                className="h-14 pl-12 pr-4 text-base rounded-2xl border-2 border-border focus:border-primary shadow-lg"
+              />
+            </div>
+            {showSearchResults && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden">
+                {searchResults.map((r, i) => (
+                  <button
+                    key={`${r.type}-${r.id}-${i}`}
+                    className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors flex items-center gap-3 border-b border-border/50 last:border-0"
+                    onMouseDown={() => handleSearchSelect(r)}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${r.type === "category" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                      {r.type === "category" ? <Users className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{r.name}</p>
+                      {r.parentName && <p className="text-xs text-muted-foreground">{r.parentName}</p>}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
-          {/* CTA */}
+          {/* CTA buttons */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="flex flex-col sm:flex-row gap-3 justify-center max-w-xl mx-auto mb-12">
             <Button onClick={handleQuickOrder} size="lg" className="flex-1 rounded-full px-8 py-6 text-base font-semibold shadow-xl hover:shadow-2xl transition-all bg-gradient-to-r from-primary to-emerald-500 hover:from-primary/90 hover:to-emerald-500/90">
               <Phone className="w-5 h-5 mr-2" />
@@ -133,7 +276,7 @@ const Index = () => {
         </div>
       </motion.section>
 
-      {/* Services */}
+      {/* Categories */}
       <section className="py-12 bg-muted/50">
         <div className="container px-4 mx-auto">
           <div className="text-center mb-8">
@@ -148,17 +291,76 @@ const Index = () => {
         <Services />
       </section>
 
+      {/* Popular Masters */}
+      {popularMasters.length > 0 && (
+        <section className="py-16 bg-background">
+          <div className="container px-4 mx-auto">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+                {language === "en" ? "Top Masters" : "Лучшие мастера"}
+              </h2>
+              <p className="text-muted-foreground">
+                {language === "en" ? "Highest rated professionals" : "Мастера с наивысшим рейтингом"}
+              </p>
+            </motion.div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+              {popularMasters.map((master, i) => {
+                const initials = master.full_name.split(" ").map(w => w[0]).join("").slice(0, 2);
+                const gradient = gradients[i % gradients.length];
+                return (
+                  <motion.div key={master.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+                    <Link to={`/masters/${master.id}`}>
+                      <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                        <div className={`h-1.5 bg-gradient-to-r ${gradient}`} />
+                        <CardContent className="p-5">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold shadow-md`}>
+                              {initials}
+                            </div>
+                            <div>
+                              <p className="font-bold text-foreground group-hover:text-primary transition-colors">{master.full_name}</p>
+                              <div className="flex items-center gap-1.5">
+                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                <span className="font-semibold">{master.average_rating}</span>
+                                <span className="text-xs text-muted-foreground">({master.total_reviews})</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {master.experience_years} лет</span>
+                            <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {master.working_districts?.[0]}</span>
+                            <span className="ml-auto font-semibold text-foreground">от {master.price_min} сом.</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+            <div className="text-center mt-8">
+              <Link to="/masters">
+                <Button variant="outline" size="lg" className="rounded-full px-8">
+                  {language === "en" ? "View all masters" : "Все мастера"}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* How it works */}
-      <section className="py-16 md:py-24 bg-background">
+      <section className="py-16 md:py-24 bg-muted/30">
         <div className="container px-4 mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-12">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{t("howItWorksTitle")}</h2>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {steps.map((step, index) => {
               const Icon = step.icon;
               return (
-                <motion.div key={index} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 * index }} className="text-center">
+                <motion.div key={index} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }} className="text-center">
                   <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center shadow-xl">
                     <Icon className="w-10 h-10 text-white" />
                   </div>
@@ -169,22 +371,44 @@ const Index = () => {
               );
             })}
           </div>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.3 }} className="text-center mt-12">
-            <p className="text-lg text-muted-foreground mb-6">{t("howItWorksFooter")}</p>
-            <Link to="/how-it-works">
-              <Button variant="outline" size="lg" className="rounded-full px-8">
-                {t("learnMore")}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-16 bg-background">
+        <div className="container px-4 mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              {language === "en" ? "What Our Clients Say" : "Отзывы клиентов"}
+            </h2>
           </motion.div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {testimonials.map((t, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+                <Card className="h-full">
+                  <CardContent className="p-6">
+                    <Quote className="w-8 h-8 text-primary/20 mb-3" />
+                    <p className="text-foreground mb-4 leading-relaxed">{t.text}</p>
+                    <div className="flex items-center gap-2">
+                      <div className="flex">
+                        {Array.from({ length: t.rating }).map((_, j) => (
+                          <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                      <span className="text-sm font-medium text-muted-foreground">— {t.name}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Guarantee banner */}
       <section className="py-12 bg-gradient-to-r from-primary to-emerald-500">
         <div className="container px-4 mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
               <Shield className="w-8 h-8 text-white" />
             </div>
