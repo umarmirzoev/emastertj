@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import DashboardLayout from "./DashboardLayout";
+import MasterDashboardLayout from "./MasterDashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -372,7 +372,7 @@ export default function MasterDashboard() {
   );
 
   return (
-    <DashboardLayout title="Кабинет мастера" navItems={navItems}>
+    <MasterDashboardLayout title="Кабинет мастера" navItems={navItems} isAvailable={isAvailable} onToggleAvailability={() => setIsAvailable(!isAvailable)}>
       {/* Welcome Banner */}
       <Card className="mb-6 border-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent overflow-hidden relative">
         <CardContent className="p-6 flex items-center justify-between">
@@ -1091,6 +1091,6 @@ export default function MasterDashboard() {
           )}
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+    </MasterDashboardLayout>
   );
 }
