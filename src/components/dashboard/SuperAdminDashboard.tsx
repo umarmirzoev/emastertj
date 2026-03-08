@@ -49,7 +49,7 @@ const appStatusLabels: Record<string, string> = {
 
 const chartColors = ["#10b981", "#3b82f6", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#84cc16"];
 
-type Tab = "overview" | "analytics" | "orders" | "admins" | "users" | "masters" | "reviews" | "applications";
+type Tab = "overview" | "analytics" | "orders" | "admins" | "users" | "masters" | "reviews" | "applications" | "shop";
 
 export default function SuperAdminDashboard() {
   const { user } = useAuth();
