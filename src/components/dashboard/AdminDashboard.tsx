@@ -21,6 +21,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { PaymentStatusBadge } from "@/components/payment/PaymentComponents";
 
 const statusColors: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",

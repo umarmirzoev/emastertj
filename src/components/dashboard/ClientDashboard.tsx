@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ClipboardList, Plus, Star, Clock, User, XCircle, MapPin, Phone,
   CheckCircle, ChevronRight, Bell, MessageSquare, Loader2, Calendar, FileText,
+  CreditCard, DollarSign,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
@@ -19,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import ReviewModal from "./ReviewModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import OrderChat from "@/components/OrderChat";
+import { PaymentDialog, PaymentStatusBadge, PriceBreakdown, ReceiptDialog } from "@/components/payment/PaymentComponents";
 
 const allStatuses = [
   { key: "new", label: "Новый заказ", icon: ClipboardList, color: "bg-blue-500" },
@@ -55,7 +57,7 @@ const statusLabels: Record<string, string> = {
   cancelled: "Отменён",
 };
 
-type Tab = "orders" | "active" | "completed" | "profile" | "reviews" | "notifications" | "application";
+type Tab = "orders" | "active" | "completed" | "payments" | "profile" | "reviews" | "notifications" | "application";
 
 export default function ClientDashboard() {
   const { user, profile, refetchUserData, hasRole } = useAuth();
@@ -71,6 +73,8 @@ export default function ClientDashboard() {
   const [myApplication, setMyApplication] = useState<any>(null);
   const { notifications, unreadCount } = useNotifications(user?.id);
   const [chatOrderId, setChatOrderId] = useState<string | null>(null);
+  const [payOrder, setPayOrder] = useState<any>(null);
+  const [receiptOrder, setReceiptOrder] = useState<any>(null);
 
   // Profile editing
   const [editName, setEditName] = useState("");
@@ -179,8 +183,11 @@ export default function ClientDashboard() {
   const completedOrders = orders.filter(o => ["completed", "reviewed"].includes(o.status));
   const clientReviews = orders.filter(o => o.status === "reviewed");
 
+  const paidOrders = orders.filter(o => (o as any).payment_status === "paid");
+
   const navItems = [
     { path: "/dashboard", label: "Мои заказы", icon: ClipboardList, badge: activeOrders.length },
+    { path: "/dashboard/payments", label: "Оплата", icon: CreditCard },
     { path: "/dashboard/profile", label: "Профиль", icon: User },
     { path: "/dashboard/notifications", label: "Уведомления", icon: Bell, badge: unreadCount },
   ];
@@ -189,13 +196,14 @@ export default function ClientDashboard() {
     { label: "Всего", value: orders.length, icon: ClipboardList, gradient: "from-blue-500/10 to-sky-500/10", iconColor: "text-blue-600", iconBg: "bg-blue-500/10" },
     { label: "Активных", value: activeOrders.length, icon: Clock, gradient: "from-amber-500/10 to-yellow-500/10", iconColor: "text-amber-600", iconBg: "bg-amber-500/10" },
     { label: "Завершённых", value: completedOrders.length, icon: CheckCircle, gradient: "from-emerald-500/10 to-green-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
-    { label: "Отзывов", value: clientReviews.length, icon: Star, gradient: "from-orange-500/10 to-red-500/10", iconColor: "text-orange-600", iconBg: "bg-orange-500/10" },
+    { label: "Оплачено", value: paidOrders.length, icon: DollarSign, gradient: "from-emerald-500/10 to-teal-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ComponentType<{ className?: string }>; count?: number }[] = [
     { key: "orders", label: "Все заказы", icon: ClipboardList, count: orders.length },
     { key: "active", label: "Активные", icon: Clock, count: activeOrders.length },
     { key: "completed", label: "Завершённые", icon: CheckCircle, count: completedOrders.length },
+    { key: "payments", label: "Оплата", icon: CreditCard, count: paidOrders.length },
     ...(myApplication ? [{ key: "application" as Tab, label: "Заявка мастера", icon: FileText }] : []),
     { key: "profile", label: "Профиль", icon: User },
     { key: "notifications", label: "Уведомления", icon: Bell, count: unreadCount },
@@ -303,6 +311,51 @@ export default function ClientDashboard() {
             </Button>
           </CardContent>
         </Card>
+      ) : tab === "payments" ? (
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold mb-2">История оплат</h3>
+          {orders.filter(o => (o as any).payment_status && (o as any).payment_status !== "unpaid").length === 0 ? (
+            <Card><CardContent className="py-12 text-center"><CreditCard className="w-10 h-10 text-muted-foreground mx-auto mb-3" /><p className="text-muted-foreground">Нет оплат</p></CardContent></Card>
+          ) : orders.filter(o => (o as any).payment_status && (o as any).payment_status !== "unpaid").map(o => (
+            <Card key={o.id} className="hover:shadow-sm transition-shadow">
+              <CardContent className="p-4 flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm truncate">{(o as any).services?.name_ru || "Заказ"}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString("ru-RU")}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm">{((o as any).total_amount || o.budget || 0).toLocaleString()} сом.</span>
+                  <PaymentStatusBadge status={(o as any).payment_status} />
+                  {(o as any).payment_status === "paid" && (
+                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => setReceiptOrder(o)}>
+                      <FileText className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {/* Unpaid completed orders */}
+          {completedOrders.filter(o => !(o as any).payment_status || (o as any).payment_status === "unpaid").length > 0 && (
+            <>
+              <h3 className="text-base font-semibold mt-6 mb-2">Ожидает оплаты</h3>
+              {completedOrders.filter(o => !(o as any).payment_status || (o as any).payment_status === "unpaid").map(o => (
+                <Card key={o.id} className="border-amber-200 bg-amber-50/50">
+                  <CardContent className="p-4 flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm truncate">{(o as any).services?.name_ru || "Заказ"}</p>
+                      <p className="text-xs text-muted-foreground">{((o as any).total_amount || o.budget || 0).toLocaleString()} сомонӣ</p>
+                    </div>
+                    <Button size="sm" className="rounded-full gap-1.5" onClick={() => setPayOrder(o)}>
+                      <CreditCard className="w-3.5 h-3.5" /> Оплатить
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </>
+          )}
+        </div>
       ) : tab === "application" && myApplication ? (
         <Card>
           <CardContent className="py-8">
@@ -497,6 +550,37 @@ export default function ClientDashboard() {
                 <OrderTimeline order={selectedOrder} />
               </div>
 
+              {/* Payment section */}
+              {["completed", "reviewed"].includes(selectedOrder.status) && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold">Оплата</span>
+                    <PaymentStatusBadge status={(selectedOrder as any).payment_status || "unpaid"} />
+                  </div>
+                  {(selectedOrder as any).total_amount > 0 && (
+                    <PriceBreakdown
+                      servicePrice={(selectedOrder as any).service_price || (selectedOrder as any).total_amount || selectedOrder.budget}
+                      materialsCost={(selectedOrder as any).materials_cost || 0}
+                      urgencySurcharge={(selectedOrder as any).urgency_surcharge || 0}
+                      totalAmount={(selectedOrder as any).total_amount || selectedOrder.budget || 0}
+                      compact
+                    />
+                  )}
+                  <div className="flex gap-2">
+                    {(!(selectedOrder as any).payment_status || (selectedOrder as any).payment_status === "unpaid" || (selectedOrder as any).payment_status === "failed") && (
+                      <Button className="flex-1 rounded-xl gap-1.5" onClick={() => setPayOrder(selectedOrder)}>
+                        <CreditCard className="w-4 h-4" /> Оплатить сейчас
+                      </Button>
+                    )}
+                    {(selectedOrder as any).payment_status === "paid" && (
+                      <Button variant="outline" className="flex-1 rounded-xl gap-1.5" onClick={() => setReceiptOrder(selectedOrder)}>
+                        <FileText className="w-4 h-4" /> Скачать чек
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Chat button */}
               {selectedOrder.master_id && !["cancelled"].includes(selectedOrder.status) && (
                 <Button
@@ -534,6 +618,23 @@ export default function ClientDashboard() {
           onSubmitted={fetchOrders}
         />
       )}
+
+      {/* Payment dialog */}
+      <PaymentDialog
+        order={payOrder}
+        open={!!payOrder}
+        onOpenChange={(open) => { if (!open) setPayOrder(null); }}
+        onPaymentComplete={() => { setPayOrder(null); fetchOrders(); }}
+      />
+
+      {/* Receipt dialog */}
+      <ReceiptDialog
+        order={receiptOrder}
+        clientName={profile?.full_name}
+        masterName={masterInfo?.full_name}
+        open={!!receiptOrder}
+        onOpenChange={(open) => { if (!open) setReceiptOrder(null); }}
+      />
     </DashboardLayout>
   );
 }
