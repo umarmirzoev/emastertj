@@ -438,7 +438,7 @@ export default function ServiceDetail() {
                               </div>
                               <div className="space-y-1.5 text-xs text-muted-foreground mb-3">
                                 <div className="flex items-center gap-1.5">
-                                  <Clock className="w-3.5 h-3.5" /> {master.experience_years} лет опыта
+                                  <Clock className="w-3.5 h-3.5" /> {master.experience_years} сол таҷриба
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <MapPin className="w-3.5 h-3.5" />
