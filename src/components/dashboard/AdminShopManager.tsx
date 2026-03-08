@@ -85,6 +85,10 @@ export default function AdminShopManager() {
       in_stock: parseInt(stockQty) > 0,
       installation_price: installPrice ? parseFloat(installPrice) : null,
       is_approved: true, seller_type: "platform",
+      is_discounted: isDiscounted,
+      promotion_start: promoStart ? new Date(promoStart).toISOString() : null,
+      promotion_end: promoEnd ? new Date(promoEnd).toISOString() : null,
+      promotion_label: promoLabel || null,
     };
     let error;
     if (editing) {
