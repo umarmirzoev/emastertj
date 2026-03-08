@@ -226,12 +226,12 @@ export default function AdminDashboard() {
   const masterUsers = allUsers.filter(u => u.user_roles?.some((r: any) => r.role === "master"));
 
   const navItems = [
-    { path: "/dashboard", label: "Панель", icon: LayoutDashboard },
-    { path: "/dashboard/orders", label: "Заказы", icon: ClipboardList, badge: newOrders.length },
-    { path: "/dashboard/users", label: "Клиенты", icon: Users },
-    { path: "/dashboard/masters", label: "Мастера", icon: Wrench },
-    { path: "/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
-    { path: "/dashboard/reviews", label: "Отзывы", icon: StarIcon },
+    { path: "/admin/dashboard", label: "Панель", icon: LayoutDashboard },
+    { path: "/admin/dashboard/orders", label: "Заказы", icon: ClipboardList, badge: newOrders.length },
+    { path: "/admin/dashboard/users", label: "Клиенты", icon: Users },
+    { path: "/admin/dashboard/masters", label: "Мастера", icon: Wrench },
+    { path: "/admin/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
+    { path: "/admin/dashboard/reviews", label: "Отзывы", icon: StarIcon },
   ];
 
   const stats = [

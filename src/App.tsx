@@ -14,6 +14,9 @@ import Contacts from "./pages/Contacts";
 import BecomeMaster from "./pages/BecomeMaster";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import MasterDashboardPage from "./pages/MasterDashboardPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import SuperAdminDashboardPage from "./pages/SuperAdminDashboardPage";
 import NotFound from "./pages/NotFound";
 import PriceList from "./pages/PriceList";
 import MasterProfile from "./pages/MasterProfile";
@@ -59,6 +62,12 @@ const AnimatedRoutes = () => {
         <Route path="/pending-approval" element={<PageTransition><PendingApproval /></PageTransition>} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route path="/master-dashboard" element={<MasterDashboardPage />} />
+        <Route path="/master-dashboard/*" element={<MasterDashboardPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/admin/dashboard/*" element={<AdminDashboardPage />} />
+        <Route path="/super-admin/dashboard" element={<SuperAdminDashboardPage />} />
+        <Route path="/super-admin/dashboard/*" element={<SuperAdminDashboardPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>

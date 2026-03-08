@@ -14,6 +14,7 @@ interface AuthContextType {
   hasRole: (role: AppRole) => boolean;
   signOut: () => Promise<void>;
   refetchUserData: () => Promise<void>;
+  getDashboardPath: () => string;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,6 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   hasRole: () => false,
   signOut: async () => {},
   refetchUserData: async () => {},
+  getDashboardPath: () => "/dashboard",
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -80,8 +82,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) await fetchUserData(user.id);
   };
 
+  const getDashboardPath = () => {
+    if (roles.includes("super_admin")) return "/super-admin/dashboard";
+    if (roles.includes("admin")) return "/admin/dashboard";
+    if (roles.includes("master")) return "/master-dashboard";
+    return "/dashboard";
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, roles, profile, hasRole, signOut, refetchUserData }}>
+    <AuthContext.Provider value={{ user, session, loading, roles, profile, hasRole, signOut, refetchUserData, getDashboardPath }}>
       {children}
     </AuthContext.Provider>
   );

@@ -3,12 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import ClientDashboard from "@/components/dashboard/ClientDashboard";
-import MasterDashboard from "@/components/dashboard/MasterDashboard";
-import AdminDashboard from "@/components/dashboard/AdminDashboard";
-import SuperAdminDashboard from "@/components/dashboard/SuperAdminDashboard";
 
 const Dashboard = () => {
-  const { user, loading, hasRole } = useAuth();
+  const { user, loading, hasRole, getDashboardPath } = useAuth();
   const navigate = useNavigate();
   const [approvalStatus, setApprovalStatus] = useState<string | null>(null);
   const [checkingApproval, setCheckingApproval] = useState(true);
@@ -17,11 +14,27 @@ const Dashboard = () => {
     if (!loading && !user) navigate("/auth");
   }, [user, loading, navigate]);
 
+  // Redirect role-specific users to their dedicated routes
+  useEffect(() => {
+    if (loading || !user) return;
+    if (hasRole("super_admin")) {
+      navigate("/super-admin/dashboard", { replace: true });
+      return;
+    }
+    if (hasRole("admin")) {
+      navigate("/admin/dashboard", { replace: true });
+      return;
+    }
+    if (hasRole("master")) {
+      navigate("/master-dashboard", { replace: true });
+      return;
+    }
+  }, [user, loading, hasRole, navigate]);
+
   // Check approval status for masters
   useEffect(() => {
     const check = async () => {
       if (!user) return;
-      // Only check if user has master role
       if (hasRole("master")) {
         const { data } = await supabase.from("profiles").select("approval_status").eq("user_id", user.id).single();
         setApprovalStatus(data?.approval_status || "active");
@@ -49,9 +62,7 @@ const Dashboard = () => {
     return null;
   }
 
-  if (hasRole("super_admin")) return <SuperAdminDashboard />;
-  if (hasRole("admin")) return <AdminDashboard />;
-  if (hasRole("master")) return <MasterDashboard />;
+  // Only clients reach here
   return <ClientDashboard />;
 };
 

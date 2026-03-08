@@ -18,7 +18,7 @@ type RoleChoice = "client" | "master";
 
 const Auth = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, getDashboardPath } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [mode, setMode] = useState<AuthMode>("login");
@@ -31,7 +31,7 @@ const Auth = () => {
   const [newUserId, setNewUserId] = useState<string | null>(null);
 
   if (user && !loading && mode !== "master_details") {
-    setTimeout(() => navigate("/dashboard"), 0);
+    setTimeout(() => navigate(getDashboardPath()), 0);
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -57,20 +57,22 @@ const Auth = () => {
       return;
     }
     
-    console.log("[Auth] Login successful, user:", data.user?.id);
-    console.log("[Auth] Session created:", !!data.session);
-    
-    // Fetch roles to log
+    // Fetch roles for redirect
+    let dashPath = "/dashboard";
     if (data.user) {
       const { data: rolesData } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", data.user.id);
-      console.log("[Auth] User roles:", rolesData?.map(r => r.role));
+      const userRoles = rolesData?.map(r => r.role) || [];
+      console.log("[Auth] User roles:", userRoles);
+      if (userRoles.includes("super_admin")) dashPath = "/super-admin/dashboard";
+      else if (userRoles.includes("admin")) dashPath = "/admin/dashboard";
+      else if (userRoles.includes("master")) dashPath = "/master-dashboard";
     }
     
     setLoading(false);
-    navigate("/dashboard");
+    navigate(dashPath);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
