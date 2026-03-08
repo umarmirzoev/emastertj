@@ -36,7 +36,8 @@ export default function ShopCategory() {
     if (id) load();
   }, [id]);
 
-  const sorted = [...products].sort((a, b) => {
+  const filtered = discountOnly ? products.filter(p => p.is_discounted || p.old_price) : products;
+  const sorted = [...filtered].sort((a, b) => {
     if (sort === "price_asc") return a.price - b.price;
     if (sort === "price_desc") return b.price - a.price;
     if (sort === "rating") return (b.rating || 0) - (a.rating || 0);
