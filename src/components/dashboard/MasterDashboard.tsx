@@ -22,6 +22,7 @@ import OrderChat from "@/components/OrderChat";
 import { useToast } from "@/hooks/use-toast";
 import { PaymentStatusBadge } from "@/components/payment/PaymentComponents";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
+import MasterProducts from "./MasterProducts";
 import { useNotifications } from "@/hooks/useNotifications";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
