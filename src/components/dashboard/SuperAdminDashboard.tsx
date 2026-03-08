@@ -805,6 +805,8 @@ export default function SuperAdminDashboard() {
             </Card>
           ))}
         </div>
+      ) : tab === "shop" ? (
+        <AdminShopManager />
       ) : null}
 
       {/* Application detail dialog */}
