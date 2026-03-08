@@ -311,6 +311,51 @@ export default function ClientDashboard() {
             </Button>
           </CardContent>
         </Card>
+      ) : tab === "payments" ? (
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold mb-2">История оплат</h3>
+          {orders.filter(o => (o as any).payment_status && (o as any).payment_status !== "unpaid").length === 0 ? (
+            <Card><CardContent className="py-12 text-center"><CreditCard className="w-10 h-10 text-muted-foreground mx-auto mb-3" /><p className="text-muted-foreground">Нет оплат</p></CardContent></Card>
+          ) : orders.filter(o => (o as any).payment_status && (o as any).payment_status !== "unpaid").map(o => (
+            <Card key={o.id} className="hover:shadow-sm transition-shadow">
+              <CardContent className="p-4 flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm truncate">{(o as any).services?.name_ru || "Заказ"}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString("ru-RU")}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm">{((o as any).total_amount || o.budget || 0).toLocaleString()} сом.</span>
+                  <PaymentStatusBadge status={(o as any).payment_status} />
+                  {(o as any).payment_status === "paid" && (
+                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => setReceiptOrder(o)}>
+                      <FileText className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {/* Unpaid completed orders */}
+          {completedOrders.filter(o => !(o as any).payment_status || (o as any).payment_status === "unpaid").length > 0 && (
+            <>
+              <h3 className="text-base font-semibold mt-6 mb-2">Ожидает оплаты</h3>
+              {completedOrders.filter(o => !(o as any).payment_status || (o as any).payment_status === "unpaid").map(o => (
+                <Card key={o.id} className="border-amber-200 bg-amber-50/50">
+                  <CardContent className="p-4 flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm truncate">{(o as any).services?.name_ru || "Заказ"}</p>
+                      <p className="text-xs text-muted-foreground">{((o as any).total_amount || o.budget || 0).toLocaleString()} сомонӣ</p>
+                    </div>
+                    <Button size="sm" className="rounded-full gap-1.5" onClick={() => setPayOrder(o)}>
+                      <CreditCard className="w-3.5 h-3.5" /> Оплатить
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </>
+          )}
+        </div>
       ) : tab === "application" && myApplication ? (
         <Card>
           <CardContent className="py-8">
