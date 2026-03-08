@@ -17,6 +17,8 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import PriceList from "./pages/PriceList";
 import MasterProfile from "./pages/MasterProfile";
+import Masters from "./pages/Masters";
+import MasterDetail from "./pages/MasterDetail";
 import VerifyEmail from "./pages/VerifyEmail";
 import PendingApproval from "./pages/PendingApproval";
 
