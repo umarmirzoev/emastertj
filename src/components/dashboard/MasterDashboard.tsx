@@ -814,7 +814,7 @@ export default function MasterDashboard() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <PaymentStatusBadge status={(o as any).payment_status || "unpaid"} />
-                        <span className="font-bold text-emerald-600 text-sm">+{o.budget || 0} сом.</span>
+                        <span className="font-bold text-emerald-600 text-sm">+{o.budget || 0} сомонӣ</span>
                       </div>
                     </div>
                   ))}
