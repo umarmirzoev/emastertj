@@ -80,7 +80,7 @@ export default function Header() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => (
+            {navItems.map((item: any) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -90,7 +90,7 @@ export default function Header() {
                     : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 }`}
               >
-                {t(item.labelKey)}
+                {item.label || t(item.labelKey)}
               </Link>
             ))}
           </nav>
