@@ -738,11 +738,32 @@ export default function MasterDashboard() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{avgOrderValue.toLocaleString()}</p><p className="text-xs text-muted-foreground">Ср. чек (сом.)</p></CardContent></Card>
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{completedOrders.length}</p><p className="text-xs text-muted-foreground">Выполнено заказов</p></CardContent></Card>
-            <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{cancelledOrders.length}</p><p className="text-xs text-muted-foreground">Отменено</p></CardContent></Card>
+            <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-emerald-600">{completedOrders.filter(o => (o as any).payment_status === "paid").length}</p><p className="text-xs text-muted-foreground">Оплачено</p></CardContent></Card>
+            <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{Math.round(totalEarnings * 0.9).toLocaleString()}</p><p className="text-xs text-muted-foreground">Чистый доход</p></CardContent></Card>
           </div>
+
+          {/* Commission breakdown */}
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-4">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-lg font-bold text-foreground">{totalEarnings.toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">Валовый доход</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-amber-600">{Math.round(totalEarnings * 0.1).toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">Комиссия (10%)</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-emerald-600">{Math.round(totalEarnings * 0.9).toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">На руки</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Earnings chart */}
           {earningsChart.some(d => d.amount > 0) && (
