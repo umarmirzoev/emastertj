@@ -1091,6 +1091,6 @@ export default function MasterDashboard() {
           )}
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+    </MasterDashboardLayout>
   );
 }
