@@ -59,7 +59,7 @@ export default function CategoryDetail() {
     return item.name_ru;
   };
 
-  const priceLabel = language === "en" ? "som." : "сом.";
+  const priceLabel = language === "en" ? "somoni" : "сомонӣ";
 
   if (loading) {
     return (
