@@ -326,7 +326,7 @@ function MasterCard({ master, index }: { master: MasterListing; index: number })
                 <div>
                   <p className="text-xs text-muted-foreground">от</p>
                   <p className="text-lg font-bold text-foreground">
-                    {master.price_min} <span className="text-sm font-normal text-muted-foreground">сом.</span>
+                    {master.price_min} <span className="text-sm font-normal text-muted-foreground">сомонӣ</span>
                   </p>
                 </div>
                 <div className="flex gap-1.5">

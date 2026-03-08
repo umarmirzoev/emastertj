@@ -64,7 +64,7 @@ export function PriceBreakdown({ servicePrice, materialsCost, urgencySurcharge, 
         {items.map((item, i) => (
           <div key={i} className="flex justify-between text-muted-foreground">
             <span>{item.label}</span>
-            <span>{item.value.toLocaleString()} сом.</span>
+            <span>{item.value.toLocaleString()} сомонӣ</span>
           </div>
         ))}
         <Separator className="my-1" />
@@ -82,7 +82,7 @@ export function PriceBreakdown({ servicePrice, materialsCost, urgencySurcharge, 
         {items.map((item, i) => (
           <div key={i} className="flex justify-between text-sm">
             <span className="text-muted-foreground">{item.label}</span>
-            <span className="font-medium">{item.value.toLocaleString()} сом.</span>
+            <span className="font-medium">{item.value.toLocaleString()} сомонӣ</span>
           </div>
         ))}
         <Separator />
@@ -173,7 +173,7 @@ export function PaymentDialog({ order, open, onOpenChange, onPaymentComplete }: 
             supabase.from("notifications").insert({
               user_id: a.user_id,
               title: "Оплата заказа",
-              message: `Заказ #${order.id.slice(0, 8)} оплачен: ${total} сом.`,
+              message: `Заказ #${order.id.slice(0, 8)} оплачен: ${total} сомонӣ`,
               type: "payment_completed",
               related_id: order.id,
             })
@@ -289,7 +289,7 @@ export function PaymentDialog({ order, open, onOpenChange, onPaymentComplete }: 
               ) : method === "cash" ? (
                 <><Banknote className="w-5 h-5" /> Подтвердить (наличные)</>
               ) : (
-                <><CreditCard className="w-5 h-5" /> Оплатить {total.toLocaleString()} сом.</>
+                <><CreditCard className="w-5 h-5" /> Оплатить {total.toLocaleString()} сомонӣ</>
               )}
             </Button>
           </div>

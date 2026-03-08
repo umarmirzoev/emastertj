@@ -305,7 +305,7 @@ export default function SuperAdminDashboard() {
             <Card className="bg-gradient-to-br from-emerald-500 to-green-600 text-white">
               <CardContent className="p-5">
                 <DollarSign className="w-8 h-8 mb-2 opacity-80" />
-                <p className="text-3xl font-bold">{todayRevenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сом.</span></p>
+                <p className="text-3xl font-bold">{todayRevenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сомонӣ</span></p>
                 <p className="text-sm opacity-80">Доход сегодня</p>
                 <p className="text-xs opacity-60 mt-1">{todayOrders.length} заказов</p>
               </CardContent>
@@ -313,7 +313,7 @@ export default function SuperAdminDashboard() {
             <Card className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
               <CardContent className="p-5">
                 <TrendingUp className="w-8 h-8 mb-2 opacity-80" />
-                <p className="text-3xl font-bold">{weekRevenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сом.</span></p>
+                <p className="text-3xl font-bold">{weekRevenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сомонӣ</span></p>
                 <p className="text-sm opacity-80">Доход за неделю</p>
                 <p className="text-xs opacity-60 mt-1">{weekOrders.length} заказов</p>
               </CardContent>
@@ -321,7 +321,7 @@ export default function SuperAdminDashboard() {
             <Card className="bg-gradient-to-br from-violet-500 to-purple-600 text-white">
               <CardContent className="p-5">
                 <BarChart3 className="w-8 h-8 mb-2 opacity-80" />
-                <p className="text-3xl font-bold">{monthRevenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сом.</span></p>
+                <p className="text-3xl font-bold">{monthRevenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сомонӣ</span></p>
                 <p className="text-sm opacity-80">Доход за месяц</p>
                 <p className="text-xs opacity-60 mt-1">{monthOrders.length} заказов</p>
               </CardContent>
@@ -329,7 +329,7 @@ export default function SuperAdminDashboard() {
             <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white">
               <CardContent className="p-5">
                 <DollarSign className="w-8 h-8 mb-2 opacity-80" />
-                <p className="text-3xl font-bold">{revenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сом.</span></p>
+                <p className="text-3xl font-bold">{revenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сомонӣ</span></p>
                 <p className="text-sm opacity-80">Общий доход</p>
                 <p className="text-xs opacity-60 mt-1">{completedOrders.length} завершённых</p>
               </CardContent>
@@ -380,7 +380,7 @@ export default function SuperAdminDashboard() {
                     <XAxis dataKey="date" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }} />
-                    <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="#10b981" fillOpacity={0.15} name="Доход (сом.)" />
+                    <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="#10b981" fillOpacity={0.15} name="Доход (сомонӣ)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -437,28 +437,28 @@ export default function SuperAdminDashboard() {
             <Card className="border-emerald-200 dark:border-emerald-800">
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground mb-1">Доход сегодня</p>
-                <p className="text-2xl font-bold text-emerald-600">{todayRevenue.toLocaleString()} сом.</p>
+                <p className="text-2xl font-bold text-emerald-600">{todayRevenue.toLocaleString()} сомонӣ</p>
                 <p className="text-xs text-muted-foreground">{todayOrders.length} заказов</p>
               </CardContent>
             </Card>
             <Card className="border-blue-200 dark:border-blue-800">
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground mb-1">Доход за неделю</p>
-                <p className="text-2xl font-bold text-blue-600">{weekRevenue.toLocaleString()} сом.</p>
+                <p className="text-2xl font-bold text-blue-600">{weekRevenue.toLocaleString()} сомонӣ</p>
                 <p className="text-xs text-muted-foreground">{weekOrders.length} заказов</p>
               </CardContent>
             </Card>
             <Card className="border-violet-200 dark:border-violet-800">
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground mb-1">Доход за месяц</p>
-                <p className="text-2xl font-bold text-violet-600">{monthRevenue.toLocaleString()} сом.</p>
+                <p className="text-2xl font-bold text-violet-600">{monthRevenue.toLocaleString()} сомонӣ</p>
                 <p className="text-xs text-muted-foreground">{monthOrders.length} заказов</p>
               </CardContent>
             </Card>
             <Card className="border-amber-200 dark:border-amber-800">
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground mb-1">Общий доход</p>
-                <p className="text-2xl font-bold text-amber-600">{revenue.toLocaleString()} сом.</p>
+                <p className="text-2xl font-bold text-amber-600">{revenue.toLocaleString()} сомонӣ</p>
                 <p className="text-xs text-muted-foreground">{completedOrders.length} завершённых</p>
               </CardContent>
             </Card>

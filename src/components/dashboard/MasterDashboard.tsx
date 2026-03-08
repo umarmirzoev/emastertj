@@ -630,7 +630,7 @@ export default function MasterDashboard() {
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    {o.budget > 0 && <p className="font-bold text-emerald-600">{o.budget} сом.</p>}
+                    {o.budget > 0 && <p className="font-bold text-emerald-600">{o.budget} сомонӣ</p>}
                     <Badge className={`${statusColors[o.status]} text-[10px] mt-1`}>{statusLabels[o.status]}</Badge>
                   </div>
                 </div>
@@ -695,7 +695,7 @@ export default function MasterDashboard() {
               ) : completedOrders.filter(o => new Date(o.completed_at || o.created_at) >= today).map(o => (
                 <div key={o.id} className="flex items-center justify-between p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20">
                   <p className="text-sm font-medium">{o.services?.name_ru || "Заказ"}</p>
-                  {o.budget > 0 && <span className="font-bold text-emerald-600 text-sm">+{o.budget} сом.</span>}
+                  {o.budget > 0 && <span className="font-bold text-emerald-600 text-sm">+{o.budget} сомонӣ</span>}
                 </div>
               ))}
             </CardContent>
@@ -739,7 +739,7 @@ export default function MasterDashboard() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{avgOrderValue.toLocaleString()}</p><p className="text-xs text-muted-foreground">Ср. чек (сом.)</p></CardContent></Card>
+            <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{avgOrderValue.toLocaleString()}</p><p className="text-xs text-muted-foreground">Ср. чек (сомонӣ)</p></CardContent></Card>
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{completedOrders.length}</p><p className="text-xs text-muted-foreground">Выполнено заказов</p></CardContent></Card>
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-emerald-600">{completedOrders.filter(o => (o as any).payment_status === "paid").length}</p><p className="text-xs text-muted-foreground">Оплачено</p></CardContent></Card>
             <Card><CardContent className="p-4 text-center"><p className="text-2xl font-bold text-foreground">{Math.round(totalEarnings * 0.9).toLocaleString()}</p><p className="text-xs text-muted-foreground">Чистый доход</p></CardContent></Card>
@@ -791,7 +791,7 @@ export default function MasterDashboard() {
                 {earningsByCategory.map((c, i) => (
                   <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/50">
                     <span className="text-sm font-medium">{c.name}</span>
-                    <span className="font-bold text-primary text-sm">{c.value.toLocaleString()} сом.</span>
+                    <span className="font-bold text-primary text-sm">{c.value.toLocaleString()} сомонӣ</span>
                   </div>
                 ))}
               </CardContent>
@@ -814,7 +814,7 @@ export default function MasterDashboard() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <PaymentStatusBadge status={(o as any).payment_status || "unpaid"} />
-                        <span className="font-bold text-emerald-600 text-sm">+{o.budget || 0} сом.</span>
+                        <span className="font-bold text-emerald-600 text-sm">+{o.budget || 0} сомонӣ</span>
                       </div>
                     </div>
                   ))}
@@ -973,7 +973,7 @@ export default function MasterDashboard() {
                     <span>•</span>
                     <span>{completedOrders.length} заказов</span>
                     <span>•</span>
-                    <span>{totalEarnings.toLocaleString()} сом.</span>
+                    <span>{totalEarnings.toLocaleString()} сомонӣ</span>
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     <Switch checked={isAvailable} onCheckedChange={setIsAvailable} />
@@ -1044,11 +1044,11 @@ export default function MasterDashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Мин. цена (сом.)</label>
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Мин. цена (сомонӣ)</label>
                     <Input type="number" value={editPriceMin} onChange={e => setEditPriceMin(e.target.value)} className="h-11" />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Макс. цена (сом.)</label>
+                    <label className="text-sm font-medium text-muted-foreground mb-1 block">Макс. цена (сомонӣ)</label>
                     <Input type="number" value={editPriceMax} onChange={e => setEditPriceMax(e.target.value)} className="h-11" />
                   </div>
                 </div>
