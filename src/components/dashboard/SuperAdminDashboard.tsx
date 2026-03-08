@@ -156,8 +156,9 @@ export default function SuperAdminDashboard() {
       const dateStr = d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
       const dayOrders = orders.filter(o => new Date(o.created_at).toDateString() === d.toDateString());
       const dayCompleted = dayOrders.filter(o => o.status === "completed" || o.status === "reviewed");
-      const dayRev = dayCompleted.reduce((s, o) => s + (o.budget || 0), 0);
-      days.push({ date: dateStr, orders: dayOrders.length, completed: dayCompleted.length, revenue: dayRev });
+      const dayRev = dayCompleted.reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+      const dayCommission = dayCompleted.filter(o => (o as any).payment_status === "paid").reduce((s, o) => s + ((o as any).platform_commission || Math.round((o.total_amount || o.budget || 0) * COMMISSION_RATE)), 0);
+      days.push({ date: dateStr, orders: dayOrders.length, completed: dayCompleted.length, revenue: dayRev, commission: dayCommission });
     }
     return days;
   }, [orders]);
