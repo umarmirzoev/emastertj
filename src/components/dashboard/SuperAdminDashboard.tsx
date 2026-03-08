@@ -329,7 +329,7 @@ export default function SuperAdminDashboard() {
             <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white">
               <CardContent className="p-5">
                 <DollarSign className="w-8 h-8 mb-2 opacity-80" />
-                <p className="text-3xl font-bold">{revenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сом.</span></p>
+                <p className="text-3xl font-bold">{revenue.toLocaleString()} <span className="text-sm font-normal opacity-80">сомонӣ</span></p>
                 <p className="text-sm opacity-80">Общий доход</p>
                 <p className="text-xs opacity-60 mt-1">{completedOrders.length} завершённых</p>
               </CardContent>
