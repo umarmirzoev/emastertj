@@ -327,9 +327,9 @@ const Index = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {master.experience_years} лет</span>
+                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {master.experience_years} {language === "en" ? "yrs" : "сол"}</span>
                             <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {master.working_districts?.[0]}</span>
-                            <span className="ml-auto font-semibold text-foreground">от {master.price_min} сом.</span>
+                            <span className="ml-auto font-semibold text-foreground">аз {master.price_min} сом.</span>
                           </div>
                         </CardContent>
                       </Card>
