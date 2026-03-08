@@ -618,6 +618,23 @@ export default function ClientDashboard() {
           onSubmitted={fetchOrders}
         />
       )}
+
+      {/* Payment dialog */}
+      <PaymentDialog
+        order={payOrder}
+        open={!!payOrder}
+        onOpenChange={(open) => { if (!open) setPayOrder(null); }}
+        onPaymentComplete={() => { setPayOrder(null); fetchOrders(); }}
+      />
+
+      {/* Receipt dialog */}
+      <ReceiptDialog
+        order={receiptOrder}
+        clientName={profile?.full_name}
+        masterName={masterInfo?.full_name}
+        open={!!receiptOrder}
+        onOpenChange={(open) => { if (!open) setReceiptOrder(null); }}
+      />
     </DashboardLayout>
   );
 }
