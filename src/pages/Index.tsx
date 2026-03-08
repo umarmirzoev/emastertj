@@ -42,6 +42,7 @@ const Index = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedServiceName, setSelectedServiceName] = useState("");
+  const [quickBookOpen, setQuickBookOpen] = useState(false);
 
   // Popular masters
   const [popularMasters, setPopularMasters] = useState<PopularMaster[]>([]);
