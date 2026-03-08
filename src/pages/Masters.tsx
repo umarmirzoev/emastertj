@@ -52,7 +52,7 @@ export default function Masters() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [district, setDistrict] = useState("all");
-  const [sortBy, setSortBy] = useState("rating");
+  const [sortBy, setSortBy] = useState("ranking");
   const [minRating, setMinRating] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
 
