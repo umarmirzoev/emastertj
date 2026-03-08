@@ -453,10 +453,11 @@ export default function ServiceDetail() {
                                   </p>
                                 </div>
                                 <div className="flex gap-1.5">
-                                  <Button size="sm" variant="outline" className="rounded-full h-8 w-8 p-0"
-                                    onClick={() => window.open(`tel:${master.phone}`)}>
-                                    <Phone className="w-3.5 h-3.5" />
-                                  </Button>
+                                  <Link to={`/masters/${master.id}`}>
+                                    <Button size="sm" variant="outline" className="rounded-full h-8 px-3 text-xs">
+                                      Подробнее
+                                    </Button>
+                                  </Link>
                                   <Button size="sm" className="rounded-full h-8 px-3 text-xs"
                                     onClick={() => openBooking(master)}>
                                     Заказать
