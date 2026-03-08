@@ -96,6 +96,7 @@ export default function ProductDetail() {
   const [withInstall, setWithInstall] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const { addToCart } = useCart();
+  const { addProduct: addToRecentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
     const load = async () => {
