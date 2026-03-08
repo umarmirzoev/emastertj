@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -34,6 +35,10 @@ export default function AdminShopManager() {
   const [imageUrl, setImageUrl] = useState("");
   const [stockQty, setStockQty] = useState("100");
   const [installPrice, setInstallPrice] = useState("");
+  const [isDiscounted, setIsDiscounted] = useState(false);
+  const [promoStart, setPromoStart] = useState("");
+  const [promoEnd, setPromoEnd] = useState("");
+  const [promoLabel, setPromoLabel] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -53,6 +58,7 @@ export default function AdminShopManager() {
   const resetForm = () => {
     setName(""); setDesc(""); setPrice(""); setOldPrice("");
     setCatId(""); setImageUrl(""); setStockQty("100"); setInstallPrice("");
+    setIsDiscounted(false); setPromoStart(""); setPromoEnd(""); setPromoLabel("");
     setEditing(null);
   };
 
@@ -62,6 +68,10 @@ export default function AdminShopManager() {
     setOldPrice(p.old_price?.toString() || ""); setCatId(p.category_id);
     setImageUrl(p.image_url || ""); setStockQty((p.stock_qty || 0).toString());
     setInstallPrice(p.installation_price?.toString() || "");
+    setIsDiscounted(!!p.is_discounted);
+    setPromoStart(p.promotion_start ? p.promotion_start.slice(0, 16) : "");
+    setPromoEnd(p.promotion_end ? p.promotion_end.slice(0, 16) : "");
+    setPromoLabel(p.promotion_label || "");
     setShowForm(true);
   };
 
@@ -76,6 +86,10 @@ export default function AdminShopManager() {
       in_stock: parseInt(stockQty) > 0,
       installation_price: installPrice ? parseFloat(installPrice) : null,
       is_approved: true, seller_type: "platform",
+      is_discounted: isDiscounted,
+      promotion_start: promoStart ? new Date(promoStart).toISOString() : null,
+      promotion_end: promoEnd ? new Date(promoEnd).toISOString() : null,
+      promotion_label: promoLabel || null,
     };
     let error;
     if (editing) {
@@ -254,6 +268,29 @@ export default function AdminShopManager() {
             <div className="grid grid-cols-2 gap-3">
               <Input type="number" placeholder="Кол-во" value={stockQty} onChange={e => setStockQty(e.target.value)} />
               <Input type="number" placeholder="Цена установки" value={installPrice} onChange={e => setInstallPrice(e.target.value)} />
+            </div>
+
+            {/* Promotion section */}
+            <div className="border-t border-border pt-4 space-y-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox checked={isDiscounted} onCheckedChange={(v) => setIsDiscounted(!!v)} />
+                <span className="text-sm font-medium text-foreground">Товар со скидкой</span>
+              </label>
+              {isDiscounted && (
+                <>
+                  <Input placeholder="Название акции (напр. Летняя распродажа)" value={promoLabel} onChange={e => setPromoLabel(e.target.value)} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Начало акции</label>
+                      <Input type="datetime-local" value={promoStart} onChange={e => setPromoStart(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Конец акции</label>
+                      <Input type="datetime-local" value={promoEnd} onChange={e => setPromoEnd(e.target.value)} />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <DialogFooter>

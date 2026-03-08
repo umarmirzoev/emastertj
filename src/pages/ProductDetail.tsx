@@ -12,6 +12,7 @@ import { useCart } from "@/hooks/useCart";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import RecentlyViewedProducts from "@/components/shop/RecentlyViewedProducts";
 import RecommendedProducts from "@/components/shop/RecommendedProducts";
+import CountdownTimer from "@/components/shop/CountdownTimer";
 import { motion } from "framer-motion";
 import {
   ShoppingCart, Star, Package, Phone, Minus, Plus,
@@ -270,6 +271,10 @@ export default function ProductDetail() {
               <span className="text-3xl font-bold text-foreground">{product.price} {t("currencySomoni")}</span>
               {product.old_price && <span className="text-lg text-muted-foreground line-through">{product.old_price} с.</span>}
             </div>
+
+            {product.promotion_end && new Date(product.promotion_end) > new Date() && (
+              <CountdownTimer endDate={product.promotion_end} />
+            )}
 
             <div className="flex items-center gap-2 flex-wrap">
               {product.in_stock ? (

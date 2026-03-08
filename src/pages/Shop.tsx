@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import CountdownTimer from "@/components/shop/CountdownTimer";
 import Header from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,6 +49,7 @@ export default function Shop() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [popular, setPopular] = useState<any[]>([]);
   const [discounted, setDiscounted] = useState<any[]>([]);
+  const [hotDeals, setHotDeals] = useState<any[]>([]);
   const [recommended, setRecommended] = useState<any[]>([]);
   const [byCategory, setByCategory] = useState<Record<string, any[]>>({});
   const [installProduct, setInstallProduct] = useState<any>(null);
@@ -62,17 +64,19 @@ export default function Shop() {
 
   useEffect(() => {
     const load = async () => {
-      const [catsRes, popRes, discRes, recRes, allRes] = await Promise.all([
+      const [catsRes, popRes, discRes, recRes, allRes, hotRes] = await Promise.all([
         supabase.from("shop_categories").select("*").order("sort_order"),
         supabase.from("shop_products").select("*, shop_categories(name)").eq("is_popular", true).eq("is_approved", true).limit(12),
         supabase.from("shop_products").select("*, shop_categories(name)").eq("is_discounted", true).eq("is_approved", true).limit(8),
         supabase.from("shop_products").select("*, shop_categories(name)").eq("is_approved", true).gte("rating", 4.5).order("reviews_count", { ascending: false }).limit(8),
         supabase.from("shop_products").select("*, shop_categories(name)").eq("is_approved", true).order("created_at", { ascending: false }).limit(200),
+        supabase.from("shop_products").select("*, shop_categories(name)").eq("is_discounted", true).eq("is_approved", true).not("promotion_end", "is", null).gte("promotion_end", new Date().toISOString()).order("promotion_end").limit(6),
       ]);
       const cats = catsRes.data || [];
       setCategories(cats);
       setPopular(popRes.data || []);
       setDiscounted(discRes.data || []);
+      setHotDeals(hotRes.data || []);
       setRecommended(recRes.data || []);
       const all = allRes.data || [];
       setAllProducts(all);
@@ -311,7 +315,32 @@ export default function Shop() {
             </section>
           )}
 
-          {/* POPULAR */}
+          {/* HOT DEALS with countdown */}
+          {hotDeals.length > 0 && (
+            <section className="py-14">
+              <div className="container px-4 mx-auto">
+                <div className="mb-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2.5">
+                        <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">🔥</div>
+                        {t("shopHotDeals")}
+                      </h2>
+                      <p className="text-muted-foreground text-sm mt-1">{t("shopHotDealsDesc")}</p>
+                    </div>
+                    {hotDeals[0]?.promotion_end && (
+                      <CountdownTimer endDate={hotDeals[0].promotion_end} />
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {hotDeals.map(p => <ProductCard key={p.id} product={p} onAdd={addToCart} t={t} />)}
+                </div>
+              </div>
+            </section>
+          )}
+
+
           <section className="py-14">
             <div className="container px-4 mx-auto">
               <div className="mb-8">

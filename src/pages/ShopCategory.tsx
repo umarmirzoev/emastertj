@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCart } from "@/hooks/useCart";
 import RecentlyViewedProducts from "@/components/shop/RecentlyViewedProducts";
-import { ShoppingCart, Star, ArrowLeft, Package, Phone } from "lucide-react";
+import { ShoppingCart, Star, ArrowLeft, Package, Phone, Percent } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ShopCategory() {
   const { id } = useParams();
@@ -17,7 +18,9 @@ export default function ShopCategory() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState("popular");
+  const [discountOnly, setDiscountOnly] = useState(false);
   const { addToCart } = useCart();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const load = async () => {
@@ -33,7 +36,8 @@ export default function ShopCategory() {
     if (id) load();
   }, [id]);
 
-  const sorted = [...products].sort((a, b) => {
+  const filtered = discountOnly ? products.filter(p => p.is_discounted || p.old_price) : products;
+  const sorted = [...filtered].sort((a, b) => {
     if (sort === "price_asc") return a.price - b.price;
     if (sort === "price_desc") return b.price - a.price;
     if (sort === "rating") return (b.rating || 0) - (a.rating || 0);
@@ -52,17 +56,25 @@ export default function ShopCategory() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3 flex-wrap mb-4">
           <Select value={sort} onValueChange={setSort}>
             <SelectTrigger className="w-48 rounded-full"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="popular">По популярности</SelectItem>
-              <SelectItem value="price_asc">Цена ↑</SelectItem>
-              <SelectItem value="price_desc">Цена ↓</SelectItem>
-              <SelectItem value="rating">По рейтингу</SelectItem>
+              <SelectItem value="popular">{t("shopByPopularity")}</SelectItem>
+              <SelectItem value="price_asc">{t("shopPriceAsc")}</SelectItem>
+              <SelectItem value="price_desc">{t("shopPriceDesc")}</SelectItem>
+              <SelectItem value="rating">{t("shopByRating")}</SelectItem>
             </SelectContent>
           </Select>
-          <a href="tel:+992979117007" className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1">
+          <Button
+            variant={discountOnly ? "default" : "outline"}
+            size="sm"
+            className="rounded-full gap-1.5"
+            onClick={() => setDiscountOnly(!discountOnly)}
+          >
+            <Percent className="w-3.5 h-3.5" /> {t("shopDiscountOnly")}
+          </Button>
+          <a href="tel:+992979117007" className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1 ml-auto">
             <Phone className="w-3 h-3" /> +992 979 117 007
           </a>
         </div>
