@@ -229,7 +229,7 @@ export default function MasterDashboard() {
       const d = new Date(today.getTime() - i * 86400000);
       const dateStr = d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
       const dayCompleted = completedOrders.filter(o => new Date(o.completed_at || o.created_at).toDateString() === d.toDateString());
-      days.push({ date: dateStr, amount: dayCompleted.reduce((s, o) => s + (o.budget || 0), 0), orders: dayCompleted.length });
+      days.push({ date: dateStr, amount: dayCompleted.reduce((s, o) => s + getPayout(o), 0), orders: dayCompleted.length });
     }
     return days;
   }, [completedOrders]);
