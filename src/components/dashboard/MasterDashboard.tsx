@@ -755,16 +755,16 @@ export default function MasterDashboard() {
             <CardContent className="p-4">
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-lg font-bold text-foreground">{totalEarnings.toLocaleString()}</p>
-                  <p className="text-[11px] text-muted-foreground">Валовый доход</p>
+                  <p className="text-lg font-bold text-foreground">{totalGross.toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">Валовый доход (сомонӣ)</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-amber-600">{Math.round(totalEarnings * 0.1).toLocaleString()}</p>
-                  <p className="text-[11px] text-muted-foreground">Комиссия (10%)</p>
+                  <p className="text-lg font-bold text-amber-600">{totalCommission.toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">Комиссия (20%)</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-emerald-600">{Math.round(totalEarnings * 0.9).toLocaleString()}</p>
-                  <p className="text-[11px] text-muted-foreground">На руки</p>
+                  <p className="text-lg font-bold text-emerald-600">{totalEarnings.toLocaleString()}</p>
+                  <p className="text-[11px] text-muted-foreground">На руки (сомонӣ)</p>
                 </div>
               </div>
             </CardContent>
