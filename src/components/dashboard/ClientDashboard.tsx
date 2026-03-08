@@ -107,24 +107,41 @@ export default function ClientDashboard() {
 
   // Poll for role change after application approval — switch to master dashboard immediately
   useEffect(() => {
-    if (!myApplication || myApplication.status !== "pending") return;
+    // Poll if user has a pending application OR no application yet (to catch quick approvals)
+    if (myApplication && myApplication.status !== "pending") return;
+    
     const interval = setInterval(async () => {
       if (!user) return;
-      const { data } = await supabase
-        .from("master_applications")
-        .select("status")
-        .eq("user_id", user.id)
-        .eq("status", "approved")
-        .limit(1);
-      if (data && data.length > 0) {
+      // Check both: application approved AND master role granted
+      const [appRes, roleRes] = await Promise.all([
+        supabase
+          .from("master_applications")
+          .select("status")
+          .eq("user_id", user.id)
+          .eq("status", "approved")
+          .limit(1),
+        supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "master")
+          .limit(1),
+      ]);
+      
+      const isApproved = (appRes.data && appRes.data.length > 0) || (roleRes.data && roleRes.data.length > 0);
+      
+      if (isApproved) {
         await refetchUserData();
-        // Force navigation to dashboard which will now render MasterDashboard
-        navigate("/dashboard", { replace: true });
-        window.location.reload();
+        toast({ title: "🎉 Поздравляем!", description: "Ваша заявка одобрена! Переход в кабинет мастера..." });
+        // Small delay for toast visibility, then reload to switch layout
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+          window.location.reload();
+        }, 1500);
       }
-    }, 5000);
+    }, 4000);
     return () => clearInterval(interval);
-  }, [myApplication, user, refetchUserData, navigate]);
+  }, [myApplication, user, refetchUserData, navigate, toast]);
 
   useRealtimeOrders({ userId: user?.id, role: "client", onUpdate: fetchOrders });
 
