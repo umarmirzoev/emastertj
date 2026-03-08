@@ -297,17 +297,29 @@ function MasterCard({ master, index }: { master: MasterListing; index: number })
                   {initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-foreground text-base group-hover:text-primary transition-colors truncate">
-                    {master.full_name}
-                  </h3>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="font-bold text-foreground text-base group-hover:text-primary transition-colors truncate">
+                      {master.full_name}
+                    </h3>
+                    {master.is_top_master && (
+                      <Badge className="bg-amber-100 text-amber-800 gap-0.5 text-[10px] px-1.5 py-0 shrink-0">
+                        <Award className="w-3 h-3" /> Топ
+                      </Badge>
+                    )}
+                  </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                     <span className="text-sm font-semibold">{master.average_rating}</span>
                     <span className="text-xs text-muted-foreground">({master.total_reviews} отзывов)</span>
+                    {master.ranking_score > 0 && (
+                      <span className="text-[10px] text-muted-foreground/60 ml-1">#{Math.round(master.ranking_score)}</span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    {master.experience_years} лет опыта
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{master.experience_years} лет</span>
+                    {master.completed_orders > 0 && (
+                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" />{master.completed_orders} работ</span>
+                    )}
                   </div>
                 </div>
               </div>
