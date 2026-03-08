@@ -263,6 +263,43 @@ export default function ClientDashboard() {
             </Button>
           </CardContent>
         </Card>
+      ) : tab === "application" && myApplication ? (
+        <Card>
+          <CardContent className="py-8">
+            <div className="text-center">
+              {myApplication.status === "pending" && (
+                <>
+                  <Clock className="w-14 h-14 text-amber-500 mx-auto mb-4" />
+                  <Badge className="bg-amber-100 text-amber-800 mb-3">На рассмотрении</Badge>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Заявка на рассмотрении</h3>
+                  <p className="text-muted-foreground">Администратор рассматривает вашу заявку. Мы уведомим вас о результате.</p>
+                </>
+              )}
+              {myApplication.status === "approved" && (
+                <>
+                  <CheckCircle className="w-14 h-14 text-green-500 mx-auto mb-4" />
+                  <Badge className="bg-green-100 text-green-800 mb-3">Одобрена</Badge>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Заявка одобрена!</h3>
+                  <p className="text-muted-foreground mb-4">Вы можете работать как мастер. Перезайдите, чтобы увидеть панель мастера.</p>
+                </>
+              )}
+              {myApplication.status === "rejected" && (
+                <>
+                  <XCircle className="w-14 h-14 text-red-500 mx-auto mb-4" />
+                  <Badge className="bg-red-100 text-red-800 mb-3">Отклонена</Badge>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Заявка отклонена</h3>
+                  <p className="text-muted-foreground mb-4">К сожалению, ваша заявка была отклонена. Вы можете подать новую.</p>
+                  <Button onClick={() => navigate("/become-master")} className="rounded-full">Подать новую заявку</Button>
+                </>
+              )}
+              <div className="mt-6 text-xs text-muted-foreground space-y-1">
+                <p>Специализация: {myApplication.specialization}</p>
+                <p>Район: {myApplication.district}</p>
+                <p>Подана: {new Date(myApplication.created_at).toLocaleDateString("ru-RU")}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       ) : tab === "notifications" ? (
         <div className="space-y-2">
           {notifications.length === 0 ? (
