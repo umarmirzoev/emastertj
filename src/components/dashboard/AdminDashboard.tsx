@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import {
   LayoutDashboard, ClipboardList, Users, UserCheck, Wrench, Star as StarIcon,
   Search, DollarSign, CheckCircle, XCircle, TrendingUp, Eye, MapPin, Phone,
-  Calendar, ArrowRight, Filter, FileText, Mail, ShoppingCart,
+  Calendar, ArrowRight, Filter, FileText, Mail, ShoppingCart, BarChart3,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
@@ -23,6 +23,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PaymentStatusBadge } from "@/components/payment/PaymentComponents";
 import AdminShopManager from "./AdminShopManager";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, LineChart, Line,
+} from "recharts";
 
 const statusColors: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",
@@ -60,8 +64,9 @@ const appStatusLabels: Record<string, string> = {
 };
 
 const statusFlow = ["new", "accepted", "assigned", "on_the_way", "arrived", "in_progress", "completed", "cancelled"];
+const chartColors = ["#10b981", "#3b82f6", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#84cc16"];
 
-type Tab = "overview" | "orders" | "applications" | "users" | "masters" | "reviews" | "shop";
+type Tab = "overview" | "analytics" | "orders" | "applications" | "users" | "masters" | "reviews" | "shop";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -81,6 +86,7 @@ export default function AdminDashboard() {
   const [appStatusFilter, setAppStatusFilter] = useState("all");
   const [appSpecFilter, setAppSpecFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
+  const [userRoleFilter, setUserRoleFilter] = useState("all");
   const [confirmAction, setConfirmAction] = useState<{ type: string; id: string; userId: string; name: string } | null>(null);
 
   // Assign master dialog
@@ -165,35 +171,27 @@ export default function AdminDashboard() {
 
   const approveApplication = async (appId: string, userId: string) => {
     const app = applications.find(a => a.id === appId);
-    // Update application status
     await supabase.from("master_applications").update({ status: "approved" }).eq("id", appId);
-    // Add master role
     const { data: existingRole } = await supabase.from("user_roles").select("id").eq("user_id", userId).eq("role", "master");
     if (!existingRole || existingRole.length === 0) {
       await supabase.from("user_roles").insert({ user_id: userId, role: "master" as any });
     }
-    // Update profile with master data
     await supabase.from("profiles").update({
       approval_status: "approved",
       service_categories: app ? [app.specialization] : [],
       experience_years: app?.experience_years || 0,
       working_districts: app ? [app.district] : [],
     }).eq("user_id", userId);
-    // Create master_listings entry
     const { data: existingListing } = await supabase.from("master_listings").select("id").eq("user_id", userId).limit(1);
     if (!existingListing || existingListing.length === 0) {
       await supabase.from("master_listings").insert({
-        user_id: userId,
-        full_name: app?.full_name || "",
-        phone: app?.phone || "",
+        user_id: userId, full_name: app?.full_name || "", phone: app?.phone || "",
         service_categories: app ? [app.specialization] : [],
         working_districts: app ? [app.district] : [],
         experience_years: app?.experience_years || 0,
-        bio: app?.description || "",
-        is_active: true,
+        bio: app?.description || "", is_active: true,
       });
     }
-    // Notify user
     await supabase.from("notifications").insert({
       user_id: userId, title: "Заявка одобрена!",
       message: "Ваша заявка мастера одобрена. Теперь вы можете работать как мастер.",
@@ -241,18 +239,73 @@ export default function AdminDashboard() {
     });
   }, [applications, appStatusFilter, appSpecFilter, search, tab]);
 
+  // Filtered users with role filter
+  const filteredUsers = useMemo(() => {
+    return allUsers.filter(u => {
+      if (userRoleFilter !== "all") {
+        const hasMatchingRole = u.user_roles?.some((r: any) => r.role === userRoleFilter);
+        if (!hasMatchingRole) return false;
+      }
+      if (search && tab === "users") {
+        const q = search.toLowerCase();
+        if (!u.full_name?.toLowerCase().includes(q) && !u.phone?.includes(q) && !u.user_id?.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  }, [allUsers, userRoleFilter, search, tab]);
+
   const pendingApps = applications.filter(a => a.status === "pending");
   const newOrders = orders.filter(o => o.status === "new");
   const activeOrders = orders.filter(o => !["completed", "cancelled", "reviewed"].includes(o.status));
   const completedOrds = orders.filter(o => o.status === "completed" || o.status === "reviewed");
+  const cancelledOrders = orders.filter(o => o.status === "cancelled");
 
   const clientUsers = allUsers.filter(u => u.user_roles?.some((r: any) => r.role === "client"));
   const masterUsers = allUsers.filter(u => u.user_roles?.some((r: any) => r.role === "master"));
 
+  // Analytics calculations
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekAgo = new Date(today.getTime() - 7 * 86400000);
+  const monthAgo = new Date(today.getTime() - 30 * 86400000);
+
+  const COMMISSION_RATE = 0.2;
+  const revenue = completedOrds.reduce((s, o) => s + (o.total_amount || o.budget || 0), 0);
+  const todayOrders = orders.filter(o => new Date(o.created_at) >= today);
+  const weekOrders = orders.filter(o => new Date(o.created_at) >= weekAgo);
+
+  // Charts data
+  const ordersByDay = useMemo(() => {
+    const days: { date: string; orders: number; completed: number }[] = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today.getTime() - i * 86400000);
+      const dateStr = d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+      const dayOrders = orders.filter(o => new Date(o.created_at).toDateString() === d.toDateString());
+      const dayCompleted = dayOrders.filter(o => o.status === "completed" || o.status === "reviewed");
+      days.push({ date: dateStr, orders: dayOrders.length, completed: dayCompleted.length });
+    }
+    return days;
+  }, [orders]);
+
+  const statusDistribution = useMemo(() => {
+    const counts: Record<string, number> = {};
+    orders.forEach(o => { counts[o.status] = (counts[o.status] || 0) + 1; });
+    return Object.entries(counts).map(([status, count]) => ({ name: statusLabels[status] || status, value: count }));
+  }, [orders]);
+
+  const categoryDistribution = useMemo(() => {
+    const counts: Record<string, number> = {};
+    orders.forEach(o => {
+      const name = o.service_categories?.name_ru || "Другое";
+      counts[name] = (counts[name] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([name, value]) => ({ name, value }));
+  }, [orders]);
+
   const navItems = [
     { path: "/admin/dashboard", label: "Панель", icon: LayoutDashboard },
     { path: "/admin/dashboard/orders", label: "Заказы", icon: ClipboardList, badge: newOrders.length },
-    { path: "/admin/dashboard/users", label: "Клиенты", icon: Users },
+    { path: "/admin/dashboard/users", label: "Пользователи", icon: Users },
     { path: "/admin/dashboard/masters", label: "Мастера", icon: Wrench },
     { path: "/admin/dashboard/applications", label: "Заявки", icon: FileText, badge: pendingApps.length },
     { path: "/admin/dashboard/reviews", label: "Отзывы", icon: StarIcon },
@@ -260,19 +313,22 @@ export default function AdminDashboard() {
   ];
 
   const stats = [
+    { label: "Пользователей", value: allUsers.length, icon: Users, gradient: "from-blue-500/10 to-sky-500/10", iconColor: "text-blue-600", iconBg: "bg-blue-500/10" },
+    { label: "Клиентов", value: clientUsers.length, icon: Users, gradient: "from-violet-500/10 to-purple-500/10", iconColor: "text-violet-600", iconBg: "bg-violet-500/10" },
+    { label: "Мастеров", value: masters.length, icon: Wrench, gradient: "from-orange-500/10 to-red-500/10", iconColor: "text-orange-600", iconBg: "bg-orange-500/10" },
     { label: "Новых", value: newOrders.length, icon: ClipboardList, gradient: "from-blue-500/10 to-sky-500/10", iconColor: "text-blue-600", iconBg: "bg-blue-500/10" },
     { label: "Активных", value: activeOrders.length, icon: TrendingUp, gradient: "from-amber-500/10 to-yellow-500/10", iconColor: "text-amber-600", iconBg: "bg-amber-500/10" },
     { label: "Завершённых", value: completedOrds.length, icon: CheckCircle, gradient: "from-emerald-500/10 to-green-500/10", iconColor: "text-emerald-600", iconBg: "bg-emerald-500/10" },
-    { label: "Клиентов", value: clientUsers.length, icon: Users, gradient: "from-violet-500/10 to-purple-500/10", iconColor: "text-violet-600", iconBg: "bg-violet-500/10" },
-    { label: "Мастеров", value: masters.length, icon: Wrench, gradient: "from-orange-500/10 to-red-500/10", iconColor: "text-orange-600", iconBg: "bg-orange-500/10" },
-    { label: "Заявки", value: pendingApps.length, icon: FileText, gradient: "from-rose-500/10 to-pink-500/10", iconColor: "text-rose-600", iconBg: "bg-rose-500/10" },
+    { label: "Отменённых", value: cancelledOrders.length, icon: XCircle, gradient: "from-red-500/10 to-rose-500/10", iconColor: "text-red-600", iconBg: "bg-red-500/10" },
+    { label: "Заявки ожид.", value: pendingApps.length, icon: FileText, gradient: "from-rose-500/10 to-pink-500/10", iconColor: "text-rose-600", iconBg: "bg-rose-500/10" },
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ComponentType<{ className?: string }>; count?: number }[] = [
     { key: "overview", label: "Обзор", icon: LayoutDashboard },
+    { key: "analytics", label: "Аналитика", icon: BarChart3 },
     { key: "orders", label: "Заказы", icon: ClipboardList, count: orders.length },
     { key: "applications", label: "Заявки мастеров", icon: FileText, count: pendingApps.length },
-    { key: "users", label: "Клиенты", icon: Users },
+    { key: "users", label: "Пользователи", icon: Users, count: allUsers.length },
     { key: "masters", label: "Мастера", icon: Wrench },
     { key: "reviews", label: "Отзывы", icon: StarIcon },
     { key: "shop", label: "Магазин", icon: ShoppingCart },
@@ -283,6 +339,22 @@ export default function AdminDashboard() {
     return u?.full_name || "—";
   };
 
+  const getUserRole = (u: any) => {
+    const roles = u.user_roles?.map((r: any) => r.role) || [];
+    if (roles.includes("super_admin")) return "Суперадмин";
+    if (roles.includes("admin")) return "Админ";
+    if (roles.includes("master")) return "Мастер";
+    return "Клиент";
+  };
+
+  const getUserRoleBadgeClass = (u: any) => {
+    const roles = u.user_roles?.map((r: any) => r.role) || [];
+    if (roles.includes("super_admin")) return "bg-indigo-100 text-indigo-800";
+    if (roles.includes("admin")) return "bg-rose-100 text-rose-800";
+    if (roles.includes("master")) return "bg-orange-100 text-orange-800";
+    return "bg-blue-100 text-blue-800";
+  };
+
   // Unique specializations from applications for filter
   const specOptions = useMemo(() => {
     const specs = new Set(applications.map(a => a.specialization).filter(Boolean));
@@ -291,16 +363,42 @@ export default function AdminDashboard() {
 
   return (
     <DashboardLayout title="Админ панель" navItems={navItems}>
+      {/* Hero counters */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <Card className="bg-gradient-to-br from-blue-600 to-indigo-700 border-0 shadow-lg">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <p className="text-3xl font-extrabold text-white">{allUsers.length}</p>
+              <p className="text-sm text-white/80 font-medium">Всего пользователей</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-emerald-600 to-green-700 border-0 shadow-lg">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+              <ClipboardList className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <p className="text-3xl font-extrabold text-white">{orders.length}</p>
+              <p className="text-sm text-white/80 font-medium">Всего заказов</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
         {stats.map((s, i) => (
           <Card key={i} className={`bg-gradient-to-br ${s.gradient} border-0 shadow-sm`}>
-            <CardContent className="p-4">
-              <div className={`w-9 h-9 rounded-xl ${s.iconBg} flex items-center justify-center mb-2`}>
+            <CardContent className="p-3">
+              <div className={`w-8 h-8 rounded-lg ${s.iconBg} flex items-center justify-center mb-1.5`}>
                 <s.icon className={`w-4 h-4 ${s.iconColor}`} />
               </div>
-              <p className="text-xl font-bold text-foreground">{s.value}</p>
-              <p className="text-[11px] text-muted-foreground">{s.label}</p>
+              <p className="text-lg font-bold text-foreground">{s.value}</p>
+              <p className="text-[10px] text-muted-foreground">{s.label}</p>
             </CardContent>
           </Card>
         ))}
@@ -403,6 +501,117 @@ export default function AdminDashboard() {
               ))}
             </CardContent>
           </Card>
+
+          {/* Quick stats summary */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-primary" /> Заказы за 14 дней
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={ordersByDay}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="date" fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                  <Tooltip />
+                  <Bar dataKey="orders" fill="hsl(var(--primary))" name="Заказы" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="completed" fill="#10b981" name="Завершено" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+      ) : tab === "analytics" ? (
+        <div className="space-y-6">
+          {/* Revenue summary */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Card className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border-0">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Общий оборот</p>
+                <p className="text-xl font-bold text-foreground">{revenue.toLocaleString()} с.</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-blue-500/10 to-sky-500/10 border-0">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Заказов сегодня</p>
+                <p className="text-xl font-bold text-foreground">{todayOrders.length}</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border-0">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Заказов за неделю</p>
+                <p className="text-xl font-bold text-foreground">{weekOrders.length}</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-0">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-1">Отзывов</p>
+                <p className="text-xl font-bold text-foreground">{reviews.length}</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Orders chart */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Заказы за 14 дней</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={ordersByDay}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="date" fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                    <YAxis fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="orders" stroke="hsl(var(--primary))" strokeWidth={2} name="Все" />
+                    <Line type="monotone" dataKey="completed" stroke="#10b981" strokeWidth={2} name="Завершено" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Status distribution */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Статусы заказов</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {statusDistribution.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie data={statusDistribution} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                        {statusDistribution.map((_, i) => <Cell key={i} fill={chartColors[i % chartColors.length]} />)}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : <p className="text-center text-muted-foreground py-12">Нет данных</p>}
+              </CardContent>
+            </Card>
+
+            {/* Category distribution */}
+            <Card className="lg:col-span-2">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Популярность категорий</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {categoryDistribution.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={categoryDistribution} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis type="number" fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis type="category" dataKey="name" width={120} fontSize={11} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                      <Tooltip />
+                      <Bar dataKey="value" fill="hsl(var(--primary))" name="Заказов" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : <p className="text-center text-muted-foreground py-12">Нет данных</p>}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       ) : tab === "orders" ? (
         <>
@@ -519,7 +728,7 @@ export default function AdminDashboard() {
               {filteredApplications.map(app => (
                 <Card key={app.id} className="hover:shadow-md transition-all cursor-pointer" onClick={() => setDetailApp(app)}>
                   <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <p className="font-semibold text-foreground">{app.full_name || "—"}</p>
@@ -553,24 +762,42 @@ export default function AdminDashboard() {
         </>
       ) : tab === "users" ? (
         <>
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Поиск клиентов..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+          <div className="flex flex-wrap gap-3 mb-4">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input placeholder="Поиск по имени, телефону..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 h-10" />
+            </div>
+            <Select value={userRoleFilter} onValueChange={setUserRoleFilter}>
+              <SelectTrigger className="w-40 h-10"><SelectValue placeholder="Роль" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все роли</SelectItem>
+                <SelectItem value="client">Клиенты</SelectItem>
+                <SelectItem value="master">Мастера</SelectItem>
+                <SelectItem value="admin">Админы</SelectItem>
+                <SelectItem value="super_admin">Суперадмины</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+          <p className="text-xs text-muted-foreground mb-3">Показано: {filteredUsers.length} из {allUsers.length}</p>
           <div className="space-y-2">
-            {clientUsers.filter(u => !search || u.full_name?.toLowerCase().includes(search.toLowerCase()) || u.phone?.includes(search)).map(u => (
+            {filteredUsers.map(u => (
               <Card key={u.id}>
                 <CardContent className="p-4 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       <Users className="w-5 h-5 text-primary" />
                     </div>
-                    <div>
-                      <p className="font-medium text-foreground">{u.full_name || "—"}</p>
-                      <p className="text-sm text-muted-foreground">{u.phone || "—"}</p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-foreground truncate">{u.full_name || "—"}</p>
+                        <Badge className={`${getUserRoleBadgeClass(u)} text-[10px]`}>{getUserRole(u)}</Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                        {u.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {u.phone}</span>}
+                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(u.created_at).toLocaleDateString("ru-RU")}</span>
+                      </div>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString("ru-RU")}</p>
                 </CardContent>
               </Card>
             ))}
@@ -595,6 +822,7 @@ export default function AdminDashboard() {
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <StarIcon className="w-3 h-3 fill-yellow-400 text-yellow-400" /> {m.average_rating}
                         <span>• {m.phone}</span>
+                        <span>• {m.completed_orders || 0} работ</span>
                       </div>
                     </div>
                   </div>
